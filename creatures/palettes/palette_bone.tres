@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3]
+
+[ext_resource type="Script" path="res://core/creature_palette.gd" id="1_8ku4w"]
+
+[resource]
+script = ExtResource("1_8ku4w")
+id = &"bone"
+ramp = PackedColorArray(0.101960786, 0.078431375, 0.047058824, 1, 0.36078432, 0.2901961, 0.1882353, 1, 0.65882355, 0.5803922, 0.4392157, 1, 0.8784314, 0.83137256, 0.6901961, 1)

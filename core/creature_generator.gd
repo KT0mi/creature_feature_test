@@ -20,8 +20,13 @@ const MAX_ATTEMPTS := 20
 const MUTATION_FILL := 0.25
 ## During fusion: chance, per node, to regrow that subtree from scratch.
 const MUTATION_REGROW := 0.05
-## During fusion: chance, per color region, to take a random palette.
+## During fusion: chance to take a random body palette instead of a parent's.
 const MUTATION_PALETTE := 0.05
+## During fusion: chance to add, drop or repaint one pattern.
+const MUTATION_PATTERN := 0.1
+## Random generation: chance of having at least 1 pattern, and (if it has
+## one) of having a 2nd. Up to Genome.MAX_PATTERNS.
+const PATTERN_CHANCES: Array[float] = [0.5, 0.3]
 
 var rng := RandomNumberGenerator.new()
 ## The PartRegistry autoload (passed in so this class is easy to test).
@@ -47,8 +52,11 @@ func random_genome(p_seed: int) -> Genome:
 		g.root = grow(_weighted_pick(roots))
 		if fits(g.root):
 			break
-	for region in 3:
-		g.region_palettes[region] = _random_palette_id()
+	g.palette = _random_palette_id()
+	for chance in PATTERN_CHANCES:
+		if g.patterns.size() >= Genome.MAX_PATTERNS or rng.randf() >= chance:
+			break
+		_add_random_pattern(g)
 	return g
 
 
@@ -87,13 +95,57 @@ func fuse_genomes(a: Genome, b: Genome, p_seed: int) -> Genome:
 		mutate(g.root)
 		if fits(g.root):
 			break
-	# Colors: each region independently from one parent (or rarely random).
-	for region in 3:
-		if rng.randf() < MUTATION_PALETTE:
-			g.region_palettes[region] = _random_palette_id()
-		else:
-			g.region_palettes[region] = (a if rng.randf() < 0.5 else b).region_palettes[region]
+	# Body palette: from one parent (or rarely a random one).
+	if rng.randf() < MUTATION_PALETTE:
+		g.palette = _random_palette_id()
+	else:
+		g.palette = (a if rng.randf() < 0.5 else b).palette
+	_fuse_patterns(g, a, b)
 	return g
+
+
+## Patterns of a child: as many as one of the parents had, picked from the
+## patterns of BOTH parents (each keeps the palette it had on that parent).
+## Then a small chance of a pattern mutation.
+func _fuse_patterns(g: Genome, a: Genome, b: Genome) -> void:
+	# Pool of all parent patterns, one per name (A's version wins ties).
+	var pool: Array[Genome.PatternGene] = []
+	var names: Array[StringName] = []
+	for gene in a.patterns + b.patterns:
+		if not names.has(gene.name):
+			names.append(gene.name)
+			pool.append(gene)
+	var count := (a if rng.randf() < 0.5 else b).patterns.size()
+	while g.patterns.size() < count and not pool.is_empty():
+		var gene: Genome.PatternGene = pool.pop_at(rng.randi_range(0, pool.size() - 1))
+		g.patterns.append(gene.duplicate_gene())
+
+	if rng.randf() < MUTATION_PATTERN:
+		match rng.randi_range(0, 2):
+			0:  # gain a pattern
+				_add_random_pattern(g)
+			1:  # lose a pattern
+				if not g.patterns.is_empty():
+					g.patterns.remove_at(rng.randi_range(0, g.patterns.size() - 1))
+			2:  # repaint a pattern
+				if not g.patterns.is_empty():
+					var gene := g.patterns[rng.randi_range(0, g.patterns.size() - 1)]
+					gene.palette = _random_palette_id(g.palette)
+
+
+## Adds one random pattern the genome doesn't have yet, if possible.
+## Its palette avoids the body palette (same colors = invisible pattern).
+func _add_random_pattern(g: Genome) -> void:
+	if g.patterns.size() >= Genome.MAX_PATTERNS:
+		return
+	var free: Array[StringName] = []
+	for pattern_name in registry.pattern_names:
+		if not g.has_pattern(pattern_name):
+			free.append(pattern_name)
+	if free.is_empty():
+		return
+	var pattern_name := free[rng.randi_range(0, free.size() - 1)]
+	g.patterns.append(Genome.PatternGene.new(pattern_name, _random_palette_id(g.palette)))
 
 
 ## Tree crossover. `a` and `b` must be legal in the same socket (same type).
@@ -166,8 +218,14 @@ func _weighted_pick(options: Array) -> PartDef:
 	return options[-1]  # floating point safety net
 
 
-func _random_palette_id() -> StringName:
-	var ids: Array[StringName] = registry.palette_ids
+## Random palette id. `exclude` is skipped when there is any other choice.
+func _random_palette_id(exclude: StringName = &"") -> StringName:
+	var ids: Array[StringName] = []
+	for id in registry.palette_ids:
+		if id != exclude:
+			ids.append(id)
+	if ids.is_empty():
+		ids = registry.palette_ids  # only one palette exists: use it anyway
 	if ids.is_empty():
 		return &""
 	return ids[rng.randi_range(0, ids.size() - 1)]

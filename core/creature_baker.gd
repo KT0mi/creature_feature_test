@@ -4,13 +4,16 @@
 ##   1. collect()  walk the part tree -> flat list of placed parts per frame
 ##   2. measure()  bounding box over ALL frames (so every frame of the sheet
 ##                 shares the same canvas and the creature doesn't jitter)
-##   3. for each frame: sort by z, recolor each part, blend it onto the canvas
+##   3. for each frame: sort by z; for each part: recolor it with the body
+##      palette, lay its patterns on top (each with its own palette), then
+##      blend the result onto the canvas
 ##   4. outline pass on the finished frame (1px around the silhouette)
 ##   5. pack frames into one horizontal strip, cache by genome key
 ##
 ## The palette pass happens PER PART before blending (not on the finished
 ## image), because shade_shift is per subtree: a far-side arm must be darkened
-## but the torso pixels next to it must not.
+## but the torso pixels next to it must not. Patterns are also merged per part,
+## so an arm in front of the torso correctly covers the torso's stripes.
 class_name CreatureBaker
 extends RefCounted
 
@@ -113,12 +116,14 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 	var offset := -box.position + Vector2i.ONE * OUTLINE_PAD
 
 	var lookup := _build_key_lookup(key)
-	# Number of tones per region in the key, used to rescale tone indices.
-	var key_lens := PackedInt32Array()
-	for region in 3:
-		key_lens.append(key.get_ramp(region).size() if key else 0)
-	var ramps := _genome_ramps(genome, palettes)
-	var outline_color := _outline_color(genome, palettes)
+	var body: CreaturePalette = palettes.get(genome.palette)
+	if body == null:
+		push_warning("Genome palette '%s' not found; colors left as drawn." % genome.palette)
+	var outline_color: Color = body.outline() if body else Color.BLACK
+	# Resolve each pattern's palette once (null = draw the pattern unchanged).
+	var pattern_palettes: Array[CreaturePalette] = []
+	for gene in genome.patterns:
+		pattern_palettes.append(palettes.get(gene.palette))
 
 	var sheet := Image.create_empty(frame_size.x * frames, frame_size.y, false, Image.FORMAT_RGBA8)
 	for f in frames:
@@ -129,7 +134,12 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 		placed.sort_custom(func(a: Placed, b: Placed) -> bool:
 			return a.z < b.z or (a.z == b.z and a.order < b.order))
 		for p in placed:
-			var img := _recolor(p.part.get_frame_image(p.frame), lookup, key_lens, ramps, p.shade)
+			var img := _recolor(p.part.get_frame_image(p.frame), lookup, body, p.shade)
+			for i in genome.patterns.size():
+				var pattern := p.part.get_pattern_frame_image(genome.patterns[i].name, p.frame)
+				if pattern != null:
+					_overlay_pattern(img,
+						_recolor(pattern, lookup, pattern_palettes[i], p.shade))
 			canvas.blend_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), p.pos + offset)
 		_add_outline(canvas, outline_color)
 		sheet.blit_rect(canvas, Rect2i(Vector2i.ZERO, frame_size), Vector2i(f * frame_size.x, 0))
@@ -147,59 +157,51 @@ static func clear_cache() -> void:
 	_cache.clear()
 
 
-## Maps every key color (as RGBA32 int) to [region, tone].
+## Maps every key color (as RGBA32 int) to its tone index (0..3).
 static func _build_key_lookup(key: CreaturePalette) -> Dictionary:
 	var lookup := {}
 	if key == null:
 		return lookup
-	for region in 3:
-		var ramp := key.get_ramp(region)
-		for tone in ramp.size():
-			lookup[ramp[tone].to_rgba32()] = Vector2i(region, tone)
+	for tone in key.ramp.size():
+		lookup[key.ramp[tone].to_rgba32()] = tone
 	return lookup
 
 
-## The three ramps this genome uses, one per region.
-static func _genome_ramps(genome: Genome, palettes: Dictionary) -> Array[PackedColorArray]:
-	var out: Array[PackedColorArray] = []
-	for region in 3:
-		var pal: CreaturePalette = palettes.get(genome.region_palettes[region])
-		out.append(pal.get_ramp(region) if pal else PackedColorArray())
-	return out
-
-
-static func _outline_color(genome: Genome, palettes: Dictionary) -> Color:
-	var pal: CreaturePalette = palettes.get(genome.region_palettes[CreaturePalette.Region.PRIMARY])
-	return pal.outline if pal else Color.BLACK
-
-
 ## Returns a recolored copy of `src`.
-## Key-colored pixels -> genome ramp color (tone + shade, clamped to the ramp).
-## Other opaque pixels (fixed colors) are copied unchanged.
-## If a region's ramp is empty in the genome, its pixels are left unchanged.
-static func _recolor(src: Image, lookup: Dictionary, key_lens: PackedInt32Array,
-		ramps: Array[PackedColorArray], shade: int) -> Image:
+## Key-colored pixels -> palette.tone(key tone + shade).
+## Every other opaque pixel is an "organic" (teeth, eyes...) and is copied
+## unchanged. With a null palette the image is returned as drawn.
+static func _recolor(src: Image, lookup: Dictionary, palette: CreaturePalette,
+		shade: int) -> Image:
 	var img := src.duplicate() as Image
+	if palette == null:
+		return img
 	for y in img.get_height():
 		for x in img.get_width():
 			var c := img.get_pixel(x, y)
 			if c.a8 == 0:
 				continue
-			var hit = lookup.get(c.to_rgba32())
-			if hit == null:
-				continue  # fixed color (eyes, teeth...)
-			var ramp: PackedColorArray = ramps[hit.x]
-			if ramp.is_empty():
-				continue
-			# Map the key tone to the genome ramp. If the ramps have different
-			# lengths, scale the index so dark stays dark and light stays light.
-			var key_len: int = key_lens[hit.x]
-			var tone: int = hit.y
-			if key_len > 1 and ramp.size() != key_len:
-				tone = roundi(float(tone) * (ramp.size() - 1) / (key_len - 1))
-			tone = clampi(tone + shade, 0, ramp.size() - 1)
-			img.set_pixel(x, y, ramp[tone])
+			var tone = lookup.get(c.to_rgba32())
+			if tone == null:
+				continue  # organic color, never recolored
+			img.set_pixel(x, y, palette.tone(tone + shade))
 	return img
+
+
+## Copies the opaque pixels of `pattern` onto `part`, but ONLY where the part
+## itself is opaque. Patterns are the same size as their part, so this is a
+## pixel-for-pixel overlay, and a stray pattern pixel can never stick out of
+## the part's silhouette. Organic pixels of the part (teeth, eyes) are covered
+## too if the pattern paints over them, so leave those areas empty when
+## drawing patterns.
+static func _overlay_pattern(part: Image, pattern: Image) -> void:
+	for y in mini(part.get_height(), pattern.get_height()):
+		for x in mini(part.get_width(), pattern.get_width()):
+			if part.get_pixel(x, y).a8 == 0:
+				continue
+			var c := pattern.get_pixel(x, y)
+			if c.a8 != 0:
+				part.set_pixel(x, y, c)
 
 
 ## Paints `color` on every transparent pixel that touches an opaque one.

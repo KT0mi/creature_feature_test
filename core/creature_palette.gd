@@ -1,43 +1,46 @@
-## A set of color ramps, one per palette REGION.
+## A 4-tone color ramp, darkest to lightest.
 ##
-## Parts are drawn with a fixed set of "key" colors (see
-## res://creatures/palette_key.tres, which is itself a CreaturePalette).
-## When baking, every pixel whose color is in the key is replaced by the color
-## at the same region + tone in the creature's palette. Pixels whose color is
-## NOT in the key (eyes, teeth...) are left untouched: those are "fixed" colors.
+##   index 0  darkest: used for the generated OUTLINE and for hard shadows
+##   index 1  shadow
+##   index 2  base
+##   index 3  light
 ##
-## Ramps go from darkest (index 0) to lightest.
+## The same class is used for three things:
+##   * res://creatures/palette_key.tres: the 4 colors you DRAW parts and
+##     patterns with. They mark which tone each pixel is.
+##   * a creature's body palette: every key-colored pixel of every part is
+##     replaced by the same index in this ramp, and the outline uses index 0.
+##   * a pattern palette: same thing, but for the pixels of a pattern overlay.
+##
+## Any color that is NOT in the key is an "organic" (teeth, white of the eyes,
+## highlights) and is never recolored.
 class_name CreaturePalette
 extends Resource
 
-## Region indices. Every part says "this pixel is primary/secondary/accent"
-## through the key color it was drawn with; the GENOME decides the actual
-## colors, which is what makes different parts look like the same creature.
-enum Region { PRIMARY, SECONDARY, ACCENT }
+## Number of tones every palette must have.
+const TONES := 4
 
 ## Stable id, stored in genomes (never the file path).
 @export var id: StringName
 
-## Main body color ramp, dark -> light.
-@export var primary: PackedColorArray
-
-## Secondary color ramp (belly, stripes...), dark -> light.
-@export var secondary: PackedColorArray
-
-## Accent ramp (small details: horns, spots...), dark -> light.
-@export var accent: PackedColorArray
-
-## Color of the 1px outline generated around the finished creature.
-@export var outline: Color = Color.BLACK
+## The ramp, darkest (index 0) to lightest (index 3).
+@export var ramp: PackedColorArray = PackedColorArray([
+	Color.BLACK, Color(0.25, 0.25, 0.25), Color(0.5, 0.5, 0.5), Color(0.75, 0.75, 0.75)])
 
 
-## Returns the ramp for a Region.
-func get_ramp(region: int) -> PackedColorArray:
-	match region:
-		Region.PRIMARY:
-			return primary
-		Region.SECONDARY:
-			return secondary
-		Region.ACCENT:
-			return accent
-	return PackedColorArray()
+## Color for tone `index`, clamped into the ramp (so shade shifts that go
+## past the darkest/lightest tone just stay at the end).
+func tone(index: int) -> Color:
+	if ramp.is_empty():
+		return Color.MAGENTA  # loud "this palette is broken" color
+	return ramp[clampi(index, 0, ramp.size() - 1)]
+
+
+## Outline color = the darkest tone.
+func outline() -> Color:
+	return tone(0)
+
+
+## True if the ramp has exactly TONES colors.
+func is_valid() -> bool:
+	return ramp.size() == TONES
