@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://b2e6eb7mvvh3k"]
 
-[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_tvwu5"]
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_ao6mu"]
 
 [resource]
-script = ExtResource("1_tvwu5")
+script = ExtResource("1_ao6mu")
 id = &"´dusk"
-ramp = PackedColorArray(0.22658296, 0.22658296, 0.33890283, 1, 0.40584272, 0.45043758, 0.61138725, 1, 0.5766774, 0.65457314, 0.81352156, 1, 71.24272, 77.25032, 85.608734, 1)
+ramp = PackedColorArray(0.22658296, 0.22658296, 0.33890283, 1, 0.40584272, 0.45043758, 0.61138725, 1, 0.5766774, 0.65457314, 0.81352156, 1, 63.6837, 72.81823, 85.60656, 1)
 metadata/_custom_type_script = "uid://de7qplmr6rrvn"
