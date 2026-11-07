@@ -26,10 +26,6 @@ extends Resource
 ##Where children parts may be attached to this part.
 @export var sockets: Array[PartSocket] = []
 
-## Allowed socket combinations (see SocketLayout). Leave empty if every
-## socket can be rolled on its own with its `chance`.
-@export var layouts: Array[SocketLayout] = []
-
 ## Relative probability of being picked during random generation.
 @export var weight: float = 1.0
 
@@ -76,34 +72,6 @@ func get_pattern_frame_image(pattern_name: StringName, frame: int) -> Image:
 	if frames.is_empty():
 		return null
 	return frames[frame % frames.size()]
-
-
-## Names of the layout groups on this part, in the order they first appear
-## in `layouts` (a fixed order keeps generation deterministic).
-func get_layout_groups() -> Array[StringName]:
-	var out: Array[StringName] = []
-	for layout in layouts:
-		if not out.has(layout.group):
-			out.append(layout.group)
-	return out
-
-
-## All layouts of one group, in the order they are listed.
-func get_layouts(group: StringName) -> Array[SocketLayout]:
-	var out: Array[SocketLayout] = []
-	for layout in layouts:
-		if layout.group == group:
-			out.append(layout)
-	return out
-
-
-## The group that controls `socket_name`, or &"" if no layout names it
-## (then the socket is rolled with its own `chance`).
-func get_socket_group(socket_name: StringName) -> StringName:
-	for layout in layouts:
-		if layout.sockets.has(socket_name):
-			return layout.group
-	return &""
 
 
 ## Finds a socket by name, or null.

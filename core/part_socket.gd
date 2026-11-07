@@ -45,12 +45,24 @@ extends Resource
 ## Typical use: the far eye in a 3/4 view, as a mirror of the near eye.
 @export var flip_h: bool = false
 
-## If set, this socket does not pick its own part: it gets a copy of
-## whatever subtree is in the socket with this name (on the same part),
-## e.g. eye_far.copy_from = "eye_near" so both eyes are always the same eye.
-## The source socket must come BEFORE this one in the `sockets` list.
-## If the source is empty, this socket is filled normally instead.
+## Makes this socket a COPY of an earlier socket on the same part, e.g.
+## eye_far.copy_from = "eye_near". A copy socket never picks its own part:
+##   * filled exactly when the source is filled, with an identical subtree
+##     (so a pair of eyes is one decision and always matches);
+##   * empty when the source is empty.
+## Its `chance`, `requires` and `excludes` are ignored (the source decides).
+## Combine with flip_h for the mirrored far side.
 @export var copy_from: StringName = &""
+
+## Only rolled if ALL of these sockets (listed earlier on the same part) are
+## already filled. e.g. eye_2.requires = ["eye_1"]: a second pair of eyes
+## only appears on creatures that have the first pair.
+@export var requires: PackedStringArray
+
+## Never filled if ANY of these sockets (listed earlier on the same part) is
+## filled. e.g. eye_cyclops.excludes = ["eye_1"]: a single central eye only
+## on creatures without the normal pair.
+@export var excludes: PackedStringArray
 
 ## True if `part` is allowed to be plugged into this socket.
 func accepts(part: PartDef) -> bool:
@@ -63,6 +75,18 @@ func accepts(part: PartDef) -> bool:
 			return false
 	for t in forbidden_tags:
 		if part.tags.has(t):
+			return false
+	return true
+
+
+## True if `requires` and `excludes` allow this socket, given which sockets
+## of the same part are already filled (`filled`: socket name -> child).
+func conditions_met(filled: Dictionary) -> bool:
+	for socket_name in requires:
+		if not filled.has(StringName(socket_name)):
+			return false
+	for socket_name in excludes:
+		if filled.has(StringName(socket_name)):
 			return false
 	return true
 
