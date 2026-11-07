@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3]
+
+[ext_resource type="Script" path="res://core/creature_palette.gd" id="1_2qsjl"]
+
+[resource]
+script = ExtResource("1_2qsjl")
+id = &"key"
+primary = PackedColorArray(0.1254902, 0.1254902, 0.1254902, 1, 0.48235294, 0.4745098, 0.48235294, 1, 0.6745098, 0.6666667, 0.6745098, 1, 1, 1, 1, 1)

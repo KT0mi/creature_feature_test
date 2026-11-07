@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://core/part_def.gd" id="1_8cipw"]
+[ext_resource type="Texture2D" path="res://creatures/parts/head/head_template/head_template.png" id="2_potc5"]
+[ext_resource type="Script" path="res://core/part_socket.gd" id="3_gcbas"]
+
+[resource]
+script = ExtResource("1_8cipw")
+id = &"head_template"
+type = &"head"
+sheet = ExtResource("2_potc5")
+attach = Vector2i(12, 23)

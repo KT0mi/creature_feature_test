@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://core/part_def.gd" id="1_x6bg2"]
+[ext_resource type="Texture2D" path="res://creatures/parts/leg/leg_template/leg_template.png" id="2_rf6ty"]
+[ext_resource type="Script" path="res://core/part_socket.gd" id="3_h5njr"]
+
+[resource]
+script = ExtResource("1_x6bg2")
+id = &"leg_template"
+type = &"leg"
+sheet = ExtResource("2_rf6ty")
+attach = Vector2i(6, 1)

@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://core/part_def.gd" id="1_ecpjt"]
+[ext_resource type="Texture2D" path="res://creatures/parts/torso/torso_template/torso_template.png" id="2_oc4hl"]
+[ext_resource type="Script" path="res://core/part_socket.gd" id="3_m20ly"]
+
+[sub_resource type="Resource" id="Resource_pxgj6"]
+script = ExtResource("3_m20ly")
+name = &"head"
+accepts_type = &"head"
+positions = Array[Vector2i]([Vector2i(16, 4)])
+
+[sub_resource type="Resource" id="Resource_wqmma"]
+script = ExtResource("3_m20ly")
+name = &"arm_near"
+accepts_type = &"arm"
+positions = Array[Vector2i]([Vector2i(5, 16)])
+
+[sub_resource type="Resource" id="Resource_5d6oa"]
+script = ExtResource("3_m20ly")
+name = &"arm_far"
+accepts_type = &"arm"
+positions = Array[Vector2i]([Vector2i(29, 16)])
+z_offset = -1
+
+[sub_resource type="Resource" id="Resource_hoy0i"]
+script = ExtResource("3_m20ly")
+name = &"leg_near"
+accepts_type = &"leg"
+positions = Array[Vector2i]([Vector2i(10, 60)])
+
+[sub_resource type="Resource" id="Resource_g6st3"]
+script = ExtResource("3_m20ly")
+name = &"leg_far"
+accepts_type = &"leg"
+positions = Array[Vector2i]([Vector2i(23, 60)])
+z_offset = -1
+
+[resource]
+script = ExtResource("1_ecpjt")
+id = &"torso_template"
+type = &"torso"
+sheet = ExtResource("2_oc4hl")
+attach = Vector2i(16, 64)
+sockets = Array[ExtResource("3_m20ly")]([SubResource("Resource_pxgj6"), SubResource("Resource_wqmma"), SubResource("Resource_5d6oa"), SubResource("Resource_hoy0i"), SubResource("Resource_g6st3")])

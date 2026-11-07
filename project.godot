@@ -12,7 +12,12 @@ config_version=5
 
 config/name="creature_feature"
 config/features=PackedStringArray("4.6", "GL Compatibility")
+run/main_scene="res://debug/creature_lab.tscn"
 config/icon="res://icon.svg"
+
+[autoload]
+
+PartRegistry="*res://core/part_registry.gd"
 
 [display]
 

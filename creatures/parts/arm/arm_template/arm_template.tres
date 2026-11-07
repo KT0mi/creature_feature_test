@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://core/part_def.gd" id="1_wl8ye"]
+[ext_resource type="Texture2D" path="res://creatures/parts/arm/arm_template/arm_template.png" id="2_68y1v"]
+[ext_resource type="Script" path="res://core/part_socket.gd" id="3_d8tl3"]
+
+[resource]
+script = ExtResource("1_wl8ye")
+id = &"arm_template"
+type = &"arm"
+sheet = ExtResource("2_68y1v")
+attach = Vector2i(7, 2)
