@@ -22,6 +22,9 @@ const MUTATION_FILL := 0.25
 const MUTATION_REGROW := 0.05
 ## During fusion: chance to take a random body palette instead of a parent's.
 const MUTATION_PALETTE := 0.05
+## During fusion: chance, per layout group, to ignore the parents and
+## re-roll the layout (e.g. a two-eyed line suddenly gets a third eye).
+const MUTATION_LAYOUT := 0.05
 ## During fusion: chance to add, drop or repaint one pattern.
 const MUTATION_PATTERN := 0.1
 ## Random generation: chance of having at least 1 pattern, and (if it has
@@ -61,14 +64,22 @@ func random_genome(p_seed: int) -> Genome:
 
 
 ## Builds a random subtree starting with `part` (recursive).
+## Sockets controlled by a layout group are filled exactly as the picked
+## layout says; the others are rolled with their own `chance`.
 func grow(part: PartDef, depth: int = 0) -> PartNode:
 	var node := PartNode.new(part)
 	if depth >= MAX_DEPTH:
 		return node
+	var chosen := _pick_layouts(part)
 	for socket in part.sockets:
+		if part.get_socket_group(socket.name) != &"":
+			if not chosen.has(socket.name):
+				continue  # not in the picked layout
 		# Always roll, even when the socket can't be filled, so adding a new
 		# part type later changes as few existing seeds as possible.
-		if rng.randf() >= socket.chance:
+		elif rng.randf() >= socket.chance:
+			continue
+		if _copy_into(node, socket):
 			continue
 		var candidates: Array[PartDef] = registry.candidates_for(socket)
 		if candidates.is_empty():
@@ -157,7 +168,17 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 	var node := PartNode.new(a.part if rng.randf() < 0.5 else b.part)
 	if depth >= MAX_DEPTH:
 		return node
+	var chosen := _fuse_layouts(node.part, a, b)
 	for socket in node.part.sockets:
+		# A layout-controlled socket is filled if and only if its layout was
+		# chosen; `must_fill` makes sure it isn't left empty either.
+		var must_fill := false
+		if node.part.get_socket_group(socket.name) != &"":
+			if not chosen.has(socket.name):
+				continue
+			must_fill = true
+		if _copy_into(node, socket):
+			continue
 		var donors: Array[PartNode] = []
 		for parent in [a, b]:
 			# Iterate in the parent's socket order for determinism.
@@ -166,9 +187,10 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 				if child != null and socket.accepts(child.part):
 					donors.append(child)
 		if donors.is_empty():
-			# Neither parent has anything for this socket: occasionally grow
-			# something new (this is one way new traits appear).
-			if rng.randf() < socket.chance * MUTATION_FILL:
+			# Neither parent has anything for this socket: grow something new
+			# if the layout requires it, otherwise only occasionally (this is
+			# one way new traits appear).
+			if must_fill or rng.randf() < socket.chance * MUTATION_FILL:
 				var candidates: Array[PartDef] = registry.candidates_for(socket)
 				if not candidates.is_empty():
 					node.children[socket.name] = grow(_weighted_pick(candidates), depth + 1)
@@ -189,22 +211,29 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 
 ## Small random changes, in place: occasionally replaces a child subtree
 ## with a freshly grown one (any part legal in that socket).
+## Copy sockets (copy_from) aren't mutated themselves: they are re-copied
+## from their source at the end, so a mutated near eye stays matched by the
+## far eye.
 func mutate(node: PartNode, depth: int = 0) -> void:
 	for socket in node.part.sockets:
 		if not node.children.has(socket.name):
 			continue
+		if socket.copy_from != &"" and node.children.has(socket.copy_from):
+			continue  # handled by _refresh_copies below
 		if rng.randf() < MUTATION_REGROW:
 			var candidates: Array[PartDef] = registry.candidates_for(socket)
 			if not candidates.is_empty():
 				node.children[socket.name] = grow(_weighted_pick(candidates), depth + 1)
 				continue
 		mutate(node.children[socket.name], depth + 1)
+	_refresh_copies(node)
 
 
 # ------------------------------------------------------------------- helpers
 
-## Picks one PartDef with probability proportional to its weight.
-func _weighted_pick(options: Array) -> PartDef:
+## Picks one item from `options` with probability proportional to its
+## `weight` property. Works for PartDef and SocketLayout (both have one).
+func _weighted_pick(options: Array) -> Variant:
 	var total := 0.0
 	for p in options:
 		total += maxf(p.weight, 0.0)
@@ -216,6 +245,72 @@ func _weighted_pick(options: Array) -> PartDef:
 		if r < 0.0:
 			return p
 	return options[-1]  # floating point safety net
+
+
+## Picks one layout per group of `part` and returns the socket names to fill,
+## as a Dictionary used as a set (socket name -> true).
+func _pick_layouts(part: PartDef) -> Dictionary:
+	var chosen := {}
+	for group in part.get_layout_groups():
+		var layout: SocketLayout = _weighted_pick(part.get_layouts(group))
+		for socket_name in layout.sockets:
+			chosen[StringName(socket_name)] = true
+	return chosen
+
+
+## Like _pick_layouts, but for fusion: each group inherits the layout of a
+## parent that has the SAME part (so a two-eyed head stays two-eyed), unless
+## neither parent does or a MUTATION_LAYOUT roll says to re-roll.
+func _fuse_layouts(part: PartDef, a: PartNode, b: PartNode) -> Dictionary:
+	var chosen := {}
+	for group in part.get_layout_groups():
+		var options: Array[SocketLayout] = []
+		for parent in [a, b]:
+			if parent.part == part:
+				var parent_layout := _layout_of(parent, group)
+				if parent_layout != null:
+					options.append(parent_layout)
+		var layout: SocketLayout
+		if options.is_empty() or rng.randf() < MUTATION_LAYOUT:
+			layout = _weighted_pick(part.get_layouts(group))
+		else:
+			layout = options[rng.randi_range(0, options.size() - 1)]
+		for socket_name in layout.sockets:
+			chosen[StringName(socket_name)] = true
+	return chosen
+
+
+## The layout of `group` that matches which sockets `node` has filled, or
+## null (e.g. a socket stayed empty because no part fit it).
+func _layout_of(node: PartNode, group: StringName) -> SocketLayout:
+	var filled := PackedStringArray()
+	for socket in node.part.sockets:
+		if node.part.get_socket_group(socket.name) == group and node.children.has(socket.name):
+			filled.append(socket.name)
+	for layout in node.part.get_layouts(group):
+		if layout.matches(filled):
+			return layout
+	return null
+
+
+## If `socket` has copy_from and that source socket is already filled on
+## `node`, puts a copy of the source subtree in `socket` and returns true.
+## Returns false when the socket must be filled normally.
+func _copy_into(node: PartNode, socket: PartSocket) -> bool:
+	if socket.copy_from == &"" or not node.children.has(socket.copy_from):
+		return false
+	var source: PartNode = node.children[socket.copy_from]
+	if not socket.accepts(source.part):
+		return false  # the copy wouldn't be legal here; fill normally
+	node.children[socket.name] = source.duplicate_tree()
+	return true
+
+
+## Re-copies every filled copy socket of `node` from its source.
+func _refresh_copies(node: PartNode) -> void:
+	for socket in node.part.sockets:
+		if node.children.has(socket.name):
+			_copy_into(node, socket)
 
 
 ## Random palette id. `exclude` is skipped when there is any other choice.

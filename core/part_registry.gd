@@ -106,11 +106,52 @@ func _add_part(def: PartDef, path: String) -> void:
 	if def.sheet == null:
 		push_error("PartDef '%s' has no sheet: %s" % [def.id, path])
 		return
+	_validate_sockets(def, path)
 	parts[def.id] = def
 	_load_patterns(def, path.get_base_dir().path_join(PATTERNS_SUBDIR))
 	if not parts_by_type.has(def.type):
 		parts_by_type[def.type] = []
 	parts_by_type[def.type].append(def)
+
+
+## Startup checks for mistakes that would otherwise fail silently (a typo in
+## a socket name just means "never filled"). Only reports errors; the part
+## is still loaded so you can see the result in the lab.
+func _validate_sockets(def: PartDef, path: String) -> void:
+	var where := "Part '%s' (%s)" % [def.id, path]
+	var names: Array[StringName] = []
+	for socket in def.sockets:
+		if names.has(socket.name):
+			push_error("%s: two sockets are called '%s'." % [where, socket.name])
+		if socket.accepts_type.is_empty():
+			push_error("%s: socket '%s' accepts no type, it can never be filled."
+				% [where, socket.name])
+		# copy_from must name a socket listed EARLIER (it's filled first).
+		if socket.copy_from != &"" and not names.has(socket.copy_from):
+			push_error("%s: socket '%s' copies '%s', which must be an earlier socket."
+				% [where, socket.name, socket.copy_from])
+		names.append(socket.name)
+
+	var group_of := {}  # socket name -> group, to catch sockets in 2 groups
+	for layout in def.layouts:
+		if layout == null:
+			push_error("%s: empty entry in layouts." % where)
+			continue
+		for socket_name in layout.sockets:
+			var socket := def.get_socket(StringName(socket_name))
+			if socket == null:
+				push_error("%s: layout in group '%s' names unknown socket '%s'."
+					% [where, layout.group, socket_name])
+				continue
+			if group_of.get(socket_name, layout.group) != layout.group:
+				push_error("%s: socket '%s' is in groups '%s' and '%s'."
+					% [where, socket_name, group_of[socket_name], layout.group])
+			group_of[socket_name] = layout.group
+			# A copy without its source would be filled with a random part,
+			# so e.g. a "far eye only" layout would get a mismatched eye.
+			if socket.copy_from != &"" and not layout.sockets.has(socket.copy_from):
+				push_error("%s: a layout in group '%s' has '%s' but not its copy source '%s'."
+					% [where, layout.group, socket_name, socket.copy_from])
 
 
 ## Fills def.patterns from the PNGs in `dir` (file name = pattern name).

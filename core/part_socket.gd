@@ -10,7 +10,8 @@ extends Resource
 ## Used as the key in PartNode.children.
 @export var name: StringName
 
-## Only parts whose PartDef.type equals this can be plugged in here.
+## Only parts whose PartDef.type is one of these can be plugged in here
+## (e.g. ["eye"], or ["eye", "gem"] for a socket that takes either).
 @export var accepts_type: PackedStringArray
 
 ## The child part must have ALL of these tags (optional).
@@ -36,13 +37,27 @@ extends Resource
 ## -1 makes far-side limbs one tone darker. 0 = unchanged.
 @export var shade_shift: int = 0
 
+## Draw the part in this socket (and everything attached to it) mirrored
+## left-right. Pixel-perfect: it only reverses pixel columns. The part's
+## attach pixel and its own socket positions are mirrored too, so the child
+## still lands on `positions`. Flips accumulate: a flipped socket inside a
+## flipped subtree draws unflipped.
+## Typical use: the far eye in a 3/4 view, as a mirror of the near eye.
+@export var flip_h: bool = false
+
+## If set, this socket does not pick its own part: it gets a copy of
+## whatever subtree is in the socket with this name (on the same part),
+## e.g. eye_far.copy_from = "eye_near" so both eyes are always the same eye.
+## The source socket must come BEFORE this one in the `sockets` list.
+## If the source is empty, this socket is filled normally instead.
+@export var copy_from: StringName = &""
+
 ## True if `part` is allowed to be plugged into this socket.
 func accepts(part: PartDef) -> bool:
-	if part == null:
+	# The part's type must be ANY of the accepted types. (has() compares the
+	# StringName type with the Strings in the array by value.)
+	if part == null or not accepts_type.has(part.type):
 		return false
-	for t in accepts_type:
-		if not part.type == t:
-			return false
 	for t in required_tags:
 		if not part.tags.has(t):
 			return false
