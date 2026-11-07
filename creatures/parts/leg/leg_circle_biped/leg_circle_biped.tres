@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://dhneq7sbebcvy"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_dpc6l"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_08fbd"]
+[ext_resource type="Texture2D" uid="uid://cnh7dvdnu0xsf" path="res://creatures/parts/leg/leg_circle_biped/leg_circle_biped.png" id="2_cjs0n"]
+
+[resource]
+script = ExtResource("1_dpc6l")
+id = &"leg_circle_biped"
+type = &"leg"
+tags = PackedStringArray("bipedal")
+sheet = ExtResource("2_cjs0n")
+attach = Vector2i(6, 1)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

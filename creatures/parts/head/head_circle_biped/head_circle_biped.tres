@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://d1ja5gamp67v7"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_6gt1v"]
+[ext_resource type="Texture2D" uid="uid://dhng03k2ir5s1" path="res://creatures/parts/head/head_circle_biped/head_circle_biped.png" id="2_rsf8q"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_u0abf"]
+
+[resource]
+script = ExtResource("1_6gt1v")
+id = &"head_circle_biped"
+type = &"head"
+sheet = ExtResource("2_rsf8q")
+attach = Vector2i(12, 23)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

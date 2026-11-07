@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://clyi7jn4wv7ma"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_tvwu5"]
+
+[resource]
+script = ExtResource("1_tvwu5")
+id = &"vibrant_green"
+ramp = PackedColorArray(0.09411765, 0.18039216, 0.11764706, 1, 0.16862746, 0.45490196, 0.19215687, 1, 0.2627451, 0.7490196, 0.21176471, 1, 0.70975083, 0.86716837, 0.6893704, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"

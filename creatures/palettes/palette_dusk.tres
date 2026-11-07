@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://b2e6eb7mvvh3k"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_tvwu5"]
+
+[resource]
+script = ExtResource("1_tvwu5")
+id = &"´dusk"
+ramp = PackedColorArray(0.22658296, 0.22658296, 0.33890283, 1, 0.40584272, 0.45043758, 0.61138725, 1, 0.5766774, 0.65457314, 0.81352156, 1, 71.24272, 77.25032, 85.608734, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"
