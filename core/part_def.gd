@@ -73,7 +73,6 @@ func get_pattern_frame_image(pattern_name: StringName, frame: int) -> Image:
 		return null
 	return frames[frame % frames.size()]
 
-
 ## Finds a socket by name, or null.
 func get_socket(socket_name: StringName) -> PartSocket:
 	for s in sockets:

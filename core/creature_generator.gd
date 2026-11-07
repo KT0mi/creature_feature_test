@@ -61,13 +61,22 @@ func random_genome(p_seed: int) -> Genome:
 
 
 ## Builds a random subtree starting with `part` (recursive).
+## Sockets are filled top to bottom:
+##   * copy sockets mirror their source (filled only if the source is);
+##   * other sockets are skipped if their requires/excludes aren't met,
+##     otherwise rolled with their `chance`.
 func grow(part: PartDef, depth: int = 0) -> PartNode:
 	var node := PartNode.new(part)
 	if depth >= MAX_DEPTH:
 		return node
 	for socket in part.sockets:
-		# Always roll, even when the socket can't be filled, so adding a new
-		# part type later changes as few existing seeds as possible.
+		if socket.copy_from != &"":
+			_copy_into(node, socket)
+			continue
+		if not socket.conditions_met(node.children):
+			continue
+		# Roll even when no part fits the socket, so adding a new part type
+		# later changes as few existing seeds as possible.
 		if rng.randf() >= socket.chance:
 			continue
 		var candidates: Array[PartDef] = registry.candidates_for(socket)
@@ -158,6 +167,14 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 	if depth >= MAX_DEPTH:
 		return node
 	for socket in node.part.sockets:
+		# Same rules as grow(): copies follow their source, and a socket whose
+		# requires/excludes aren't met stays empty even if a parent could
+		# donate something. This keeps fused children within the rules.
+		if socket.copy_from != &"":
+			_copy_into(node, socket)
+			continue
+		if not socket.conditions_met(node.children):
+			continue
 		var donors: Array[PartNode] = []
 		for parent in [a, b]:
 			# Iterate in the parent's socket order for determinism.
@@ -189,21 +206,29 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 
 ## Small random changes, in place: occasionally replaces a child subtree
 ## with a freshly grown one (any part legal in that socket).
+## Only already-filled sockets are touched, so which sockets are filled (and
+## therefore requires/excludes) never changes here.
+## Copy sockets aren't mutated themselves: they are re-copied from their
+## source at the end, so a mutated near eye stays matched by the far eye.
 func mutate(node: PartNode, depth: int = 0) -> void:
 	for socket in node.part.sockets:
 		if not node.children.has(socket.name):
 			continue
+		if socket.copy_from != &"":
+			continue  # handled by _refresh_copies below
 		if rng.randf() < MUTATION_REGROW:
 			var candidates: Array[PartDef] = registry.candidates_for(socket)
 			if not candidates.is_empty():
 				node.children[socket.name] = grow(_weighted_pick(candidates), depth + 1)
 				continue
 		mutate(node.children[socket.name], depth + 1)
+	_refresh_copies(node)
 
 
 # ------------------------------------------------------------------- helpers
 
-## Picks one PartDef with probability proportional to its weight.
+## Picks one item from `options` with probability proportional to its
+## `weight` property.
 func _weighted_pick(options: Array) -> PartDef:
 	var total := 0.0
 	for p in options:
@@ -216,6 +241,25 @@ func _weighted_pick(options: Array) -> PartDef:
 		if r < 0.0:
 			return p
 	return options[-1]  # floating point safety net
+
+
+## Sets copy socket `socket` on `node` to match its source: a copy of the
+## source subtree if the source is filled (and the copy is legal in this
+## socket), otherwise empty. Never picks a part of its own.
+func _copy_into(node: PartNode, socket: PartSocket) -> void:
+	var source: PartNode = node.children.get(socket.copy_from)
+	if source != null and socket.accepts(source.part):
+		node.children[socket.name] = source.duplicate_tree()
+	else:
+		node.children.erase(socket.name)
+
+
+## Re-syncs every copy socket of `node` with its source (after mutation).
+## Socket order guarantees a source is final before its copies are made.
+func _refresh_copies(node: PartNode) -> void:
+	for socket in node.part.sockets:
+		if socket.copy_from != &"":
+			_copy_into(node, socket)
 
 
 ## Random palette id. `exclude` is skipped when there is any other choice.

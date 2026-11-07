@@ -106,11 +106,53 @@ func _add_part(def: PartDef, path: String) -> void:
 	if def.sheet == null:
 		push_error("PartDef '%s' has no sheet: %s" % [def.id, path])
 		return
+	_validate_sockets(def, path)
 	parts[def.id] = def
 	_load_patterns(def, path.get_base_dir().path_join(PATTERNS_SUBDIR))
 	if not parts_by_type.has(def.type):
 		parts_by_type[def.type] = []
 	parts_by_type[def.type].append(def)
+
+
+## Startup checks for mistakes that would otherwise fail silently (a typo in
+## a socket name just means "never filled"). Only reports errors; the part
+## is still loaded so you can see the result in the lab.
+func _validate_sockets(def: PartDef, path: String) -> void:
+	var where := "Part '%s' (%s)" % [def.id, path]
+	# Names of the sockets seen so far: rules may only point at these,
+	# because sockets are filled top to bottom.
+	var earlier: Array[StringName] = []
+	for socket in def.sockets:
+		if socket == null:
+			push_error("%s: empty entry in sockets." % where)
+			continue
+		var socket_name := socket.name
+		if earlier.has(socket_name):
+			push_error("%s: two sockets are called '%s' (copy-pasted socket? use Make Unique)."
+				% [where, socket_name])
+		if socket.accepts_type.is_empty():
+			push_error("%s: socket '%s' accepts no type, it can never be filled." % [where, socket_name])
+
+		if socket.copy_from != &"":
+			if not earlier.has(socket.copy_from):
+				push_error("%s: socket '%s' copies '%s', which must be a socket listed above it."
+					% [where, socket_name, socket.copy_from])
+			if not socket.requires.is_empty() or not socket.excludes.is_empty():
+				push_warning("%s: socket '%s' is a copy; its requires/excludes are ignored."
+					% [where, socket_name])
+
+		for other in socket.requires:
+			if not earlier.has(StringName(other)):
+				push_error("%s: socket '%s' requires '%s', which must be a socket listed above it."
+					% [where, socket_name, other])
+		for other in socket.excludes:
+			if not earlier.has(StringName(other)):
+				push_error("%s: socket '%s' excludes '%s', which must be a socket listed above it."
+					% [where, socket_name, other])
+			if socket.requires.has(other):
+				push_error("%s: socket '%s' both requires and excludes '%s', it can never be filled."
+					% [where, socket_name, other])
+		earlier.append(socket_name)
 
 
 ## Fills def.patterns from the PNGs in `dir` (file name = pattern name).

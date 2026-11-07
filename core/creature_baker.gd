@@ -46,7 +46,7 @@ class Placed:
 	var z: int            # accumulated z (parent z + socket z_offset)
 	var shade: int        # accumulated shade_shift
 	var order: int        # tree walk order, breaks ties between equal z
-
+	var flip: bool
 
 ## Number of frames a creature animation has: the longest part animation.
 ## Shorter parts loop (frame % their frame_count).
@@ -61,11 +61,16 @@ static func frame_count_of(root: PartNode) -> int:
 ## `frame`. `anchor` is where THIS node's attach pixel goes.
 ##   child anchor = parent anchor - parent attach + socket position
 ## i.e. the socket position is in the parent's own pixel coordinates.
+## `flip` = this node is drawn mirrored.
 static func collect(node: PartNode, anchor: Vector2i, z: int, shade: int,
-		frame: int, out: Array[Placed]) -> void:
+		flip: bool, frame: int, out: Array[Placed]) -> void:
 	var def := node.part
 	var local_frame := frame % def.frame_count
-	var top_left := anchor - def.attach
+	var width := def.get_frame_size().x
+	var attach := def.attach
+	if flip:
+		attach.x = width - 1 - attach.x
+	var top_left := anchor - attach
 
 	var p := Placed.new()
 	p.part = def
@@ -74,14 +79,21 @@ static func collect(node: PartNode, anchor: Vector2i, z: int, shade: int,
 	p.z = z
 	p.shade = shade
 	p.order = out.size()
+	p.flip = flip
 	out.append(p)
 
 	# Iterate in socket order (not dictionary order) so the result is stable.
 	for socket in def.sockets:
 		if not node.children.has(socket.name):
 			continue
-		collect(node.children[socket.name], top_left + socket.position_at(local_frame),
-			z + socket.z_offset, shade + socket.shade_shift, frame, out)
+		var socket_pos := socket.position_at(local_frame)
+		if flip:
+			socket_pos.x = width - 1 - socket_pos.x
+		# `flip != socket.flip_h`: a flip inside a flip cancels out.
+		collect(node.children[socket.name], top_left + socket_pos,
+			z + socket.z_offset, shade + socket.shade_shift,
+			flip != socket.flip_h, frame, out)
+
 
 
 ## Bounding box (creature space) of the creature over all its frames,
@@ -93,7 +105,7 @@ static func measure(root: PartNode) -> Rect2i:
 	var first := true
 	for f in frame_count_of(root):
 		var placed: Array[Placed] = []
-		collect(root, Vector2i.ZERO, 0, 0, f, placed)
+		collect(root, Vector2i.ZERO, 0, 0, false, f, placed)
 		for p in placed:
 			var r := Rect2i(p.pos, p.part.get_frame_size())
 			box = r if first else box.merge(r)
@@ -129,7 +141,7 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 	for f in frames:
 		var canvas := Image.create_empty(frame_size.x, frame_size.y, false, Image.FORMAT_RGBA8)
 		var placed: Array[Placed] = []
-		collect(root, Vector2i.ZERO, 0, 0, f, placed)
+		collect(root, Vector2i.ZERO, 0, 0, false, f, placed)
 		# Godot's sort isn't stable, so ties on z are broken by walk order.
 		placed.sort_custom(func(a: Placed, b: Placed) -> bool:
 			return a.z < b.z or (a.z == b.z and a.order < b.order))
@@ -140,6 +152,10 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 				if pattern != null:
 					_overlay_pattern(img,
 						_recolor(pattern, lookup, pattern_palettes[i], p.shade))
+			# Mirror AFTER the patterns are laid on, so part and pattern
+			# (drawn 1:1 in the same orientation) flip together.
+			if p.flip:
+				img.flip_x()
 			canvas.blend_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), p.pos + offset)
 		_add_outline(canvas, outline_color)
 		sheet.blit_rect(canvas, Rect2i(Vector2i.ZERO, frame_size), Vector2i(f * frame_size.x, 0))

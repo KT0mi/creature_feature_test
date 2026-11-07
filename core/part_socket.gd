@@ -36,13 +36,35 @@ extends Resource
 ## -1 makes far-side limbs one tone darker. 0 = unchanged.
 @export var shade_shift: int = 0
 
+## Draw the part in this socket (and everything attached to it) mirrored.
+@export var flip_h := false
+
+@export_group("Conditionals")
+
+## Makes this socket a COPY of an earlier socket on the same part, e.g.
+## eye_far.copy_from = "eye_near". A copy socket never picks its own part:
+##   * filled exactly when the source is filled, with an identical subtree
+##     (so a pair of eyes is one decision and always matches);
+##   * empty when the source is empty.
+## Its `chance`, `requires` and `excludes` are ignored (the source decides).
+## Combine with flip_h for the mirrored far side.
+@export var copy_from: StringName = &""
+
+## Only rolled if ALL of these sockets (listed earlier on the same part) are
+## already filled. e.g. eye_2.requires = ["eye_1"]: a second pair of eyes
+## only appears on creatures that have the first pair.
+@export var requires: PackedStringArray
+
+## Never filled if ANY of these sockets (listed earlier on the same part) is
+## filled. e.g. eye_cyclops.excludes = ["eye_1"]: a single central eye only
+## on creatures without the normal pair.
+@export var excludes: PackedStringArray
+
+
 ## True if `part` is allowed to be plugged into this socket.
 func accepts(part: PartDef) -> bool:
-	if part == null:
+	if part == null or not accepts_type.has(part.type):
 		return false
-	for t in accepts_type:
-		if not part.type == t:
-			return false
 	for t in required_tags:
 		if not part.tags.has(t):
 			return false
@@ -51,6 +73,16 @@ func accepts(part: PartDef) -> bool:
 			return false
 	return true
 
+## True if `requires` and `excludes` allow this socket, given which sockets
+## of the same part are already filled (`filled`: socket name -> child).
+func conditions_met(filled: Dictionary) -> bool:
+	for socket_name in requires:
+		if not filled.has(StringName(socket_name)):
+			return false
+	for socket_name in excludes:
+		if filled.has(StringName(socket_name)):
+			return false
+	return true
 
 ## Socket position for the given parent frame (falls back to the last entry).
 func position_at(frame: int) -> Vector2i:
