@@ -246,12 +246,38 @@ func _weighted_pick(options: Array) -> PartDef:
 ## Sets copy socket `socket` on `node` to match its source: a copy of the
 ## source subtree if the source is filled (and the copy is legal in this
 ## socket), otherwise empty. Never picks a part of its own.
+## With use_counterpart the copy is made of each part's counterpart instead.
 func _copy_into(node: PartNode, socket: PartSocket) -> void:
 	var source: PartNode = node.children.get(socket.copy_from)
-	if source != null and socket.accepts(source.part):
-		node.children[socket.name] = source.duplicate_tree()
+	var copy: PartNode = null
+	if source != null:
+		copy = _counterpart_tree(source) if socket.use_counterpart else source.duplicate_tree()
+	if copy != null and socket.accepts(copy.part):
+		node.children[socket.name] = copy
 	else:
 		node.children.erase(socket.name)
+
+
+## Copy of `node`'s subtree where every part that has a counterpart is
+## replaced by it (near ear -> far ear, and e.g. a near earring on it ->
+## far earring). Children keep their socket names; a child is dropped if
+## the counterpart part has no socket with that name or the socket doesn't
+## accept it.
+func _counterpart_tree(node: PartNode) -> PartNode:
+	var def := node.part
+	if def.counterpart != &"":
+		var other: PartDef = registry.get_part(def.counterpart)
+		if other != null:
+			def = other
+	var copy := PartNode.new(def)
+	for socket_name in node.children:
+		var socket := def.get_socket(socket_name)
+		if socket == null:
+			continue
+		var child := _counterpart_tree(node.children[socket_name])
+		if socket.accepts(child.part):
+			copy.children[socket_name] = child
+	return copy
 
 
 ## Re-syncs every copy socket of `node` with its source (after mutation).

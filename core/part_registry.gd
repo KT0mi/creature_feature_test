@@ -72,6 +72,10 @@ func reload() -> void:
 	for t in parts_by_type:
 		parts_by_type[t].sort_custom(func(a, b): return String(a.id) < String(b.id))
 
+	# Counterparts can only be checked once every part is loaded.
+	for def in parts.values():
+		_validate_counterpart(def)
+
 	print("PartRegistry: %d parts, %d palettes, patterns: %s."
 		% [parts.size(), palettes.size(), pattern_names])
 
@@ -141,6 +145,10 @@ func _validate_sockets(def: PartDef, path: String) -> void:
 				push_warning("%s: socket '%s' is a copy; its requires/excludes are ignored."
 					% [where, socket_name])
 
+		if socket.use_counterpart and socket.copy_from == &"":
+			push_warning("%s: socket '%s' has use_counterpart but no copy_from; it does nothing."
+				% [where, socket_name])
+
 		for other in socket.requires:
 			if not earlier.has(StringName(other)):
 				push_error("%s: socket '%s' requires '%s', which must be a socket listed above it."
@@ -153,6 +161,19 @@ func _validate_sockets(def: PartDef, path: String) -> void:
 				push_error("%s: socket '%s' both requires and excludes '%s', it can never be filled."
 					% [where, socket_name, other])
 		earlier.append(socket_name)
+
+
+## Checks that `def.counterpart` names an existing part of the same type.
+## (A typo would otherwise silently fall back to copying the same part.)
+func _validate_counterpart(def: PartDef) -> void:
+	if def.counterpart == &"":
+		return
+	var other: PartDef = parts.get(def.counterpart)
+	if other == null:
+		push_error("Part '%s': counterpart '%s' doesn't exist." % [def.id, def.counterpart])
+	elif other.type != def.type:
+		push_error("Part '%s' (%s): counterpart '%s' is a %s."
+			% [def.id, def.type, other.id, other.type])
 
 
 ## Fills def.patterns from the PNGs in `dir` (file name = pattern name).

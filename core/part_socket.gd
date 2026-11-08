@@ -50,6 +50,12 @@ extends Resource
 ## Combine with flip_h for the mirrored far side.
 @export var copy_from: StringName = &""
 
+## Only used with copy_from. Instead of an identical copy of the source,
+## place the COUNTERPART of each part in the copied subtree (see
+## PartDef.counterpart): the near ear in the source socket gives its far ear
+## here. Parts without a counterpart are copied as they are.
+@export var use_counterpart: bool = false
+
 ## Only rolled if ALL of these sockets (listed earlier on the same part) are
 ## already filled. e.g. eye_2.requires = ["eye_1"]: a second pair of eyes
 ## only appears on creatures that have the first pair.
