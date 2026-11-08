@@ -1,0 +1,62 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://dcdadx85f6cl3"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_x6rxp"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_r0qcj"]
+[ext_resource type="Texture2D" uid="uid://c0cr01n5bvgfl" path="res://creatures/parts/torso/torso_ratfolk/torso_ratfolk.png" id="2_w87c5"]
+
+[sub_resource type="Resource" id="Resource_pj7tf"]
+script = ExtResource("2_r0qcj")
+name = &"head"
+accepts_type = PackedStringArray("head")
+positions = Array[Vector2i]([Vector2i(30, 6)])
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_7ylyn"]
+script = ExtResource("2_r0qcj")
+name = &"arm_near"
+accepts_type = PackedStringArray("arm")
+positions = Array[Vector2i]([Vector2i(24, 12)])
+z_offset = 2
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_st8qu"]
+script = ExtResource("2_r0qcj")
+name = &"arm_far"
+accepts_type = PackedStringArray("arm")
+positions = Array[Vector2i]([Vector2i(36, 12)])
+z_offset = -2
+copy_from = &"arm_near"
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_qdkvm"]
+script = ExtResource("2_r0qcj")
+name = &"leg_near"
+accepts_type = PackedStringArray("leg")
+positions = Array[Vector2i]([Vector2i(11, 37)])
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_1opjn"]
+script = ExtResource("2_r0qcj")
+name = &"leg_far"
+accepts_type = PackedStringArray("leg")
+positions = Array[Vector2i]([Vector2i(22, 37)])
+z_offset = -1
+copy_from = &"leg_near"
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_r0qcj"]
+script = ExtResource("2_r0qcj")
+name = &"tail"
+accepts_type = PackedStringArray("tail")
+positions = Array[Vector2i]([Vector2i(5, 31)])
+z_offset = -3
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_x6rxp")
+id = &"torso_ratfolk"
+type = &"torso"
+sheet = ExtResource("2_w87c5")
+attach = Vector2i(16, 40)
+sockets = Array[ExtResource("2_r0qcj")]([SubResource("Resource_pj7tf"), SubResource("Resource_7ylyn"), SubResource("Resource_st8qu"), SubResource("Resource_qdkvm"), SubResource("Resource_1opjn"), SubResource("Resource_r0qcj")])
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

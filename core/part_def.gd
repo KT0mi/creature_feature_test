@@ -26,6 +26,13 @@ extends Resource
 ##Where children parts may be attached to this part.
 @export var sockets: Array[PartSocket] = []
 
+## Id of the OTHER version of this same part, for parts drawn differently
+## on the near and far side (e.g. ear_catfolk_near <-> ear_catfolk_far).
+## A socket with copy_from + use_counterpart places this part instead of an
+## identical copy, so the pair always matches but each side has its own art.
+## Leave empty for parts that are the same on both sides (or just flipped).
+@export var counterpart: StringName = &""
+
 ## Relative probability of being picked during random generation.
 @export var weight: float = 1.0
 

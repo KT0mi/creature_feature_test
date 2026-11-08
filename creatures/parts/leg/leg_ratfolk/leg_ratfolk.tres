@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://x5xy4e1t3o3g"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_ch6gg"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_edhy4"]
+[ext_resource type="Texture2D" uid="uid://bw18m620xw68u" path="res://creatures/parts/leg/leg_ratfolk/leg_ratfolk.png" id="2_kjy8f"]
+
+[resource]
+script = ExtResource("1_ch6gg")
+id = &"leg_ratfolk"
+type = &"leg"
+sheet = ExtResource("2_kjy8f")
+attach = Vector2i(10, 3)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

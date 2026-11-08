@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bgye56y27en1b"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_ke81n"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_awbj3"]
+[ext_resource type="Texture2D" uid="uid://biuwjw3ai4nl2" path="res://creatures/parts/ear/ear_catfolk_ear_near/ear_catfolk_ear_near.png" id="2_ytn5c"]
+
+[resource]
+script = ExtResource("1_ke81n")
+id = &"ear_catfolk_ear_near"
+type = &"ear"
+tags = PackedStringArray("near")
+sheet = ExtResource("2_ytn5c")
+attach = Vector2i(4, 6)
+counterpart = &"ear_catfolk_ear_far"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"
