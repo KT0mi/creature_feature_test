@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://bn1svg7d1lmip"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_q2k2h"]
+
+[resource]
+script = ExtResource("1_q2k2h")
+id = &"dark_fae"
+ramp = PackedColorArray(0.10025149, 0.028211305, 0.011288168, 1, 0.1764706, 0.0627451, 0.21176471, 1, 0.41960785, 0.02745098, 0.2, 1, 0.40784314, 0.3137255, 0.6784314, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"

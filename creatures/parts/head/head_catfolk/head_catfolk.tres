@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cg15vdtgob5my"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_2ek7f"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_2lvyj"]
+[ext_resource type="Texture2D" uid="uid://dvlko2paeb5it" path="res://creatures/parts/head/head_catfolk/head_catfolk.png" id="2_obq7o"]
+
+[sub_resource type="Resource" id="Resource_2lvyj"]
+script = ExtResource("2_2lvyj")
+name = &"eye_near"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(12, 7)])
+chance = 0.8
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_obq7o"]
+script = ExtResource("2_2lvyj")
+name = &"eye_far"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(21, 7)])
+chance = 0.8
+flip_h = true
+copy_from = &"eye_near"
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_j0plo"]
+script = ExtResource("2_2lvyj")
+name = &"eye_middle"
+accepts_type = PackedStringArray("eye")
+required_tags = PackedStringArray("middle")
+positions = Array[Vector2i]([Vector2i(16, 4)])
+chance = 0.5
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_igac1"]
+script = ExtResource("2_2lvyj")
+name = &"ear_near"
+accepts_type = PackedStringArray("ear")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(6, 1)])
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_jbx8i"]
+script = ExtResource("2_2lvyj")
+name = &"ear_far"
+accepts_type = PackedStringArray("ear")
+forbidden_tags = PackedStringArray("near")
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_2ek7f")
+id = &"head_catfolk"
+type = &"head"
+sheet = ExtResource("2_obq7o")
+attach = Vector2i(14, 18)
+sockets = Array[ExtResource("2_2lvyj")]([SubResource("Resource_2lvyj"), SubResource("Resource_obq7o"), SubResource("Resource_j0plo"), SubResource("Resource_igac1"), SubResource("Resource_jbx8i")])
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://caojoro3hhcdr"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_3gcsl"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_23pju"]
+[ext_resource type="Texture2D" uid="uid://dxsr6q2p1ttih" path="res://creatures/parts/arm/arm_catfolk/arm_catfolk.png" id="2_vib2g"]
+
+[resource]
+script = ExtResource("1_3gcsl")
+id = &"arm_catfolk"
+type = &"arm"
+sheet = ExtResource("2_vib2g")
+attach = Vector2i(10, 2)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

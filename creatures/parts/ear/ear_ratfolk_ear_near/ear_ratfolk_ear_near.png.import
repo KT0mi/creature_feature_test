@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fdpqirdcpctp"
-path="res://.godot/imported/eye_circle_biped_third_eye.png-2ba4f4e1108b6963a66f02f1896f76d3.ctex"
+uid="uid://cvcsuq125t8vu"
+path="res://.godot/imported/ear_ratfolk_ear_near.png-95520d5da82240906b706245ea14d332.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://creatures/parts/eye/eye_circle_biped_third_eye/eye_circle_biped_third_eye.png"
-dest_files=["res://.godot/imported/eye_circle_biped_third_eye.png-2ba4f4e1108b6963a66f02f1896f76d3.ctex"]
+source_file="res://creatures/parts/ear/ear_ratfolk_ear_near/ear_ratfolk_ear_near.png"
+dest_files=["res://.godot/imported/ear_ratfolk_ear_near.png-95520d5da82240906b706245ea14d332.ctex"]
 
 [params]
 

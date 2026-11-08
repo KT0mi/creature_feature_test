@@ -11,14 +11,6 @@ accepts_type = PackedStringArray("head")
 positions = Array[Vector2i]([Vector2i(16, 4)])
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
-[sub_resource type="Resource" id="Resource_xr65w"]
-script = ExtResource("2_yibko")
-name = &"arm_far"
-accepts_type = PackedStringArray("arm")
-positions = Array[Vector2i]([Vector2i(29, 16)])
-z_offset = -1
-metadata/_custom_type_script = "uid://bfh2awx2qd881"
-
 [sub_resource type="Resource" id="Resource_hpepo"]
 script = ExtResource("2_yibko")
 name = &"arm_near"
@@ -26,12 +18,13 @@ accepts_type = PackedStringArray("arm")
 positions = Array[Vector2i]([Vector2i(5, 16)])
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
-[sub_resource type="Resource" id="Resource_u6m4q"]
+[sub_resource type="Resource" id="Resource_xr65w"]
 script = ExtResource("2_yibko")
-name = &"leg_far"
-accepts_type = PackedStringArray("leg")
-positions = Array[Vector2i]([Vector2i(23, 60)])
+name = &"arm_far"
+accepts_type = PackedStringArray("arm")
+positions = Array[Vector2i]([Vector2i(29, 16)])
 z_offset = -1
+copy_from = &"arm_near"
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
 [sub_resource type="Resource" id="Resource_mt0bu"]
@@ -41,6 +34,15 @@ accepts_type = PackedStringArray("leg")
 positions = Array[Vector2i]([Vector2i(10, 60)])
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_u6m4q"]
+script = ExtResource("2_yibko")
+name = &"leg_far"
+accepts_type = PackedStringArray("leg")
+positions = Array[Vector2i]([Vector2i(23, 60)])
+z_offset = -1
+copy_from = &"leg_near"
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
 [resource]
 script = ExtResource("1_ghbkm")
 id = &"torso_circle_biped"
@@ -48,5 +50,5 @@ type = &"torso"
 tags = PackedStringArray("bipedal")
 sheet = ExtResource("2_jmqts")
 attach = Vector2i(16, 64)
-sockets = Array[ExtResource("2_yibko")]([SubResource("Resource_5g261"), SubResource("Resource_xr65w"), SubResource("Resource_hpepo"), SubResource("Resource_u6m4q"), SubResource("Resource_mt0bu")])
+sockets = Array[ExtResource("2_yibko")]([SubResource("Resource_5g261"), SubResource("Resource_hpepo"), SubResource("Resource_xr65w"), SubResource("Resource_mt0bu"), SubResource("Resource_u6m4q")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"
