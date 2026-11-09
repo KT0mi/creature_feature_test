@@ -52,6 +52,7 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 script = ExtResource("1_q3g6u")
 id = &"head_ratfolk"
 type = &"head"
+tags = PackedStringArray("side")
 sheet = ExtResource("2_stfus")
 attach = Vector2i(8, 16)
 sockets = Array[ExtResource("2_yyv0f")]([SubResource("Resource_5jrb7"), SubResource("Resource_6o7h5"), SubResource("Resource_ry846"), SubResource("Resource_qwx0i"), SubResource("Resource_72jh5")])

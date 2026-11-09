@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c51pxyb7807dp"
-path="res://.godot/imported/stripped.png-6b68d83093a69c043c6007bf7c040eed.ctex"
+uid="uid://bvt8c5p4vqnol"
+path="res://.godot/imported/torso_amphitere.png-b594ad4714b92eaebf07c95244a1f17a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://creatures/parts/arm/arm_circle_biped/patterns/stripped.png"
-dest_files=["res://.godot/imported/stripped.png-6b68d83093a69c043c6007bf7c040eed.ctex"]
+source_file="res://creatures/parts/torso/torso_amphitere/torso_amphitere.png"
+dest_files=["res://.godot/imported/torso_amphitere.png-b594ad4714b92eaebf07c95244a1f17a.ctex"]
 
 [params]
 

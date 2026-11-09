@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://p0a1m2qd7ymu"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_gnas8"]
+
+[resource]
+script = ExtResource("1_gnas8")
+id = &"baby_pink"
+ramp = PackedColorArray(0.183, 0.05957274, 0.18289214, 1, 0.49747914, 0.13961357, 0.2776822, 1, 0.99215686, 0.65882355, 0.7490196, 1, 1, 0.85882354, 0.85882354, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"
