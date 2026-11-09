@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://b5nlsa7e6nnvu"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_i2e7c"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_3y77i"]
+[ext_resource type="Texture2D" uid="uid://7rcmecoqhgch" path="res://creatures/parts/wing/wing_amphitere_near/wing_amphitere_near.png" id="2_hqcjl"]
+
+[resource]
+script = ExtResource("1_i2e7c")
+id = &"wing_amphitere_near"
+type = &"wing"
+tags = PackedStringArray("near")
+sheet = ExtResource("2_hqcjl")
+attach = Vector2i(46, 31)
+counterpart = &"wing_amphitere_far"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://0yhugi28cp51"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_7dlii"]
+[ext_resource type="Texture2D" uid="uid://cakt6tn574qx1" path="res://creatures/parts/wing/wing_amphitere_far/wing_amphitere_far.png" id="2_27i46"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_gcyrw"]
+
+[resource]
+script = ExtResource("1_7dlii")
+id = &"wing_amphitere_far"
+type = &"wing"
+tags = PackedStringArray("far")
+sheet = ExtResource("2_27i46")
+attach = Vector2i(3, 30)
+counterpart = &"wing_amphitere_near"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"
