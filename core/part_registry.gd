@@ -10,6 +10,8 @@ extends Node
 
 const PARTS_DIR := "res://creatures/parts/"
 const PALETTES_DIR := "res://creatures/palettes/"
+## Where FusionRecipe .tres files live (any sub-folder structure).
+const RECIPES_DIR := "res://creatures/recipes/"
 ## Name of the sub-folder (next to a part's .tres) that holds its patterns.
 const PATTERNS_SUBDIR := "patterns"
 ## The palette whose colors parts are DRAWN with (see CreaturePalette).
@@ -27,6 +29,11 @@ var palettes: Dictionary = {}
 var palette_ids: Array[StringName] = []
 ## Every pattern name found on at least one part, sorted (deterministic).
 var pattern_names: Array[StringName] = []
+## Fusion recipes, indexed by the (unordered) pair of part ids:
+## pair_key(a, b) -> Array of FusionRecipe, in file path order.
+## Looking up a pair is a single dictionary access, however many recipes
+## exist, so checking every socket during fusion is cheap.
+var recipes: Dictionary = {}
 ## The key palette (colors used in the source art).
 var key: CreaturePalette
 ## Naming settings (see CreatureNaming). Defaults if the file is missing.
@@ -44,6 +51,7 @@ func reload() -> void:
 	palettes.clear()
 	palette_ids.clear()
 	pattern_names.clear()
+	recipes.clear()
 
 	for path in _find_tres(PARTS_DIR):
 		var res := load(path)
@@ -86,9 +94,21 @@ func reload() -> void:
 	# Counterparts can only be checked once every part is loaded.
 	for def in parts.values():
 		_validate_counterpart(def)
+
+	# Recipes refer to part ids, so they're loaded after the parts.
+	# Paths are sorted so the order (and therefore fusion) is deterministic.
+	var recipe_paths := _find_tres(RECIPES_DIR)
+	recipe_paths.sort()
+	for path in recipe_paths:
+		var res := load(path)
+		if res is FusionRecipe and _validate_recipe(res, path):
+			var k := pair_key(res.part_a, res.part_b)
+			if not recipes.has(k):
+				recipes[k] = []
+			recipes[k].append(res)
 	
-	print("PartRegistry: %d parts, %d palettes, patterns: %s."
-		% [parts.size(), palettes.size(), pattern_names])
+	print("PartRegistry: %d parts, %d palettes, %d recipe pairs, patterns: %s."
+		% [parts.size(), palettes.size(), recipes.size(), pattern_names])
 
 
 ## PartDef by id, or null.
@@ -101,14 +121,25 @@ func get_parts_of_type(type: StringName) -> Array:
 	return parts_by_type.get(type, [])
 
 
-## All parts that are legal in `socket`, in deterministic order.
+## All parts that random picking may put in `socket`, in deterministic
+## order. fusion_only parts are left out (they only come from recipes).
 func candidates_for(socket: PartSocket) -> Array[PartDef]:
 	var out: Array[PartDef] = []
 	for type in socket.accepts_type:
 		for p in get_parts_of_type(type):
-			if socket.accepts(p):
+			if not p.fusion_only and socket.accepts(p):
 				out.append(p)
 	return out
+
+
+## Same key for (a, b) and (b, a).
+static func pair_key(a: StringName, b: StringName) -> String:
+	return "%s|%s" % ([a, b] if String(a) <= String(b) else [b, a])
+
+
+## Recipes for two part ids (either order). Empty array if none.
+func recipes_for(a: StringName, b: StringName) -> Array:
+	return recipes.get(pair_key(a, b), [])
 
 
 func _add_part(def: PartDef, path: String) -> void:
@@ -192,6 +223,20 @@ func _validate_counterpart(def: PartDef) -> void:
 	elif other.type != def.type:
 		push_error("Part '%s' (%s): counterpart '%s' is a %s."
 			% [def.id, def.type, other.id, other.type])
+
+## Checks a recipe's part ids. Returns false (recipe skipped) if any of
+## them doesn't exist.
+func _validate_recipe(r: FusionRecipe, path: String) -> bool:
+	for id in [r.part_a, r.part_b, r.result]:
+		if not parts.has(id):
+			push_error("Recipe %s: part '%s' doesn't exist; recipe skipped." % [path, id])
+			return false
+	var result_type: StringName = parts[r.result].type
+	if result_type != parts[r.part_a].type and result_type != parts[r.part_b].type:
+		push_warning("Recipe %s: result '%s' is a %s, unlike both inputs; it only "
+			% [path, r.result, result_type] + "happens in sockets that accept %s." % result_type)
+	return true
+
 
 ## Fills def.patterns from the PNGs in `dir` (file name = pattern name).
 ## A pattern whose size doesn't match the part's sheet is rejected, because
