@@ -81,7 +81,9 @@ func _unhandled_input(event: InputEvent) -> void:
 				queue_redraw()
 			KEY_P:
 				for i in selected:
-					print("cell %d: %s" % [i, JSON.stringify(genomes[i].to_dict())])
+					print("cell %d: %s\n  %s" % [i,
+						CreatureNamer.name_of(genomes[i], PartRegistry),
+						JSON.stringify(genomes[i].to_dict())])
 			KEY_EQUAL, KEY_KP_ADD:
 				_zoom(2.0)
 			KEY_MINUS, KEY_KP_SUBTRACT:
@@ -200,6 +202,9 @@ func _update_hud(extra: String = "") -> void:
 	else:
 		lines.append("fusion of seeds %d x %d   Esc: back" % [fusion_parents[0].seed, fusion_parents[1].seed])
 	lines.append("selected: %s   P: print   wheel/+/-: zoom   arrows: move" % [selected])
+	# Names of the selected creatures.
+	for i in selected:
+		lines.append("  %d: %s" % [i, CreatureNamer.name_of(genomes[i], PartRegistry)])
 	if extra != "":
 		lines.append(extra)
 	hud.text = "\n".join(lines)

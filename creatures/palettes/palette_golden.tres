@@ -5,5 +5,6 @@
 [resource]
 script = ExtResource("1_hbulh")
 id = &"golden"
+display_name = "Golden"
 ramp = PackedColorArray(0.15524581, 0.06545165, 0.024693338, 1, 0.37284127, 0.21772224, 0.121647544, 1, 0.72, 0.53304, 0.1296, 1, 0.8527644, 0.7427839, 0.34558812, 1)
 metadata/_custom_type_script = "uid://de7qplmr6rrvn"

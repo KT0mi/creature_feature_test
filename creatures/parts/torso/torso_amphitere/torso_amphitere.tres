@@ -83,4 +83,7 @@ type = &"torso"
 sheet = ExtResource("2_hxlnd")
 attach = Vector2i(36, 76)
 sockets = Array[ExtResource("2_5qnfr")]([SubResource("Resource_48ktd"), SubResource("Resource_5qnfr"), SubResource("Resource_hxlnd"), SubResource("Resource_xv7of"), SubResource("Resource_fefj1"), SubResource("Resource_w48bf"), SubResource("Resource_p2p2a")])
+name_front = "Snake"
+name_back = "serpent"
+name_full = "Amphitere"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

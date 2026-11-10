@@ -12,4 +12,5 @@ tags = PackedStringArray("near")
 sheet = ExtResource("2_hqcjl")
 attach = Vector2i(46, 31)
 counterpart = &"wing_amphitere_far"
+name_adjective = "Winged"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

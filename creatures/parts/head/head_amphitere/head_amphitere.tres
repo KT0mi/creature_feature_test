@@ -50,4 +50,7 @@ type = &"head"
 sheet = ExtResource("2_a47bg")
 attach = Vector2i(5, 13)
 sockets = Array[ExtResource("2_4p4uq")]([SubResource("Resource_dhpso"), SubResource("Resource_4p4uq"), SubResource("Resource_a47bg"), SubResource("Resource_hw5x6")])
+name_front = "Snake"
+name_back = "serpent"
+name_full = "Amphitere"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

@@ -44,6 +44,21 @@ extends Resource
 ## 1:1 pixels), so it's drawn at the part's position with no extra data.
 var patterns: Dictionary = {}
 
+@export_group("Naming")
+## Radical used at the FRONT of the main name when this part is the head,
+## e.g. "Cat" (head) + "wurm" (torso) = "Catwurm".
+@export var name_front: String = ""
+## Radical used at the BACK of the main name when this part is the torso.
+@export var name_back: String = ""
+## Whole main name for a torso with no head (e.g. "Pyramite"). Optional.
+@export var name_full: String = ""
+## Optional adjective this part adds to the name pool, e.g. "Winged".
+@export var name_adjective: String = ""
+## Where the adjective goes in the name (English order).
+@export var name_adjective_category: CreatureNamer.Category = CreatureNamer.Category.FEATURE
+## How likely the adjective is to be picked, relative to other candidates.
+@export var name_adjective_weight: float = 1.0
+@export_group("")
 
 # Cache of the frames cut out of `sheet` (not saved, filled on demand).
 var _frame_images: Array[Image] = []

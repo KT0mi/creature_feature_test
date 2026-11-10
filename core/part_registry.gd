@@ -14,6 +14,8 @@ const PALETTES_DIR := "res://creatures/palettes/"
 const PATTERNS_SUBDIR := "patterns"
 ## The palette whose colors parts are DRAWN with (see CreaturePalette).
 const KEY_PATH := "res://creatures/palette_key.tres"
+## Optional naming settings (fixed names, pattern words, count rules...).
+const NAMING_PATH := "res://creatures/naming.tres"
 
 ## id (StringName) -> PartDef
 var parts: Dictionary = {}
@@ -27,11 +29,12 @@ var palette_ids: Array[StringName] = []
 var pattern_names: Array[StringName] = []
 ## The key palette (colors used in the source art).
 var key: CreaturePalette
+## Naming settings (see CreatureNaming). Defaults if the file is missing.
+var naming: CreatureNaming
 
 
 func _ready() -> void:
 	reload()
-
 
 ## (Re)scans everything. Safe to call again after adding files at runtime.
 func reload() -> void:
@@ -71,6 +74,12 @@ func reload() -> void:
 	# same on every OS, and generation must be deterministic for a given seed.
 	for t in parts_by_type:
 		parts_by_type[t].sort_custom(func(a, b): return String(a.id) < String(b.id))
+	
+	naming = null
+	if ResourceLoader.exists(NAMING_PATH):
+		naming = load(NAMING_PATH) as CreatureNaming
+	if naming == null: naming = CreatureNaming.new()
+	
 	
 	# Counterparts can only be checked once every part is loaded.
 	for def in parts.values():

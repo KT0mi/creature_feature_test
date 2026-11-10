@@ -65,4 +65,7 @@ type = &"head"
 sheet = ExtResource("2_rsf8q")
 attach = Vector2i(12, 23)
 sockets = Array[ExtResource("2_u0abf")]([SubResource("Resource_u0abf"), SubResource("Resource_rsf8q"), SubResource("Resource_rt3q1"), SubResource("Resource_v5eok"), SubResource("Resource_r7kjc"), SubResource("Resource_xbb1t")])
+name_front = "Blob"
+name_back = "blob"
+name_full = "Blob"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

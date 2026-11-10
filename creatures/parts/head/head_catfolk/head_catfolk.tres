@@ -58,4 +58,7 @@ type = &"head"
 sheet = ExtResource("2_obq7o")
 attach = Vector2i(14, 18)
 sockets = Array[ExtResource("2_2lvyj")]([SubResource("Resource_2lvyj"), SubResource("Resource_obq7o"), SubResource("Resource_j0plo"), SubResource("Resource_igac1"), SubResource("Resource_jbx8i")])
+name_front = "Cat"
+name_back = "feline"
+name_full = "Catfolk"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

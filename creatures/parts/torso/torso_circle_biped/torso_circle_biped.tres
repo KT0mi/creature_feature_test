@@ -61,4 +61,7 @@ tags = PackedStringArray("bipedal")
 sheet = ExtResource("2_jmqts")
 attach = Vector2i(16, 64)
 sockets = Array[ExtResource("2_yibko")]([SubResource("Resource_5g261"), SubResource("Resource_hpepo"), SubResource("Resource_xr65w"), SubResource("Resource_mt0bu"), SubResource("Resource_u6m4q")])
+name_front = "Blob"
+name_back = "blob"
+name_full = "Blob"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

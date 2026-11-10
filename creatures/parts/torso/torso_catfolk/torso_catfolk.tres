@@ -71,4 +71,7 @@ tags = PackedStringArray("bipedal")
 sheet = ExtResource("2_47vui")
 attach = Vector2i(12, 33)
 sockets = Array[ExtResource("2_xebp5")]([SubResource("Resource_xebp5"), SubResource("Resource_47vui"), SubResource("Resource_igikq"), SubResource("Resource_3fi5c"), SubResource("Resource_alyn7"), SubResource("Resource_50l11")])
+name_front = "Cat"
+name_back = "feline"
+name_full = "Catfolk"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

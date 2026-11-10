@@ -10,6 +10,9 @@ const TONES := 4
 
 @export var id: StringName
 
+##Name used when naming a creature after generation
+@export var display_name: String = ""
+
 ## The ramp, darkest (index 0) to lightest (index 3).
 @export var ramp: PackedColorArray = PackedColorArray([
 	Color.BLACK, Color(0.25, 0.25, 0.25), Color(0.5, 0.5, 0.5), Color(0.75, 0.75, 0.75)])

@@ -5,5 +5,6 @@
 [resource]
 script = ExtResource("1_s37t6")
 id = &"cherry"
+display_name = "Cherry"
 ramp = PackedColorArray(0.121401824, 0.049622588, 0.018330982, 1, 0.2962557, 0.0026859636, 0.03872829, 1, 0.627451, 0.003921569, 0.03137255, 1, 0.84, 0.52247995, 0.48720002, 1)
 metadata/_custom_type_script = "uid://de7qplmr6rrvn"

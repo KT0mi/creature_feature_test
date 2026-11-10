@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_ao6mu")
-id = &"´dusk"
+id = &"dusk"
+display_name = "Dusk"
 ramp = PackedColorArray(0.22658296, 0.22658296, 0.33890283, 1, 0.40584272, 0.45043758, 0.61138725, 1, 0.5766774, 0.65457314, 0.81352156, 1, 63.6837, 72.81823, 85.60656, 1)
 metadata/_custom_type_script = "uid://de7qplmr6rrvn"
