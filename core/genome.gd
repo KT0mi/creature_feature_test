@@ -1,3 +1,4 @@
+@tool
 ##Data required to rebuild a creature: the part tree, palettes, patterns and the seed.
 ##The baked image is a cache of this genome, therefore do not save the image but this to_dict() and rebake.
 class_name Genome

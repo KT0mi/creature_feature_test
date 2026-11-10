@@ -1,3 +1,4 @@
+@tool
 ## A connection point on a PartDef where a child part can be attached.
 ##
 ## Example: a torso has a "head" socket that accepts parts of type "head",

@@ -1,3 +1,4 @@
+@tool
 ## Autoload (singleton) named "PartRegistry". Registered in project.godot.
 ##
 ## On startup it scans res://creatures/parts/ and res://creatures/palettes/

@@ -1,3 +1,4 @@
+@tool
 ## Global naming settings, loaded from res://creatures/naming.tres if it
 ## exists (otherwise these defaults are used). See CreatureNamer.
 class_name CreatureNaming

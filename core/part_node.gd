@@ -1,3 +1,4 @@
+@tool
 ## One node of a creature's part tree: "this PartDef, with these children".
 ##
 ## The whole tree (starting at the torso) is the shape half of a creature's
