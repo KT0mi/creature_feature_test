@@ -42,7 +42,9 @@ func _init(p_registry: Node, p_seed: int = 0) -> void:
 ## A brand new random creature. Returns null if there is no root part.
 func random_genome(p_seed: int) -> Genome:
 	rng.seed = p_seed
-	var roots: Array = registry.get_parts_of_type(ROOT_TYPE)
+	# fusion_only torsos can only come from recipes.
+	var roots: Array = registry.get_parts_of_type(ROOT_TYPE).filter(
+		func(p: PartDef) -> bool: return not p.fusion_only)
 	if roots.is_empty():
 		return null
 	var g := Genome.new()
@@ -99,7 +101,8 @@ func fuse_genomes(a: Genome, b: Genome, p_seed: int) -> Genome:
 	var g := Genome.new()
 	g.seed = p_seed
 	for attempt in MAX_ATTEMPTS:
-		g.root = fuse(a.root, b.root)
+		# The roots (torsos) can have a recipe too.
+		g.root = fuse(a.root, b.root, 0, _roll_recipe(a.root, b.root, null))
 		mutate(g.root)
 		if fits(g.root):
 			break
@@ -161,8 +164,10 @@ func _add_random_pattern(g: Genome) -> void:
 ## parent that fit that socket, matched by type, not by socket name. So a
 ## 4-armed parent can donate to a 2-armed child, and a "claw" socket can take
 ## a claw that sat in a socket called "talon".
-func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
-	var node := PartNode.new(a.part if rng.randf() < 0.5 else b.part)
+## `forced`: use this part instead of picking a's or b's (set when a
+## FusionRecipe fired for a + b).
+func fuse(a: PartNode, b: PartNode, depth: int = 0, forced: PartDef = null) -> PartNode:
+	var node := PartNode.new(forced if forced else (a.part if rng.randf() < 0.5 else b.part))
 	if depth >= MAX_DEPTH:
 		return node
 	for socket in node.part.sockets:
@@ -174,13 +179,13 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 			continue
 		if not socket.conditions_met(node.children):
 			continue
+		# Donors from each parent are kept apart so recipes can pair one
+		# part from A with one from B.
+		var donors_a := _donors(a, socket)
+		var donors_b := _donors(b, socket)
 		var donors: Array[PartNode] = []
-		for parent in [a, b]:
-			# Iterate in the parent's socket order for determinism.
-			for parent_socket in parent.part.sockets:
-				var child: PartNode = parent.children.get(parent_socket.name)
-				if child != null and socket.accepts(child.part):
-					donors.append(child)
+		donors.append_array(donors_a)
+		donors.append_array(donors_b)
 		if donors.is_empty():
 			# Neither parent has anything for this socket: occasionally grow
 			# something new (this is one way new traits appear).
@@ -188,6 +193,15 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 				var picked := _pick_for_socket(socket)
 				if picked != null:
 					node.children[socket.name] = grow(picked, depth + 1)
+			continue
+			# Authored recipes first. Every recipe that matches some A x B donor
+		# pair gets ONE roll per socket (a parent with two identical arms
+		# doesn't get two chances). If one fires, its result part is used and
+		# its children are fused from that pair. If none fires (or there are
+		# no recipes for these parts), the normal 50/50 below happens.
+		var fired := _roll_socket_recipes(donors_a, donors_b, socket)
+		if not fired.is_empty():
+			node.children[socket.name] = fuse(fired[0], fired[1], depth + 1, fired[2])
 			continue
 		if donors.size() >= 2 and rng.randf() < 0.5:
 			# Mix inside: e.g. arm from A, hand from B, claws from either.
@@ -201,6 +215,47 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 			var pick := donors[rng.randi_range(0, donors.size() - 1)]
 			node.children[socket.name] = pick.duplicate_tree()
 	return node
+
+## Children of `parent` that fit `socket`, in the parent's socket order.
+func _donors(parent: PartNode, socket: PartSocket) -> Array[PartNode]:
+	var out: Array[PartNode] = []
+	for parent_socket in parent.part.sockets:
+		var child: PartNode = parent.children.get(parent_socket.name)
+		if child != null and socket.accepts(child.part):
+			out.append(child)
+	return out
+
+
+## Rolls every recipe for the parts of `a` and `b` (in file order) and
+## returns the result part of the first one that fires, or null.
+## With a `socket`, recipes whose result the socket doesn't accept are
+## skipped. No random number is used when there's no recipe, so fusions
+## without recipes give the same results as before.
+func _roll_recipe(a: PartNode, b: PartNode, socket: PartSocket) -> PartDef:
+	var fired := _roll_socket_recipes([a], [b], socket)
+	return fired[2] if not fired.is_empty() else null
+
+
+## Collects the distinct recipes matching any (one from A, one from B)
+## donor pair, then rolls each recipe once, in order.
+## Returns [donor_a, donor_b, result PartDef] for the first that fires,
+## or an empty array.
+func _roll_socket_recipes(donors_a: Array, donors_b: Array, socket: PartSocket) -> Array:
+	var seen := {}       # recipe -> true, so each recipe is rolled once
+	var matches := []    # [recipe, donor_a, donor_b] in discovery order
+	for da in donors_a:
+		for db in donors_b:
+			for recipe in registry.recipes_for(da.part.id, db.part.id):
+				if not seen.has(recipe):
+					seen[recipe] = true
+					matches.append([recipe, da, db])
+	for m in matches:
+		var result: PartDef = registry.get_part(m[0].result)
+		if socket != null and not socket.accepts(result):
+			continue
+		if rng.randf() < m[0].chance:
+			return [m[1], m[2], result]
+	return []
 
 
 ## Small random changes, in place: occasionally replaces a child subtree

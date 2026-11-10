@@ -33,6 +33,11 @@ extends Resource
 ## Leave empty for parts that are the same on both sides (or just flipped).
 @export var counterpart: StringName = &""
 
+
+## If true, this part is never picked by random generation, mutation or
+## fusion fill-ins: it can only appear through a FusionRecipe.
+@export var fusion_only: bool = false
+
 ## Relative probability of being picked during random generation.
 @export var weight: float = 1.0
 
