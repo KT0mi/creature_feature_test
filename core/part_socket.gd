@@ -13,6 +13,12 @@ extends Resource
 ## Only parts whose PartDef.type equals this can be plugged in here.
 @export var accepts_type: PackedStringArray
 
+##Optional weights for picking which type of part the part to be chosen
+##for this socket is.
+##When any part is not included here, it counts as weight = 1.0
+##Parts inherited from fusion ignore this.
+@export var type_weights: Dictionary[StringName, float] = {}
+
 ## The child part must have ALL of these tags (optional).
 @export var required_tags: PackedStringArray
 
@@ -66,6 +72,8 @@ extends Resource
 ## on creatures without the normal pair.
 @export var excludes: PackedStringArray
 
+func type_weight(type: StringName) -> float:
+	return maxf(type_weights.get(type, 1.0), 0.0)
 
 ## True if `part` is allowed to be plugged into this socket.
 func accepts(part: PartDef) -> bool:

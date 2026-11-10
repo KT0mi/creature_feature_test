@@ -78,10 +78,10 @@ func grow(part: PartDef, depth: int = 0) -> PartNode:
 		# later changes as few existing seeds as possible.
 		if rng.randf() >= socket.chance:
 			continue
-		var candidates: Array[PartDef] = registry.candidates_for(socket)
-		if candidates.is_empty():
+		var picked := _pick_for_socket(socket)
+		if picked == null:
 			continue
-		node.children[socket.name] = grow(_weighted_pick(candidates), depth + 1)
+		node.children[socket.name] = grow(picked, depth + 1)
 	return node
 
 
@@ -185,9 +185,9 @@ func fuse(a: PartNode, b: PartNode, depth: int = 0) -> PartNode:
 			# Neither parent has anything for this socket: occasionally grow
 			# something new (this is one way new traits appear).
 			if rng.randf() < socket.chance * MUTATION_FILL:
-				var candidates: Array[PartDef] = registry.candidates_for(socket)
-				if not candidates.is_empty():
-					node.children[socket.name] = grow(_weighted_pick(candidates), depth + 1)
+				var picked := _pick_for_socket(socket)
+				if picked != null:
+					node.children[socket.name] = grow(picked, depth + 1)
 			continue
 		if donors.size() >= 2 and rng.randf() < 0.5:
 			# Mix inside: e.g. arm from A, hand from B, claws from either.
@@ -216,15 +216,47 @@ func mutate(node: PartNode, depth: int = 0) -> void:
 		if socket.copy_from != &"":
 			continue  # handled by _refresh_copies below
 		if rng.randf() < MUTATION_REGROW:
-			var candidates: Array[PartDef] = registry.candidates_for(socket)
-			if not candidates.is_empty():
-				node.children[socket.name] = grow(_weighted_pick(candidates), depth + 1)
+			var picked := _pick_for_socket(socket)
+			if picked != null:
+				node.children[socket.name] = grow(picked, depth + 1)
 				continue
 		mutate(node.children[socket.name], depth + 1)
 	_refresh_copies(node)
 
 
 # ------------------------------------------------------------------- helpers
+
+## Picks a NEW part for `socket`, in two steps:
+##   1. a type, by the socket's type_weights (only among accepted types
+##      that have at least one part fitting the socket, so a type with no
+##      parts yet never "wastes" a pick);
+##   2. a part of that type, by the parts' own `weight`.
+## Returns null if nothing fits.
+func _pick_for_socket(socket: PartSocket) -> PartDef:
+	var candidates: Array[PartDef] = registry.candidates_for(socket)
+	if candidates.is_empty():
+		return null
+	# Group candidates by type, in accepts_type order (deterministic).
+	var types: Array[StringName] = []
+	var by_type := {}
+	for part in candidates:
+		if not by_type.has(part.type):
+			types.append(part.type)
+			by_type[part.type] = []
+		by_type[part.type].append(part)
+	var total := 0.0
+	for t in types:
+		total += socket.type_weight(t)
+	var chosen: StringName = types[0]
+	if types.size() > 1 and total > 0.0:
+		var r := rng.randf() * total
+		chosen = types[-1]  # floating point safety net
+		for t in types:
+			r -= socket.type_weight(t)
+			if r < 0.0:
+				chosen = t
+				break
+	return _weighted_pick(by_type[chosen])
 
 ## Picks one item from `options` with probability proportional to its
 ## `weight` property.
