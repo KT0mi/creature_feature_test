@@ -10,6 +10,10 @@ const TONES := 4
 
 @export var id: StringName
 
+## Color word used in creature names, e.g. "Red" or "Golden".
+## Leave empty to never name creatures after this palette.
+@export var display_name: String = ""
+
 ## The ramp, darkest (index 0) to lightest (index 3).
 @export var ramp: PackedColorArray = PackedColorArray([
 	Color.BLACK, Color(0.25, 0.25, 0.25), Color(0.5, 0.5, 0.5), Color(0.75, 0.75, 0.75)])
