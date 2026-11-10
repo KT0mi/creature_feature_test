@@ -149,6 +149,14 @@ func _validate_sockets(def: PartDef, path: String) -> void:
 			push_warning("%s: socket '%s' has use_counterpart but no copy_from; it does nothing."
 				% [where, socket_name])
 		
+		for t in socket.type_weights:
+			if not socket.accepts_type.has(t):
+				push_warning("%s: socket '%s' has a type weight for '%s', which it doesn't accept."
+					% [where, socket_name, t])
+			elif socket.type_weights[t] < 0.0:
+				push_error("%s: socket '%s' has a negative weight for '%s'."
+					% [where, socket_name, t])
+
 		for other in socket.requires:
 			if not earlier.has(StringName(other)):
 				push_error("%s: socket '%s' requires '%s', which must be a socket listed above it."

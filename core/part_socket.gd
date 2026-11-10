@@ -13,6 +13,16 @@ extends Resource
 ## Only parts whose PartDef.type equals this can be plugged in here.
 @export var accepts_type: PackedStringArray
 
+## Optional: how likely each accepted TYPE is, relative to the others,
+## when this socket picks a new part. e.g. accepts_type = ["arm", "wing"]
+## with type_weights = {arm: 1.0, wing: 0.1} gives a wing about 1 time in 11.
+## A type that isn't listed here counts as 1.0. Leave it empty for "all
+## types equally likely". The parts' own `weight` then picks WHICH part of
+## the chosen type, so rarity per socket doesn't touch the part's weight.
+## Only used when a part is newly picked (generation, mutation, filling an
+## empty socket in fusion); parts inherited through fusion ignore it.
+@export var type_weights: Dictionary[StringName, float] = {}
+
 ## The child part must have ALL of these tags (optional).
 @export var required_tags: PackedStringArray
 
@@ -65,6 +75,11 @@ extends Resource
 ## filled. e.g. eye_cyclops.excludes = ["eye_1"]: a single central eye only
 ## on creatures without the normal pair.
 @export var excludes: PackedStringArray
+
+
+## Weight of an accepted type in this socket (1.0 if not listed).
+func type_weight(type: StringName) -> float:
+	return maxf(type_weights.get(type, 1.0), 0.0)
 
 
 ## True if `part` is allowed to be plugged into this socket.
