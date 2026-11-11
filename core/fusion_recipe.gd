@@ -1,3 +1,4 @@
+@tool
 ## An authored fusion result: when parts `part_a` and `part_b` meet in the
 ## same socket during a fusion (one from each parent), the child gets
 ## `result` there with probability `chance`.

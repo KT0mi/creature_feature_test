@@ -1,3 +1,4 @@
+@tool
 ## Turns a Genome into a pixel-perfect spritesheet texture.
 ##
 ## Pipeline (all integer math, no scaling/rotation):

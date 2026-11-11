@@ -1,3 +1,4 @@
+@tool
 ## Random generation (grow) and fusion (fuse + mutate) of genomes.
 ##
 ## Everything goes through ONE RandomNumberGenerator seeded by the caller, and

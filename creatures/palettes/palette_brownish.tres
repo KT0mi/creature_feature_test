@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://dytbtiqrnxkjs"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_56i0i"]
+
+[resource]
+script = ExtResource("1_56i0i")
+id = &"brownish"
+display_name = "Brownish"
+ramp = PackedColorArray(0.00072495063, 0.0009371854, 0.014400667, 1, 0.2, 0.17506666, 0.132, 1, 0.54, 0.5184, 0.45360005, 1, 0.83550596, 0.71202934, 0.5674745, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"

@@ -1,3 +1,4 @@
+@tool
 ##4-tone color ramp, darkest to lightest.
 ##
 ##Parts are drawn with a fixed set of "key" colors
@@ -15,7 +16,10 @@ const TONES := 4
 
 ## The ramp, darkest (index 0) to lightest (index 3).
 @export var ramp: PackedColorArray = PackedColorArray([
-	Color.BLACK, Color(0.25, 0.25, 0.25), Color(0.5, 0.5, 0.5), Color(0.75, 0.75, 0.75)])
+	Color.BLACK, Color(0.25, 0.25, 0.25), Color(0.5, 0.5, 0.5), Color(0.75, 0.75, 0.75)]):
+	set(value):
+		ramp = value
+		emit_changed()
 
 ## Color for tone `index`, clamped into the ramp (so shade shifts that go
 ## past the darkest/lightest tone just stay at the end).

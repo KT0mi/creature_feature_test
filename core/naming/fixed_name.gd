@@ -1,3 +1,4 @@
+@tool
 ## An authored main name for one head + torso combination, e.g.
 ## head_catfolk + torso_amphitere -> "Catwurm". Used by CreatureNaming.
 class_name FixedName

@@ -1,3 +1,4 @@
+@tool
 ##Definition of 1 drawable part of a creature (head, torso, arm, etc.)
 ##lives in res://creatures/parts/<type>/<id>
 class_name PartDef

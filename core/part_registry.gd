@@ -1,3 +1,4 @@
+@tool
 ## Autoload (singleton) named "PartRegistry". Registered in project.godot.
 ##
 ## On startup it scans res://creatures/parts/ and res://creatures/palettes/
@@ -16,7 +17,7 @@ const PATTERNS_SUBDIR := "patterns"
 ## The palette whose colors parts are DRAWN with (see CreaturePalette).
 const KEY_PATH := "res://creatures/palette_key.tres"
 ## Optional naming settings (fixed names, pattern words, count rules...).
-const NAMING_PATH := "res://creatures/naming.tres"
+const NAMING_PATH := "res://creatures/naming/naming.tres"
 
 ## id (StringName) -> PartDef
 var parts: Dictionary = {}

@@ -1,3 +1,4 @@
+@tool
 ## Builds a creature's common name from its genome, e.g.
 ## "Giant Red Winged Catwurm".
 ##
