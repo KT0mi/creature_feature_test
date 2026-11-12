@@ -11,6 +11,13 @@ count = 3
 word = "Three-Eyed"
 metadata/_custom_type_script = "uid://ch4ttvw1y0con"
 
+[sub_resource type="Resource" id="Resource_50htj"]
+script = ExtResource("1_g24np")
+type = &"eye"
+count = 0
+word = "Blind"
+metadata/_custom_type_script = "uid://ch4ttvw1y0con"
+
 [sub_resource type="Resource" id="Resource_ec6qq"]
 script = ExtResource("2_ec6qq")
 head = &"head_amphitere"
@@ -45,5 +52,5 @@ fixed_names = Array[ExtResource("2_ec6qq")]([SubResource("Resource_ec6qq"), SubR
 small_height = 64
 small_word = "Tiny"
 large_word = "Large"
-count_rules = Array[ExtResource("1_g24np")]([SubResource("Resource_g24np")])
+count_rules = Array[ExtResource("1_g24np")]([SubResource("Resource_g24np"), SubResource("Resource_50htj")])
 metadata/_custom_type_script = "uid://bkgghjuv66hsf"

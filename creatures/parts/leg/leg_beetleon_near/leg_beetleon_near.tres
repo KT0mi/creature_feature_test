@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://c2pdko2joufsb"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_ryb7h"]
+[ext_resource type="Texture2D" uid="uid://cef47hyu1tp8u" path="res://creatures/parts/leg/leg_beetleon_near/leg_beetleon_near.png" id="2_a4lyn"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_tests"]
+
+[resource]
+script = ExtResource("1_ryb7h")
+id = &"leg_beetleon_near"
+type = &"leg"
+tags = PackedStringArray("near")
+sheet = ExtResource("2_a4lyn")
+attach = Vector2i(7, 3)
+counterpart = &"leg_beetleon_far"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

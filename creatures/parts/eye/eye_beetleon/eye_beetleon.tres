@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://dbcp3m2hb55c3"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_4fpe8"]
+[ext_resource type="Texture2D" uid="uid://d3h5swdo7muwg" path="res://creatures/parts/eye/eye_beetleon/eye_beetleon.png" id="2_7xch5"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_dyg14"]
+
+[resource]
+script = ExtResource("1_4fpe8")
+id = &"eye_beetleon"
+type = &"eye"
+tags = PackedStringArray("side")
+sheet = ExtResource("2_7xch5")
+attach = Vector2i(4, 2)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

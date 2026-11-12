@@ -3,7 +3,7 @@
 extends HFlowContainer
 
 ## Integer zoom (1 = one screen pixel per art pixel).
-var zoom: int = 2:
+var zoom: int = 3:
 	set(value):
 		zoom = maxi(value, 1)
 		_resize_all()

@@ -18,7 +18,7 @@ accepts_type = PackedStringArray("arm", "wing")
 type_weights = Dictionary[StringName, float]({
 &"wing": 0.05
 })
-forbidden_tags = PackedStringArray("far")
+forbidden_tags = PackedStringArray("far", "big")
 positions = Array[Vector2i]([Vector2i(3, 8)])
 z_offset = 2
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
@@ -30,7 +30,7 @@ accepts_type = PackedStringArray("arm", "wing")
 type_weights = Dictionary[StringName, float]({
 &"wing": 0.05
 })
-forbidden_tags = PackedStringArray("near")
+forbidden_tags = PackedStringArray("near", "big")
 positions = Array[Vector2i]([Vector2i(23, 8)])
 z_offset = -2
 copy_from = &"arm_near"
@@ -41,6 +41,7 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 script = ExtResource("2_xebp5")
 name = &"leg_near"
 accepts_type = PackedStringArray("leg")
+forbidden_tags = PackedStringArray("far")
 positions = Array[Vector2i]([Vector2i(6, 29)])
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
@@ -48,6 +49,7 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 script = ExtResource("2_xebp5")
 name = &"leg_far"
 accepts_type = PackedStringArray("leg")
+forbidden_tags = PackedStringArray("near")
 positions = Array[Vector2i]([Vector2i(17, 29)])
 z_offset = -1
 copy_from = &"leg_near"
@@ -67,7 +69,7 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 script = ExtResource("1_nxsq6")
 id = &"torso_catfolk"
 type = &"torso"
-tags = PackedStringArray("bipedal")
+tags = PackedStringArray("bipedal", "small")
 sheet = ExtResource("2_47vui")
 attach = Vector2i(12, 33)
 sockets = Array[ExtResource("2_xebp5")]([SubResource("Resource_xebp5"), SubResource("Resource_47vui"), SubResource("Resource_igikq"), SubResource("Resource_3fi5c"), SubResource("Resource_alyn7"), SubResource("Resource_50l11")])

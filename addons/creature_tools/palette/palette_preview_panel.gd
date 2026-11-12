@@ -106,7 +106,7 @@ func _build_ui() -> void:
 	_zoom = SpinBox.new()
 	_zoom.min_value = 1
 	_zoom.max_value = 4
-	_zoom.value = 2
+	_zoom.value = 3
 	_zoom.value_changed.connect(func(v): _preview.zoom = int(v))
 	options_row.add_child(_zoom)
 	var rescan := Button.new()

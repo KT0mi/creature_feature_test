@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bi8qk3vcyuamc"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_6gqxd"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_0xy5i"]
+[ext_resource type="Texture2D" uid="uid://dwntvuuxk8r36" path="res://creatures/parts/wing/wing_beetleon_near/wing_beetleon.png" id="2_t1l5h"]
+
+[resource]
+script = ExtResource("1_6gqxd")
+id = &"wing_beetleon_near"
+type = &"wing"
+tags = PackedStringArray("near", "big", "back")
+sheet = ExtResource("2_t1l5h")
+attach = Vector2i(13, 3)
+counterpart = &"wing_beetleon_far"
+name_adjective = "Winged"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

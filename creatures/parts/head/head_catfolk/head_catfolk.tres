@@ -25,7 +25,10 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 [sub_resource type="Resource" id="Resource_j0plo"]
 script = ExtResource("2_2lvyj")
 name = &"eye_middle"
-accepts_type = PackedStringArray("eye")
+accepts_type = PackedStringArray("eye", "horn")
+type_weights = Dictionary[StringName, float]({
+&"horn": 0.05
+})
 required_tags = PackedStringArray("middle")
 positions = Array[Vector2i]([Vector2i(16, 4)])
 chance = 0.5
