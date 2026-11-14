@@ -84,6 +84,8 @@ func react(ctx: BattleContext, owner: BattleUnit, event: BattleEvent) -> void:
 ```
 In the inspector you then create `backstep.tres` with this script, and set its id, name, description and cooldown there.
 
+> **Update:** an armed reaction is now a status on the unit (`ReactionStatus`), and passives became **attributes**. See [[Statuses and Attributes]].
+
 ## Passives (same mechanism, for free)
 Parts could also have always-on **passive** effects ("Spiny: an enemy that hits this creature in melee takes 1 damage"). A passive is just a reaction that is **always armed** and never expires, attached to the part instead of played as a card. Not needed for the first version, but the event system supports it from day one.
 

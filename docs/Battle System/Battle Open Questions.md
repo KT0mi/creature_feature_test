@@ -11,6 +11,8 @@ To decide while prototyping/testing:
 - [ ] **Duplicate cards from different parts**: one copy, two copies, or an upgraded version? ([[Combat Profile#Deck]])
 - [ ] **Deck size cap**, or let build handle "too many cards"?
 - [ ] **How facing changes**: on move, on attack, free turn, or via cards? ([[Grid and Facing#How facing changes]])
+- [x] ~~Status stacking~~: per status, ADD by default ([[Statuses and Attributes]])
+- [x] ~~Does poison count as an attack?~~ No (`lose_hp`)
 - [ ] **Reaction cooldown**: starts when played or when it fires? ([[Cards and Effects#Reactions]])
 - [ ] **Reaction lifetime**: until your next turn, or until it fires?
 - [ ] **"Next to"** for reactions: 4 neighbours (orthogonal) or 8 (with diagonals)?

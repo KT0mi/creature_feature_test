@@ -27,6 +27,8 @@ A fast, small-scale, grid-based, turn-based battle (a bit like *Into the Breach*
 | Paired parts | Count **twice** for stats/build, **once** for cards |
 | Deck size / duplicate cards from different parts | **Open**, decide after tests |
 | HP between battles | Full HP at the start of every battle |
+| Statuses | Applied by cards, react to events; attributes = permanent statuses from parts |
+| Visible reactions | Opponent sees that a reaction is ready (not which), per card |
 | Anti "part dump" | **Build**: sum of every part's build weight. Higher build loses first-turn advantage |
 
 ## Architecture in one picture
@@ -46,6 +48,7 @@ The **model** never waits for the **view**: it applies an action and returns a l
 - [[Rules Engine]]: state, turn structure, initiative, cooldowns, damage, events
 - [[Grid and Facing]]: the 5×5 board, 4-way facing, pattern rotation
 - [[Cards and Effects]]: card data, effects, script cards, **reactions**, passives
+- [[Statuses and Attributes]]: Poisoned-like statuses, permanent attributes, armed reactions as statuses
 - [[Battle View]]: scenes, sprites on the board, HUD, animations
 - [[AI and Balance Testing]]: enemy AI, headless auto-battles
 - [[Integration with Creature Systems]]: how it plugs into parts, fusion, baker, tools

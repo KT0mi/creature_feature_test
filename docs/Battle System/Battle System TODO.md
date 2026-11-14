@@ -16,12 +16,19 @@ Back to [[Battle System Overview]]. One branch per phase.
 - [ ] `CombatProfile.from_genome()`: stats (torso base + modifiers, pairs ×2), build, deck (pairs ×1) ([[Combat Profile]])
 - [ ] Creature lab: show stats, build and deck of the selected creatures
 
+### Phase 1b: Statuses (done on `claude/battle-data-structures-status-feature`)
+- [x] `StatusEffect`, `StatusInstance`, `ReactionStatus`, `ApplyStatusEffect`
+- [x] Attributes on parts and in `CombatProfile`
+- [x] New events (turn start/end, attacked, HP lost, status applied/expired) and context API
+- [ ] Write the real Poisoned / Poisonous statuses as `.tres` + scripts
+
 ## Phase 2: Rules engine (headless)
 - [ ] `BattleState`, `BattleUnit`, `BattleAction`, `BattleEvent`, `CombatRules` ([[Rules Engine]])
 - [ ] Grid helpers + pattern rotation by facing ([[Grid and Facing]])
 - [ ] `legal_actions()` with the 2-card budget (max 1 attack, any order) and cooldowns
 - [ ] `apply()` with the event queue
-- [ ] Reactions: arm, trigger, expire; chain-depth limit
+- [ ] Status engine: apply/stack/remove, offer every event to every status (reactions and attributes included), automatic ticks, chain-depth limit
+- [ ] Apply attributes at battle start
 - [ ] Initiative by build (seeded tie-break), cooldown countdown, win check
 - [ ] First cards: a basic step, a dash, a basic melee attack, a line attack, a push, **Backstep** (script card)
 - [ ] Simple AI (random, then greedy) ([[AI and Balance Testing]])
