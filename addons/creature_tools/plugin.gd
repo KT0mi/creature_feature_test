@@ -7,6 +7,7 @@ const PartEditorScreen := preload("res://addons/creature_tools/part/part_editor_
 
 var _context: ToolsContext
 var _palette_inspector: EditorInspectorPlugin
+## The "Parts" main screen (tab next to 2D / 3D / Script / AssetLib).
 var _part_screen: PartEditorScreen
 
 
