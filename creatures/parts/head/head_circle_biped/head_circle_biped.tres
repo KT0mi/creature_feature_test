@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://d1ja5gamp67v7"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_6gt1v"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_rt3q1"]
 [ext_resource type="Texture2D" uid="uid://dhng03k2ir5s1" path="res://creatures/parts/head/head_circle_biped/head_circle_biped.png" id="2_rsf8q"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_u0abf"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_v5eok"]
 
 [sub_resource type="Resource" id="Resource_u0abf"]
 script = ExtResource("2_u0abf")
@@ -61,6 +63,9 @@ positions = Array[Vector2i]([Vector2i(15, 4)])
 chance = 0.3
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_w2ooc"]
+script = ExtResource("5_v5eok")
+
 [resource]
 script = ExtResource("1_6gt1v")
 id = &"head_circle_biped"
@@ -68,6 +73,7 @@ type = &"head"
 sheet = ExtResource("2_rsf8q")
 attach = Vector2i(12, 23)
 sockets = Array[ExtResource("2_u0abf")]([SubResource("Resource_u0abf"), SubResource("Resource_rsf8q"), SubResource("Resource_rt3q1"), SubResource("Resource_v5eok"), SubResource("Resource_r7kjc"), SubResource("Resource_xbb1t")])
+stats = SubResource("Resource_w2ooc")
 name_front = "Blob"
 name_back = "blob"
 name_full = "Blob"

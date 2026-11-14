@@ -1,3 +1,4 @@
+@tool
 ##This resource is a data structure storing the stats for individual parts
 class_name PartStats
 extends Resource

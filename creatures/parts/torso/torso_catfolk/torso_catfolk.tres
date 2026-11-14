@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://c2s07fpp2qxdr"]
 
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_igikq"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_nxsq6"]
 [ext_resource type="Texture2D" uid="uid://dbvsj3gbe5eak" path="res://creatures/parts/torso/torso_catfolk/torso_catfolk..png" id="2_47vui"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_xebp5"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_3fi5c"]
 
 [sub_resource type="Resource" id="Resource_xebp5"]
 script = ExtResource("2_xebp5")
@@ -65,6 +67,9 @@ chance = 0.8
 z_offset = -3
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_quxcv"]
+script = ExtResource("5_3fi5c")
+
 [resource]
 script = ExtResource("1_nxsq6")
 id = &"torso_catfolk"
@@ -73,6 +78,7 @@ tags = PackedStringArray("bipedal", "small")
 sheet = ExtResource("2_47vui")
 attach = Vector2i(12, 33)
 sockets = Array[ExtResource("2_xebp5")]([SubResource("Resource_xebp5"), SubResource("Resource_47vui"), SubResource("Resource_igikq"), SubResource("Resource_3fi5c"), SubResource("Resource_alyn7"), SubResource("Resource_50l11")])
+stats = SubResource("Resource_quxcv")
 name_front = "Cat"
 name_back = "feline"
 name_full = "Catfolk"

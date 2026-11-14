@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://c4u5r0tb3w7na"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_662qe"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_dhpso"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_4p4uq"]
 [ext_resource type="Texture2D" uid="uid://dwsgv76bsqk0y" path="res://creatures/parts/head/head_amphitere/head_amphitere.png" id="2_a47bg"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_hw5x6"]
 
 [sub_resource type="Resource" id="Resource_dhpso"]
 script = ExtResource("2_4p4uq")
@@ -43,6 +45,9 @@ copy_from = &"ear_near"
 use_counterpart = true
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_eajgy"]
+script = ExtResource("5_hw5x6")
+
 [resource]
 script = ExtResource("1_662qe")
 id = &"head_amphitere"
@@ -50,6 +55,7 @@ type = &"head"
 sheet = ExtResource("2_a47bg")
 attach = Vector2i(5, 13)
 sockets = Array[ExtResource("2_4p4uq")]([SubResource("Resource_dhpso"), SubResource("Resource_4p4uq"), SubResource("Resource_a47bg"), SubResource("Resource_hw5x6")])
+stats = SubResource("Resource_eajgy")
 name_front = "Snake"
 name_back = "serpent"
 name_full = "Amphitere"

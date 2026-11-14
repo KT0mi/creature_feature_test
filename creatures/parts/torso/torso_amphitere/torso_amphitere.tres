@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bjpkbamkn84if"]
 
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_48ktd"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_58wn2"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_5qnfr"]
 [ext_resource type="Texture2D" uid="uid://bvt8c5p4vqnol" path="res://creatures/parts/torso/torso_amphitere/torso_amphitere.png" id="2_hxlnd"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_xv7of"]
 
 [sub_resource type="Resource" id="Resource_48ktd"]
 script = ExtResource("2_5qnfr")
@@ -76,6 +78,9 @@ copy_from = &"wing_near_3"
 use_counterpart = true
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_ay043"]
+script = ExtResource("5_xv7of")
+
 [resource]
 script = ExtResource("1_58wn2")
 id = &"torso_amphitere"
@@ -83,6 +88,7 @@ type = &"torso"
 sheet = ExtResource("2_hxlnd")
 attach = Vector2i(36, 76)
 sockets = Array[ExtResource("2_5qnfr")]([SubResource("Resource_48ktd"), SubResource("Resource_5qnfr"), SubResource("Resource_hxlnd"), SubResource("Resource_xv7of"), SubResource("Resource_fefj1"), SubResource("Resource_w48bf"), SubResource("Resource_p2p2a")])
+stats = SubResource("Resource_ay043")
 name_front = "Snake"
 name_back = "serpent"
 name_full = "Amphitere"

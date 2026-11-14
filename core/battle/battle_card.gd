@@ -1,10 +1,11 @@
+@tool
 ##Generic class of cards
 ##Parent class of all cards
 class_name BattleCard
 extends Resource
 
-var id: StringName
-var name: String
+@export var id: StringName
+@export var name: String
 
 #Number of turns this card is inactive for, after use
-var cooldown: int
+@export var cooldown: int

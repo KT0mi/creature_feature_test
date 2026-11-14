@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://ba6w58vq3agvm"]
 
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_uculw"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_vwq1j"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_57c4m"]
 [ext_resource type="Texture2D" uid="uid://oe64hgkdtk24" path="res://creatures/parts/torso/torso_beetleon/torso_beetleon.png" id="2_mjqoi"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_hak34"]
 
 [sub_resource type="Resource" id="Resource_57c4m"]
 script = ExtResource("2_57c4m")
@@ -76,6 +78,9 @@ copy_from = &"wing_near"
 use_counterpart = true
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_fmkx1"]
+script = ExtResource("5_hak34")
+
 [resource]
 script = ExtResource("1_vwq1j")
 id = &"torso_beetleon"
@@ -84,6 +89,7 @@ tags = PackedStringArray("big")
 sheet = ExtResource("2_mjqoi")
 attach = Vector2i(31, 57)
 sockets = Array[ExtResource("2_57c4m")]([SubResource("Resource_57c4m"), SubResource("Resource_mjqoi"), SubResource("Resource_uculw"), SubResource("Resource_hak34"), SubResource("Resource_luc1c"), SubResource("Resource_1vkv8"), SubResource("Resource_iqmav")])
+stats = SubResource("Resource_fmkx1")
 name_front = "Beetle"
 name_back = "eon"
 name_full = "Beetleon"

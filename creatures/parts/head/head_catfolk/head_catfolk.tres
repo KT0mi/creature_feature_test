@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cg15vdtgob5my"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_2ek7f"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_j0plo"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_2lvyj"]
 [ext_resource type="Texture2D" uid="uid://dvlko2paeb5it" path="res://creatures/parts/head/head_catfolk/head_catfolk.png" id="2_obq7o"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_igac1"]
 
 [sub_resource type="Resource" id="Resource_2lvyj"]
 script = ExtResource("2_2lvyj")
@@ -54,6 +56,9 @@ copy_from = &"ear_near"
 use_counterpart = true
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_dbeuk"]
+script = ExtResource("5_igac1")
+
 [resource]
 script = ExtResource("1_2ek7f")
 id = &"head_catfolk"
@@ -61,6 +66,7 @@ type = &"head"
 sheet = ExtResource("2_obq7o")
 attach = Vector2i(14, 18)
 sockets = Array[ExtResource("2_2lvyj")]([SubResource("Resource_2lvyj"), SubResource("Resource_obq7o"), SubResource("Resource_j0plo"), SubResource("Resource_igac1"), SubResource("Resource_jbx8i")])
+stats = SubResource("Resource_dbeuk")
 name_front = "Cat"
 name_back = "feline"
 name_full = "Catfolk"

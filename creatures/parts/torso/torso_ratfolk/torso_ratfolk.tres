@@ -1,8 +1,10 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://dcdadx85f6cl3"]
 
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_pj7tf"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_x6rxp"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_r0qcj"]
 [ext_resource type="Texture2D" uid="uid://c0cr01n5bvgfl" path="res://creatures/parts/torso/torso_ratfolk/torso_ratfolk.png" id="2_w87c5"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_7ylyn"]
 
 [sub_resource type="Resource" id="Resource_pj7tf"]
 script = ExtResource("2_r0qcj")
@@ -64,6 +66,9 @@ positions = Array[Vector2i]([Vector2i(5, 31)])
 z_offset = -3
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
+[sub_resource type="Resource" id="Resource_au5ie"]
+script = ExtResource("5_7ylyn")
+
 [resource]
 script = ExtResource("1_x6rxp")
 id = &"torso_ratfolk"
@@ -71,6 +76,7 @@ type = &"torso"
 sheet = ExtResource("2_w87c5")
 attach = Vector2i(16, 40)
 sockets = Array[ExtResource("2_r0qcj")]([SubResource("Resource_pj7tf"), SubResource("Resource_7ylyn"), SubResource("Resource_st8qu"), SubResource("Resource_qdkvm"), SubResource("Resource_1opjn"), SubResource("Resource_r0qcj")])
+stats = SubResource("Resource_au5ie")
 name_front = "Rat"
 name_back = "rodent"
 name_full = "Ratfolk"
