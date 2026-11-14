@@ -50,6 +50,12 @@ extends Resource
 ## 1:1 pixels), so it's drawn at the part's position with no extra data.
 var patterns: Dictionary = {}
 
+@export_group("Gameplay")
+@export var stats: PartStats = PartStats.new()
+
+##Cards added to the creature pool by this part
+@export var added_cards: Array[BattleCard]
+
 @export_group("Naming")
 ## Radical used at the FRONT of the main name when this part is the head,
 ## e.g. "Cat" (head) + "wurm" (torso) = "Catwurm".
