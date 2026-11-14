@@ -1,0 +1,56 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://c4u5r0tb3w7na"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_662qe"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_4p4uq"]
+[ext_resource type="Texture2D" uid="uid://dwsgv76bsqk0y" path="res://creatures/parts/head/head_amphitere/head_amphitere.png" id="2_a47bg"]
+
+[sub_resource type="Resource" id="Resource_dhpso"]
+script = ExtResource("2_4p4uq")
+name = &"eye_1"
+accepts_type = PackedStringArray("eye")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(14, 9)])
+chance = 0.9
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_4p4uq"]
+script = ExtResource("2_4p4uq")
+name = &"eye_2"
+accepts_type = PackedStringArray("eye")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(11, 4)])
+chance = 0.5
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_a47bg"]
+script = ExtResource("2_4p4uq")
+name = &"ear_near"
+accepts_type = PackedStringArray("ear")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(2, 4)])
+chance = 0.2
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_hw5x6"]
+script = ExtResource("2_4p4uq")
+name = &"ear_far"
+accepts_type = PackedStringArray("ear")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(15, 2)])
+chance = 0.2
+z_offset = -1
+copy_from = &"ear_near"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_662qe")
+id = &"head_amphitere"
+type = &"head"
+sheet = ExtResource("2_a47bg")
+attach = Vector2i(5, 13)
+sockets = Array[ExtResource("2_4p4uq")]([SubResource("Resource_dhpso"), SubResource("Resource_4p4uq"), SubResource("Resource_a47bg"), SubResource("Resource_hw5x6")])
+name_front = "Snake"
+name_back = "serpent"
+name_full = "Amphitere"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bym4cg3qk06r"]
+
+[ext_resource type="Script" uid="uid://lmmisp2p44bu" path="res://debug/creature_lab.gd" id="1_msmgb"]
+
+[node name="CreatureLab" type="Node2D" unique_id=2120217419]
+script = ExtResource("1_msmgb")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=146414708]
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=2015465864]
+
+[node name="Label" type="Label" parent="HUD" unique_id=292570327]
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 14

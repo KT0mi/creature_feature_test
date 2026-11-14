@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://6jyb6cur6t05"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_glddw"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_4p3ge"]
+[ext_resource type="Texture2D" uid="uid://d15bwkk80navp" path="res://creatures/parts/arm/arm_beetleon_near/arm_beetleon_near.png" id="2_yyyb3"]
+
+[resource]
+script = ExtResource("1_glddw")
+id = &"arm_beetleon_near"
+type = &"arm"
+tags = PackedStringArray("near", "big")
+sheet = ExtResource("2_yyyb3")
+attach = Vector2i(12, 6)
+counterpart = &"arm_beetleon_far"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

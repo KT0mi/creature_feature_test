@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://gfgdu508jl8u"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_u8swu"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_21ag2"]
+[ext_resource type="Texture2D" uid="uid://c10l0dp4efqpa" path="res://creatures/parts/leg/leg_catfolk/leg_catfolk.png" id="2_mm8o5"]
+
+[resource]
+script = ExtResource("1_u8swu")
+id = &"leg_catfolk"
+type = &"leg"
+tags = PackedStringArray("bipedal")
+sheet = ExtResource("2_mm8o5")
+attach = Vector2i(12, 2)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

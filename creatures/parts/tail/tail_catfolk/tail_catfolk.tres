@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://myt3klfojxeh"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_kh7j8"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_0h76i"]
+[ext_resource type="Texture2D" uid="uid://dehbbm2adkbgb" path="res://creatures/parts/tail/tail_catfolk/tail_catfolk.png" id="2_xnn08"]
+
+[resource]
+script = ExtResource("1_kh7j8")
+id = &"tail_catfolk"
+type = &"tail"
+sheet = ExtResource("2_xnn08")
+attach = Vector2i(32, 19)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

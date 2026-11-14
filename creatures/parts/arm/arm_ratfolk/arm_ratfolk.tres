@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://b31khghphjjmx"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_1vkcr"]
+[ext_resource type="Texture2D" uid="uid://8vvv1jlg2slm" path="res://creatures/parts/arm/arm_ratfolk/arm_ratfolk.png" id="2_51264"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_hs82h"]
+
+[resource]
+script = ExtResource("1_1vkcr")
+id = &"arm_ratfolk"
+type = &"arm"
+sheet = ExtResource("2_51264")
+attach = Vector2i(15, 3)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

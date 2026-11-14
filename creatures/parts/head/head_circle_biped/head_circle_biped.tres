@@ -1,0 +1,74 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://d1ja5gamp67v7"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_6gt1v"]
+[ext_resource type="Texture2D" uid="uid://dhng03k2ir5s1" path="res://creatures/parts/head/head_circle_biped/head_circle_biped.png" id="2_rsf8q"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_u0abf"]
+
+[sub_resource type="Resource" id="Resource_u0abf"]
+script = ExtResource("2_u0abf")
+name = &"eye_near_1"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(11, 13)])
+chance = 0.8
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_rsf8q"]
+script = ExtResource("2_u0abf")
+name = &"eye_far_1"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(19, 13)])
+chance = 0.8
+flip_h = true
+copy_from = &"eye_near_1"
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_rt3q1"]
+script = ExtResource("2_u0abf")
+name = &"eye_middle_1"
+accepts_type = PackedStringArray("eye", "horn")
+type_weights = Dictionary[StringName, float]({
+&"horn": 0.05
+})
+required_tags = PackedStringArray("middle")
+positions = Array[Vector2i]([Vector2i(15, 9)])
+chance = 0.8
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_v5eok"]
+script = ExtResource("2_u0abf")
+name = &"eye_near_2"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(10, 8)])
+chance = 0.5
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_r7kjc"]
+script = ExtResource("2_u0abf")
+name = &"eye_far_2"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(19, 8)])
+chance = 0.5
+flip_h = true
+copy_from = &"eye_near_2"
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_xbb1t"]
+script = ExtResource("2_u0abf")
+name = &"eye_middle_2"
+accepts_type = PackedStringArray("eye")
+required_tags = PackedStringArray("middle")
+positions = Array[Vector2i]([Vector2i(15, 4)])
+chance = 0.3
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_6gt1v")
+id = &"head_circle_biped"
+type = &"head"
+sheet = ExtResource("2_rsf8q")
+attach = Vector2i(12, 23)
+sockets = Array[ExtResource("2_u0abf")]([SubResource("Resource_u0abf"), SubResource("Resource_rsf8q"), SubResource("Resource_rt3q1"), SubResource("Resource_v5eok"), SubResource("Resource_r7kjc"), SubResource("Resource_xbb1t")])
+name_front = "Blob"
+name_back = "blob"
+name_full = "Blob"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

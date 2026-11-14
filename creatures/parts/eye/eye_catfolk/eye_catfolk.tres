@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cxnjgt87xa2ve"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_w30va"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_0hohv"]
+[ext_resource type="Texture2D" uid="uid://cxjdqplnaseao" path="res://creatures/parts/eye/eye_catfolk/eye_catfolk.png" id="2_rodf5"]
+
+[resource]
+script = ExtResource("1_w30va")
+id = &"eye_catfolk"
+type = &"eye"
+tags = PackedStringArray("side")
+sheet = ExtResource("2_rodf5")
+attach = Vector2i(3, 2)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

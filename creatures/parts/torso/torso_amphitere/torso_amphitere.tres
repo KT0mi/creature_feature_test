@@ -1,0 +1,89 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bjpkbamkn84if"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_58wn2"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_5qnfr"]
+[ext_resource type="Texture2D" uid="uid://bvt8c5p4vqnol" path="res://creatures/parts/torso/torso_amphitere/torso_amphitere.png" id="2_hxlnd"]
+
+[sub_resource type="Resource" id="Resource_48ktd"]
+script = ExtResource("2_5qnfr")
+name = &"head"
+accepts_type = PackedStringArray("head")
+positions = Array[Vector2i]([Vector2i(53, 4)])
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_5qnfr"]
+script = ExtResource("2_5qnfr")
+name = &"wing_near_1"
+accepts_type = PackedStringArray("wing", "arm")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(20, 15)])
+chance = 0.8
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_hxlnd"]
+script = ExtResource("2_5qnfr")
+name = &"wing_far_1"
+accepts_type = PackedStringArray("wing", "arm")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(32, 15)])
+chance = 0.8
+z_offset = -3
+copy_from = &"wing_near_1"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_xv7of"]
+script = ExtResource("2_5qnfr")
+name = &"wing_near_2"
+accepts_type = PackedStringArray("wing", "arm")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(35, 42)])
+chance = 0.6
+z_offset = 2
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_fefj1"]
+script = ExtResource("2_5qnfr")
+name = &"wing_far_2"
+accepts_type = PackedStringArray("wing", "arm")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(48, 42)])
+chance = 0.6
+z_offset = -2
+copy_from = &"wing_near_2"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_w48bf"]
+script = ExtResource("2_5qnfr")
+name = &"wing_near_3"
+accepts_type = PackedStringArray("wing", "arm")
+forbidden_tags = PackedStringArray("far", "big")
+positions = Array[Vector2i]([Vector2i(60, 54)])
+chance = 0.4
+z_offset = 3
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_p2p2a"]
+script = ExtResource("2_5qnfr")
+name = &"wing_far_3"
+accepts_type = PackedStringArray("wing", "arm")
+forbidden_tags = PackedStringArray("near", "big")
+positions = Array[Vector2i]([Vector2i(70, 54)])
+chance = 0.4
+z_offset = -1
+copy_from = &"wing_near_3"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_58wn2")
+id = &"torso_amphitere"
+type = &"torso"
+sheet = ExtResource("2_hxlnd")
+attach = Vector2i(36, 76)
+sockets = Array[ExtResource("2_5qnfr")]([SubResource("Resource_48ktd"), SubResource("Resource_5qnfr"), SubResource("Resource_hxlnd"), SubResource("Resource_xv7of"), SubResource("Resource_fefj1"), SubResource("Resource_w48bf"), SubResource("Resource_p2p2a")])
+name_front = "Snake"
+name_back = "serpent"
+name_full = "Amphitere"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

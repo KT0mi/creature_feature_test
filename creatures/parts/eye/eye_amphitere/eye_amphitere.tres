@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://b161dsug0a48u"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_akmny"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_34urh"]
+[ext_resource type="Texture2D" uid="uid://dyweiedvfxed5" path="res://creatures/parts/eye/eye_amphitere/eye_amphitere.png" id="2_naa4g"]
+
+[resource]
+script = ExtResource("1_akmny")
+id = &"eye_amphitere"
+type = &"eye"
+sheet = ExtResource("2_naa4g")
+attach = Vector2i(4, 2)
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

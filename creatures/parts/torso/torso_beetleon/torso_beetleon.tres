@@ -1,0 +1,90 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://ba6w58vq3agvm"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_vwq1j"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_57c4m"]
+[ext_resource type="Texture2D" uid="uid://oe64hgkdtk24" path="res://creatures/parts/torso/torso_beetleon/torso_beetleon.png" id="2_mjqoi"]
+
+[sub_resource type="Resource" id="Resource_57c4m"]
+script = ExtResource("2_57c4m")
+name = &"head"
+accepts_type = PackedStringArray("head")
+positions = Array[Vector2i]([Vector2i(32, 5)])
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_mjqoi"]
+script = ExtResource("2_57c4m")
+name = &"arm_near"
+accepts_type = PackedStringArray("arm", "wing")
+type_weights = Dictionary[StringName, float]({
+&"wing": 0.05
+})
+forbidden_tags = PackedStringArray("far", "back")
+positions = Array[Vector2i]([Vector2i(5, 12)])
+z_offset = 2
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_uculw"]
+script = ExtResource("2_57c4m")
+name = &"arm_far"
+accepts_type = PackedStringArray("arm", "wing")
+type_weights = Dictionary[StringName, float]({
+&"wing": 0.05
+})
+forbidden_tags = PackedStringArray("near", "back")
+positions = Array[Vector2i]([Vector2i(53, 12)])
+z_offset = -2
+copy_from = &"arm_near"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_hak34"]
+script = ExtResource("2_57c4m")
+name = &"leg_near"
+accepts_type = PackedStringArray("leg")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(23, 55)])
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_luc1c"]
+script = ExtResource("2_57c4m")
+name = &"leg_far"
+accepts_type = PackedStringArray("leg")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(39, 55)])
+z_offset = -1
+copy_from = &"leg_near"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_1vkv8"]
+script = ExtResource("2_57c4m")
+name = &"wing_near"
+accepts_type = PackedStringArray("wing")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(9, 14)])
+z_offset = -3
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_iqmav"]
+script = ExtResource("2_57c4m")
+name = &"wing_far"
+accepts_type = PackedStringArray("wing")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(39, 14)])
+z_offset = -4
+copy_from = &"wing_near"
+use_counterpart = true
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_vwq1j")
+id = &"torso_beetleon"
+type = &"torso"
+tags = PackedStringArray("big")
+sheet = ExtResource("2_mjqoi")
+attach = Vector2i(31, 57)
+sockets = Array[ExtResource("2_57c4m")]([SubResource("Resource_57c4m"), SubResource("Resource_mjqoi"), SubResource("Resource_uculw"), SubResource("Resource_hak34"), SubResource("Resource_luc1c"), SubResource("Resource_1vkv8"), SubResource("Resource_iqmav")])
+name_front = "Beetle"
+name_back = "eon"
+name_full = "Beetleon"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

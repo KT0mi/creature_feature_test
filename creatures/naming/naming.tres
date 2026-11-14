@@ -1,0 +1,63 @@
+[gd_resource type="Resource" script_class="CreatureNaming" format=3 uid="uid://dtd8i2c0bfpwj"]
+
+[ext_resource type="Script" uid="uid://ch4ttvw1y0con" path="res://core/naming/name_count_rule.gd" id="1_g24np"]
+[ext_resource type="Script" uid="uid://dggtt1osusvfb" path="res://core/naming/fixed_name.gd" id="2_ec6qq"]
+[ext_resource type="Script" uid="uid://bkgghjuv66hsf" path="res://core/naming/creature_naming.gd" id="3_53if0"]
+
+[sub_resource type="Resource" id="Resource_g24np"]
+script = ExtResource("1_g24np")
+type = &"eye"
+count = 3
+word = "Three-Eyed"
+metadata/_custom_type_script = "uid://ch4ttvw1y0con"
+
+[sub_resource type="Resource" id="Resource_50htj"]
+script = ExtResource("1_g24np")
+type = &"eye"
+count = 0
+word = "Blind"
+metadata/_custom_type_script = "uid://ch4ttvw1y0con"
+
+[sub_resource type="Resource" id="Resource_ec6qq"]
+script = ExtResource("2_ec6qq")
+head = &"head_amphitere"
+torso = &"torso_amphitere"
+name = "Amphitere"
+metadata/_custom_type_script = "uid://dggtt1osusvfb"
+
+[sub_resource type="Resource" id="Resource_53if0"]
+script = ExtResource("2_ec6qq")
+head = &"head_catfolk"
+torso = &"torso_catfolk"
+name = "Catfolk"
+metadata/_custom_type_script = "uid://dggtt1osusvfb"
+
+[sub_resource type="Resource" id="Resource_u0jhs"]
+script = ExtResource("2_ec6qq")
+head = &"head_ratfolk"
+torso = &"torso_ratfolk"
+name = "Ratfolk"
+metadata/_custom_type_script = "uid://dggtt1osusvfb"
+
+[sub_resource type="Resource" id="Resource_pofu8"]
+script = ExtResource("2_ec6qq")
+head = &"head_circle_biped"
+torso = &"torso_circle_biped"
+name = "Blob"
+metadata/_custom_type_script = "uid://dggtt1osusvfb"
+
+[sub_resource type="Resource" id="Resource_7p6y1"]
+script = ExtResource("2_ec6qq")
+head = &"head_beetleon"
+torso = &"torso_beetleon"
+name = "Beetleon"
+metadata/_custom_type_script = "uid://dggtt1osusvfb"
+
+[resource]
+script = ExtResource("3_53if0")
+fixed_names = Array[ExtResource("2_ec6qq")]([SubResource("Resource_ec6qq"), SubResource("Resource_53if0"), SubResource("Resource_u0jhs"), SubResource("Resource_pofu8"), SubResource("Resource_7p6y1")])
+small_height = 64
+small_word = "Tiny"
+large_word = "Large"
+count_rules = Array[ExtResource("1_g24np")]([SubResource("Resource_g24np"), SubResource("Resource_50htj")])
+metadata/_custom_type_script = "uid://bkgghjuv66hsf"

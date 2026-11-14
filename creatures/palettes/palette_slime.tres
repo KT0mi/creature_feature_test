@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://eyiclthui7ap"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_4kl8u"]
+
+[resource]
+script = ExtResource("1_4kl8u")
+id = &"slime"
+display_name = "Slime"
+ramp = PackedColorArray(0.0648, 0.18, 0.11664, 1, 0.15721694, 0.29012102, 0.1200609, 0.85490197, 0.3513675, 0.5717703, 0.20634767, 0.58431375, 0.474306, 0.75658536, 0.4038838, 0.61960787)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"

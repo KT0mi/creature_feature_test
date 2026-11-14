@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://yfbtgcjk2mcu"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_xflg1"]
+
+[resource]
+script = ExtResource("1_xflg1")
+id = &"auburn"
+display_name = "Auburn"
+ramp = PackedColorArray(0.042888016, 0.0011122535, 0.12652868, 1, 0.39840323, 0.12861401, 0.046085037, 1, 0.6023861, 0.274033, 0.10054047, 1, 0.7237154, 0.44638413, 0.126668, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"

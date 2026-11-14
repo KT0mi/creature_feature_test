@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://nsto3ss3c2rd"]
+
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_fk3a6"]
+[ext_resource type="Texture2D" uid="uid://c4j8qevlbbmbr" path="res://creatures/parts/head/head_beetleon/head_beetleon.png" id="2_14tvy"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_h16b8"]
+
+[sub_resource type="Resource" id="Resource_h16b8"]
+script = ExtResource("2_h16b8")
+name = &"horn"
+accepts_type = PackedStringArray("horn", "eye")
+positions = Array[Vector2i]([Vector2i(17, 4)])
+chance = 0.9
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_14tvy"]
+script = ExtResource("2_h16b8")
+name = &"eye_1"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(14, 9)])
+chance = 0.9
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[sub_resource type="Resource" id="Resource_ahdnf"]
+script = ExtResource("2_h16b8")
+name = &"eye_2"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(10, 4)])
+chance = 0.4
+metadata/_custom_type_script = "uid://bfh2awx2qd881"
+
+[resource]
+script = ExtResource("1_fk3a6")
+id = &"head_beetleon"
+type = &"head"
+sheet = ExtResource("2_14tvy")
+attach = Vector2i(11, 16)
+sockets = Array[ExtResource("2_h16b8")]([SubResource("Resource_h16b8"), SubResource("Resource_14tvy"), SubResource("Resource_ahdnf")])
+name_front = "Beetle"
+name_back = "eon"
+name_full = "Beetleon"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

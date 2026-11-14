@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CreaturePalette" format=3 uid="uid://bq0dwsgpy50om"]
+
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_b02dt"]
+
+[resource]
+script = ExtResource("1_b02dt")
+id = &"cream"
+display_name = "Cream"
+ramp = PackedColorArray(0.09535485, 0.021331785, 0, 1, 0.2, 0.1488, 0.072000004, 1, 0.62, 0.5346467, 0.2542, 1, 0.84, 0.7798, 0.47879997, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"
