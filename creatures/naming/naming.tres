@@ -46,9 +46,16 @@ torso = &"torso_circle_biped"
 name = "Blob"
 metadata/_custom_type_script = "uid://dggtt1osusvfb"
 
+[sub_resource type="Resource" id="Resource_7p6y1"]
+script = ExtResource("2_ec6qq")
+head = &"head_beetleon"
+torso = &"torso_beetleon"
+name = "Beetleon"
+metadata/_custom_type_script = "uid://dggtt1osusvfb"
+
 [resource]
 script = ExtResource("3_53if0")
-fixed_names = Array[ExtResource("2_ec6qq")]([SubResource("Resource_ec6qq"), SubResource("Resource_53if0"), SubResource("Resource_u0jhs"), SubResource("Resource_pofu8")])
+fixed_names = Array[ExtResource("2_ec6qq")]([SubResource("Resource_ec6qq"), SubResource("Resource_53if0"), SubResource("Resource_u0jhs"), SubResource("Resource_pofu8"), SubResource("Resource_7p6y1")])
 small_height = 64
 small_word = "Tiny"
 large_word = "Large"

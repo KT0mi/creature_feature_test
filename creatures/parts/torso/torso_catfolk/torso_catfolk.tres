@@ -18,7 +18,7 @@ accepts_type = PackedStringArray("arm", "wing")
 type_weights = Dictionary[StringName, float]({
 &"wing": 0.05
 })
-forbidden_tags = PackedStringArray("far", "big")
+forbidden_tags = PackedStringArray("far", "big", "back")
 positions = Array[Vector2i]([Vector2i(3, 8)])
 z_offset = 2
 metadata/_custom_type_script = "uid://bfh2awx2qd881"
@@ -30,7 +30,7 @@ accepts_type = PackedStringArray("arm", "wing")
 type_weights = Dictionary[StringName, float]({
 &"wing": 0.05
 })
-forbidden_tags = PackedStringArray("near", "big")
+forbidden_tags = PackedStringArray("near", "big", "back")
 positions = Array[Vector2i]([Vector2i(23, 8)])
 z_offset = -2
 copy_from = &"arm_near"
