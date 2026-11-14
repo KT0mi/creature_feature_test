@@ -56,6 +56,10 @@ var patterns: Dictionary = {}
 ##Cards added to the creature pool by this part
 @export var added_cards: Array[BattleCard]
 
+## Attributes (permanent statuses, e.g. Poisonous) this part gives the
+## creature. Like cards: their own .tres in res://creatures/statuses/.
+@export var added_attributes: Array[StatusEffect]
+
 @export_group("Naming")
 ## Radical used at the FRONT of the main name when this part is the head,
 ## e.g. "Cat" (head) + "wurm" (torso) = "Catwurm".

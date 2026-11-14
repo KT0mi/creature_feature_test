@@ -83,9 +83,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_P:
 				for i in selected:
 					var profile := CombatProfile.from_genome(genomes[i], PartRegistry)
-					print("cell %d: %s\n  %s\n  cards: %s\n  %s" % [i,
+					print("cell %d: %s\n  %s\n  cards: %s\n  attributes: %s\n  %s" % [i,
 						CreatureNamer.name_of(genomes[i], PartRegistry),
 						profile.describe_stats(), profile.describe_cards(),
+						profile.describe_attributes(),
 						JSON.stringify(genomes[i].to_dict())])
 			KEY_EQUAL, KEY_KP_ADD:
 				_zoom(2.0)
@@ -211,7 +212,8 @@ func _update_hud(extra: String = "") -> void:
 		# Battle numbers derived from the parts (see CombatProfile).
 		var profile := CombatProfile.from_genome(genomes[i], PartRegistry)
 		lines.append("     %s" % profile.describe_stats())
-		lines.append("     cards: %s" % profile.describe_cards())
+		lines.append("     cards: %s   attributes: %s" % [profile.describe_cards(),
+			profile.describe_attributes()])
 	if extra != "":
 		lines.append(extra)
 	hud.text = "\n".join(lines)

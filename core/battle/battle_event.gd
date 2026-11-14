@@ -18,6 +18,14 @@ enum Type {
 	CARD_PLAYED, ## `source` played `card` on cell `to`
 	REACTED,   ## `card` (a reaction armed on `unit`) fired
 	DIED,      ## unit reached 0 HP
+	TURN_STARTED,    ## `unit`'s side starts its turn (one event per unit)
+	TURN_ENDED,      ## `unit`'s side ends its turn (one event per unit)
+	ATTACKED,        ## `source` played an attack card on `unit` (sent even
+	                 ## if no damage follows; "whenever you're attacked")
+	HP_LOST,         ## unit lost `amount` HP without being attacked
+	                 ## (e.g. poison); attack reactions don't see this
+	STATUS_APPLIED,  ## `status` applied to unit by `source`; `amount` = count added
+	STATUS_EXPIRED,  ## `status` removed from unit (count 0, fired, cleansed)
 }
 
 var type: Type
@@ -31,6 +39,8 @@ var to: Vector2i
 var amount: int = 0
 ## The card involved (CARD_PLAYED, REACTED), if any.
 var card: BattleCard
+## The status involved (STATUS_APPLIED, STATUS_EXPIRED), if any.
+var status: StatusEffect
 
 
 func _init(p_type: Type = Type.MOVED, p_unit: BattleUnit = null) -> void:
@@ -44,8 +54,10 @@ func describe() -> String:
 	match type:
 		Type.MOVED, Type.PUSHED:
 			return "%s %s %s -> %s" % [Type.keys()[type], who, from, to]
-		Type.DAMAGED, Type.HEALED:
+		Type.DAMAGED, Type.HEALED, Type.HP_LOST:
 			return "%s %s %d" % [Type.keys()[type], who, amount]
 		Type.CARD_PLAYED, Type.REACTED:
 			return "%s %s %s" % [Type.keys()[type], who, card.id if card else &"?"]
+		Type.STATUS_APPLIED, Type.STATUS_EXPIRED:
+			return "%s %s %s" % [Type.keys()[type], who, status.id if status else &"?"]
 	return "%s %s" % [Type.keys()[type], who]

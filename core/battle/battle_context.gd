@@ -60,6 +60,23 @@ func heal(_target: BattleUnit, _amount: int) -> void:
 	_todo("heal")
 
 
+## `unit` loses `amount` HP directly: not an attack, ignores def/res
+## (statuses like Poisoned subtract what they need first). Records HP_LOST.
+func lose_hp(_unit: BattleUnit, _amount: int) -> void:
+	_todo("lose_hp")
+
+
+## `source` applies `amount` of `status` to `target`, following the
+## status's stack_rule if it's already there. Records STATUS_APPLIED.
+func apply_status(_source: BattleUnit, _target: BattleUnit, _status: StatusEffect, _amount: int) -> void:
+	_todo("apply_status")
+
+
+## Removes a status instance (not attributes). Records STATUS_EXPIRED.
+func remove_status(_unit: BattleUnit, _instance: StatusInstance) -> void:
+	_todo("remove_status")
+
+
 func _todo(what: String) -> Variant:
 	push_error("BattleContext.%s() is implemented by the rules engine (phase 2)." % what)
 	return null

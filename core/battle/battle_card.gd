@@ -15,9 +15,11 @@
 ##
 ## Cards only act on the battle through BattleContext, never directly.
 ##
-## Reactions: playing one ARMS it on the unit. Every BattleEvent is then
-## offered to reacts_to(); when it returns true, react() runs and the card
-## is disarmed. (Lifetime and cooldown details: phase 2.)
+## Reactions: playing one ARMS it: the user gets a ReactionStatus that
+## forwards every BattleEvent to this card's reacts_to(); when it returns
+## true, react() runs and the status is removed. Unfired, it expires at the
+## owner's next turn start. The opponent sees it according to
+## `reaction_reveal`.
 class_name BattleCard
 extends Resource
 
@@ -45,6 +47,10 @@ enum Kind { MOVE, ATTACK }
 ## What happens on the target cell, in order (data-only cards).
 @export var effects: Array[CardEffect] = []
 
+## Reactions only: what the opponent sees while it's armed. Default: that a
+## reaction is ready, but not which one.
+@export var reaction_reveal: StatusEffect.Reveal = StatusEffect.Reveal.HIDDEN_DETAILS
+
 
 ## Cells this card can target right now.
 ## Default: `pattern` rotated to the user's facing, kept on the board.
@@ -62,8 +68,12 @@ func targets(ctx: BattleContext, user: BattleUnit) -> Array[Vector2i]:
 
 
 ## What happens when `user` plays this card on `target`.
-## Default: runs `effects` in order.
+## Default: reactions arm themselves on the user; other cards run `effects`
+## in order.
 func play(ctx: BattleContext, user: BattleUnit, target: Vector2i) -> void:
+	if is_reaction():
+		ctx.apply_status(user, user, ReactionStatus.for_card(self), 1)
+		return
 	for effect in effects:
 		if effect != null:
 			effect.apply(ctx, user, target)

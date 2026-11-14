@@ -9,14 +9,16 @@
 ##   build  sum of every part's build_weight (torso included, pairs twice).
 ##          Higher = worse (loses first-turn advantage).
 ##   deck   cards added by the parts. Paired parts add their cards ONCE.
+##   attributes  permanent statuses from the parts (same rules as cards);
+##          applied to the unit when a battle starts.
 ##
 ## Usage: var profile := CombatProfile.from_genome(genome, PartRegistry)
 class_name CombatProfile
 extends RefCounted
 
-## Open design question: if two DIFFERENT parts add the same card, keep
-## both copies (false) or only one (true)? Flip this to test both.
-## (Copies from paired parts are always merged, whatever this says.)
+## Open design question: if two DIFFERENT parts add the same card (or
+## attribute), keep both copies (false) or only one (true)? Flip this to
+## test both. (Copies from paired parts are always merged.)
 static var merge_duplicate_cards := false
 
 ##Stats
@@ -28,6 +30,10 @@ var def: int
 var res: int
 var build: int
 var battle_cards: Array[BattleCard] = []
+## Attributes (permanent StatusEffects). The same attribute from two
+## different parts appears twice (it stacks by the status's stack_rule),
+## unless merge_duplicate_cards is on.
+var attributes: Array[StatusEffect] = []
 
 
 ## Builds the profile of `genome`. `registry` is the PartRegistry (kept for
@@ -58,6 +64,8 @@ func _add_node(node: PartNode, in_copy: bool) -> void:
 	if not in_copy:
 		for card in part.added_cards:
 			_add_card(card)
+		for attribute in part.added_attributes:
+			_add_attribute(attribute)
 	for socket in part.sockets:
 		var child: PartNode = node.children.get(socket.name)
 		if child != null:
@@ -72,6 +80,24 @@ func _add_card(card: BattleCard) -> void:
 			if existing.id == card.id:
 				return
 	battle_cards.append(card)
+
+
+func _add_attribute(attribute: StatusEffect) -> void:
+	if attribute == null:
+		return
+	if merge_duplicate_cards:
+		for existing in attributes:
+			if existing.id == attribute.id:
+				return
+	attributes.append(attribute)
+
+
+## Attribute names, e.g. "Poisonous".
+func describe_attributes() -> String:
+	var names := PackedStringArray()
+	for a in attributes:
+		names.append(a.name if a.name != "" else String(a.id))
+	return ", ".join(names) if not names.is_empty() else "(none)"
 
 
 ## One-line summary, e.g. "PHY 3  SPC 1  HP 12  DEF 2  RES 1  BUILD 7".
