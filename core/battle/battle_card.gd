@@ -9,3 +9,15 @@ extends Resource
 
 #Number of turns this card is inactive for, after use
 @export var cooldown: int
+
+func targets() -> PackedVector2Array:
+	return []
+	
+func play() -> void:
+	return 
+	
+func reacts_to() -> Callable:
+	return func(): return false
+
+func react() -> void:
+	return
