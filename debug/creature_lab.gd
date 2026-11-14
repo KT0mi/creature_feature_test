@@ -8,7 +8,8 @@
 ##   F            fuse the 2 selected: cell 1 = parent A, cell 2 = parent B,
 ##                every other cell = a child with a different fusion seed
 ##   Esc          clear selection / back to the random grid
-##   P            print the selected genomes (IDs) to the Output panel
+##   P            print the selected creatures (name, stats, cards, genome IDs)
+##                to the Output panel
 ##   Arrows/WASD  move the camera       Mouse wheel / +/-  zoom
 extends Node2D
 
@@ -81,8 +82,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				queue_redraw()
 			KEY_P:
 				for i in selected:
-					print("cell %d: %s\n  %s" % [i,
+					var profile := CombatProfile.from_genome(genomes[i], PartRegistry)
+					print("cell %d: %s\n  %s\n  cards: %s\n  %s" % [i,
 						CreatureNamer.name_of(genomes[i], PartRegistry),
+						profile.describe_stats(), profile.describe_cards(),
 						JSON.stringify(genomes[i].to_dict())])
 			KEY_EQUAL, KEY_KP_ADD:
 				_zoom(2.0)
@@ -205,6 +208,10 @@ func _update_hud(extra: String = "") -> void:
 	# Names of the selected creatures.
 	for i in selected:
 		lines.append("  %d: %s" % [i, CreatureNamer.name_of(genomes[i], PartRegistry)])
+		# Battle numbers derived from the parts (see CombatProfile).
+		var profile := CombatProfile.from_genome(genomes[i], PartRegistry)
+		lines.append("     %s" % profile.describe_stats())
+		lines.append("     cards: %s" % profile.describe_cards())
 	if extra != "":
 		lines.append(extra)
 	hud.text = "\n".join(lines)

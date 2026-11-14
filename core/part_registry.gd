@@ -12,6 +12,9 @@ extends Node
 const PARTS_DIR := "res://creatures/parts/"
 const PALETTES_DIR := "res://creatures/palettes/"
 const RECIPES_DIR := "res://creatures/recipes"
+## Card library: one BattleCard .tres per card (any sub-folders). Script
+## cards keep their .gd next to their .tres.
+const CARDS_DIR := "res://creatures/cards/"
 ## Name of the sub-folder (next to a part's .tres) that holds its patterns.
 const PATTERNS_SUBDIR := "patterns"
 ## The palette whose colors parts are DRAWN with (see CreaturePalette).
@@ -38,6 +41,8 @@ var recipes: Dictionary = {}
 var key: CreaturePalette
 ## Naming settings (see CreatureNaming). Defaults if the file is missing.
 var naming: CreatureNaming
+## id (StringName) -> BattleCard, from the card library.
+var cards: Dictionary = {}
 
 
 func _ready() -> void:
@@ -51,6 +56,7 @@ func reload() -> void:
 	palette_ids.clear()
 	pattern_names.clear()
 	recipes.clear()
+	cards.clear()
 
 	for path in _find_tres(PARTS_DIR):
 		var res := load(path)
@@ -89,9 +95,18 @@ func reload() -> void:
 	if naming == null: naming = CreatureNaming.new()
 	
 	
-	# Counterparts can only be checked once every part is loaded.
+	# Cards before the counterpart/card checks below, which use them.
+	var card_paths := _find_tres(CARDS_DIR)
+	card_paths.sort()
+	for path in card_paths:
+		var res := load(path)
+		if res is BattleCard:
+			_add_card(res, path)
+
+	# Counterparts and cards can only be checked once every part is loaded.
 	for def in parts.values():
 		_validate_counterpart(def)
+		_validate_part_cards(def)
 	
 	var recipe_paths := _find_tres(RECIPES_DIR)
 	recipe_paths.sort()
@@ -103,8 +118,13 @@ func reload() -> void:
 				recipes[k] = []
 			recipes[k].append(res)
 	
-	print("PartRegistry: %d parts, %d palettes, %d recipe pairs, patterns: %s."
-		% [parts.size(), palettes.size(), recipes.size(), pattern_names])
+	print("PartRegistry: %d parts, %d palettes, %d cards, %d recipe pairs, patterns: %s."
+		% [parts.size(), palettes.size(), cards.size(), recipes.size(), pattern_names])
+
+## BattleCard by id, or null.
+func get_card(id: StringName) -> BattleCard:
+	return cards.get(id)
+
 
 ## PartDef by id, or null.
 func get_part(id: StringName) -> PartDef:
@@ -203,6 +223,32 @@ func _validate_sockets(def: PartDef, path: String) -> void:
 				push_error("%s: socket '%s' both requires and excludes '%s', it can never be filled."
 					% [where, socket_name, other])
 		earlier.append(socket_name)
+
+func _add_card(card: BattleCard, path: String) -> void:
+	if card.id == &"":
+		push_error("Card without id: %s" % path)
+		return
+	if cards.has(card.id):
+		push_error("Duplicate card id '%s' in %s and %s"
+			% [card.id, cards[card.id].resource_path, path])
+		return
+	cards[card.id] = card
+
+
+## Checks the cards a part adds. Cards should be their own .tres in the
+## card library: a card created INSIDE the part's .tres (embedded) is a
+## separate copy per part, can't be shared, and is easy to break.
+func _validate_part_cards(def: PartDef) -> void:
+	for card in def.added_cards:
+		if card == null:
+			push_warning("Part '%s': empty entry in added_cards." % def.id)
+		elif card.resource_path == "" or card.resource_path.contains("::"):
+			push_warning("Part '%s': card '%s' is embedded in the part; save it as its own .tres in %s."
+				% [def.id, card.id, CARDS_DIR])
+		elif cards.get(card.id) != card:
+			push_warning("Part '%s': card '%s' (%s) isn't in the card library %s."
+				% [def.id, card.id, card.resource_path, CARDS_DIR])
+
 
 ## Checks that `def.counterpart` names an existing part of the same type.
 ## (A typo would otherwise silently fall back to copying the same part.)
