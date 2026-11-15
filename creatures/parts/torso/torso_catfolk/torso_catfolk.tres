@@ -70,6 +70,12 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
 [sub_resource type="Resource" id="Resource_quxcv"]
 script = ExtResource("5_3fi5c")
+phys_dmg = 12
+spc_dmg = 8
+hp = 10
+def = 8
+res = 8
+build_weight = 8
 
 [resource]
 script = ExtResource("1_nxsq6")

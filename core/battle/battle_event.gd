@@ -22,6 +22,7 @@ enum Type {
 					 ## (e.g. poison); attack reactions don't see this
 	STATUS_APPLIED,  ## `status` applied to unit by `source`; `amount` = count added
 	STATUS_EXPIRED,  ## `status` removed from unit (count 0, fired, cleansed)
+	BATTLE_ENDED,    ## 'amount' = winning team (-2 = draw)
 }
 
 var type: Type
@@ -37,6 +38,10 @@ var amount: int = 0
 var card: BattleCard
 ## The status involved (STATUS_APPLIED, STATUS_EXPIRED), if any.
 var status: StatusEffect
+## How deep in a reaction chain this event happened (0 = caused directly
+## by an action). Events deeper than CombatRules.MAX_CHAIN_DEPTH still
+## happen but nothing reacts to them.
+var depth: int = 0
 
 
 func _init(p_type: Type = Type.MOVED, p_unit: BattleUnit = null) -> void:
@@ -46,7 +51,7 @@ func _init(p_type: Type = Type.MOVED, p_unit: BattleUnit = null) -> void:
 
 ## Short readable form for logs, e.g. "DAMAGED Catwurm 3".
 func describe() -> String:
-	var who := unit.label() if unit else "?"
+	var who := unit.label() if unit else "-"
 	match type:
 		Type.MOVED, Type.PUSHED:
 			return "%s %s %s -> %s" % [Type.keys()[type], who, from, to]

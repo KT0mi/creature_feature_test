@@ -12,8 +12,8 @@ extends Node
 const PARTS_DIR := "res://creatures/parts/"
 const PALETTES_DIR := "res://creatures/palettes/"
 const RECIPES_DIR := "res://creatures/recipes"
-##Card sub-folder := 
-const CARDS_DIR := "res:://creatures/cards"
+##Card sub-folder
+const CARDS_DIR := "res://creatures/cards"
 ## Status library: StatusEffect .tres files (statuses and attributes),
 ## scripted ones keep their .gd next to their .tres.
 const STATUSES_DIR := "res://creatures/statuses/"

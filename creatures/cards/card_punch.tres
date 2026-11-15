@@ -6,6 +6,7 @@
 
 [sub_resource type="Resource" id="Resource_ehr5v"]
 script = ExtResource("2_1c7wh")
+power = 0
 metadata/_custom_type_script = "uid://dgi3jhghrr6jr"
 
 [resource]

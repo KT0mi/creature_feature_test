@@ -48,6 +48,11 @@ metadata/_custom_type_script = "uid://bfh2awx2qd881"
 
 [sub_resource type="Resource" id="Resource_eajgy"]
 script = ExtResource("5_hw5x6")
+phys_dmg = 2
+spc_dmg = 3
+hp = 2
+res = 3
+build_weight = 2
 
 [resource]
 script = ExtResource("1_662qe")

@@ -13,10 +13,10 @@ To decide while prototyping/testing:
 - [ ] **How facing changes**: on move, on attack, free turn, or via cards? ([[Grid and Facing#How facing changes]])
 - [x] ~~Status stacking~~: per status, ADD by default ([[Statuses and Attributes]])
 - [x] ~~Does poison count as an attack?~~ No (`lose_hp`)
-- [ ] **Reaction cooldown**: starts when played or when it fires? ([[Cards and Effects#Reactions]])
-- [ ] **Reaction lifetime**: until your next turn, or until it fires?
+- [x] **Reaction cooldown**: starts when played or when it fires? ([[Cards and Effects#Reactions]]) When played.
+- [x] **Reaction lifetime**: until your next turn, or until it fires? Expired when it fires, else, until the creatures next turn
 - [ ] **"Next to"** for reactions: 4 neighbours (orthogonal) or 8 (with diagonals)?
-- [ ] **Team initiative** (3v3): sum of builds, or average?
+- [ ] **Team initiative** (3v3): sum of builds, or average? 
 - [ ] **Creature size** in combat: visual only, or does it matter (e.g. big = easier to hit, can't pass)?
 - [ ] **Damage formula** constants (and minimum damage).
 - [ ] Does **build** do anything besides initiative (e.g. movement range, cooldown penalties)?

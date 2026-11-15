@@ -1,8 +1,15 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://c2pdko2joufsb"]
 
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_o3ui5"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_ryb7h"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_6olu4"]
 [ext_resource type="Texture2D" uid="uid://cef47hyu1tp8u" path="res://creatures/parts/leg/leg_beetleon_near/leg_beetleon_near.png" id="2_a4lyn"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_tests"]
+[ext_resource type="Resource" uid="uid://d4a1wg03rl87d" path="res://creatures/cards/card_step.tres" id="3_42a1x"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="7_toln1"]
+
+[sub_resource type="Resource" id="Resource_snlfu"]
+script = ExtResource("7_toln1")
 
 [resource]
 script = ExtResource("1_ryb7h")
@@ -12,4 +19,6 @@ tags = PackedStringArray("near")
 sheet = ExtResource("2_a4lyn")
 attach = Vector2i(7, 3)
 counterpart = &"leg_beetleon_far"
+stats = SubResource("Resource_snlfu")
+added_cards = Array[ExtResource("2_6olu4")]([ExtResource("3_42a1x")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

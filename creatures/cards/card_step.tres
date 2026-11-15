@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BattleCard" format=3 uid="uid://d4a1wg03rl87d"]
+
+[ext_resource type="Script" uid="uid://0pr8s3jbyoo2" path="res://core/battle/data_driven_cards/card_effect.gd" id="1_w42x2"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_21gyw"]
+[ext_resource type="Script" uid="uid://f0ihby6g3ch7" path="res://core/battle/data_driven_cards/move_self_effect.gd" id="2_qg2p7"]
+
+[sub_resource type="Resource" id="Resource_pips7"]
+script = ExtResource("2_qg2p7")
+metadata/_custom_type_script = "uid://f0ihby6g3ch7"
+
+[resource]
+script = ExtResource("2_21gyw")
+id = &"step"
+name = "Step"
+kind = 0
+pattern = Array[Vector2i]([Vector2i(1, 0)])
+effects = Array[ExtResource("1_w42x2")]([SubResource("Resource_pips7")])
+metadata/_custom_type_script = "uid://cok13ywyqlu1s"

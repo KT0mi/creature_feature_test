@@ -1,8 +1,15 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://dhneq7sbebcvy"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_dpc6l"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_o0pht"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_08fbd"]
 [ext_resource type="Texture2D" uid="uid://cnh7dvdnu0xsf" path="res://creatures/parts/leg/leg_circle_biped/leg_circle_biped.png" id="2_cjs0n"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_yrujd"]
+[ext_resource type="Resource" uid="uid://d4a1wg03rl87d" path="res://creatures/cards/card_step.tres" id="3_rl3m3"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="7_me8lx"]
+
+[sub_resource type="Resource" id="Resource_3xgir"]
+script = ExtResource("7_me8lx")
 
 [resource]
 script = ExtResource("1_dpc6l")
@@ -11,4 +18,6 @@ type = &"leg"
 tags = PackedStringArray("bipedal")
 sheet = ExtResource("2_cjs0n")
 attach = Vector2i(6, 1)
+stats = SubResource("Resource_3xgir")
+added_cards = Array[ExtResource("2_yrujd")]([ExtResource("3_rl3m3")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"
