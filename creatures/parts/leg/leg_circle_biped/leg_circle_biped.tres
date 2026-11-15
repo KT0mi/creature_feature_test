@@ -10,6 +10,12 @@
 
 [sub_resource type="Resource" id="Resource_3xgir"]
 script = ExtResource("7_me8lx")
+phys_dmg = 1
+spc_dmg = 1
+hp = 1
+def = 1
+res = 1
+build_weight = 3
 
 [resource]
 script = ExtResource("1_dpc6l")

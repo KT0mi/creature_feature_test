@@ -1,8 +1,16 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bgtp3lncwhbvf"]
 
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_gevxr"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_vi2dc"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_4ti6m"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_n5cqe"]
 [ext_resource type="Texture2D" uid="uid://ctapclvxosmca" path="res://creatures/parts/horn/horn_beetleon/horn_beetleon.png" id="2_nhmmc"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_mn60g"]
+
+[sub_resource type="Resource" id="Resource_k8cto"]
+script = ExtResource("6_mn60g")
+phys_dmg = 4
+build_weight = 6
 
 [resource]
 script = ExtResource("1_vi2dc")
@@ -11,5 +19,6 @@ type = &"horn"
 tags = PackedStringArray("middle")
 sheet = ExtResource("2_nhmmc")
 attach = Vector2i(3, 29)
+stats = SubResource("Resource_k8cto")
 name_adjective = "Horned"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

@@ -1,8 +1,18 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://myt3klfojxeh"]
 
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_hhme2"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_kh7j8"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_0h76i"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_mu0fj"]
 [ext_resource type="Texture2D" uid="uid://dehbbm2adkbgb" path="res://creatures/parts/tail/tail_catfolk/tail_catfolk.png" id="2_xnn08"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_pj5ud"]
+
+[sub_resource type="Resource" id="Resource_jomk3"]
+script = ExtResource("6_pj5ud")
+phys_dmg = 1
+hp = 1
+def = 1
+build_weight = 1
 
 [resource]
 script = ExtResource("1_kh7j8")
@@ -10,4 +20,5 @@ id = &"tail_catfolk"
 type = &"tail"
 sheet = ExtResource("2_xnn08")
 attach = Vector2i(32, 19)
+stats = SubResource("Resource_jomk3")
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

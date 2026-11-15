@@ -8,8 +8,12 @@
 [ext_resource type="Resource" uid="uid://ciyuo7hbxwbmj" path="res://creatures/cards/card_punch.tres" id="3_5uy00"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="7_8sgyl"]
 
-[sub_resource type="Resource" id="Resource_v7n3p"]
+[sub_resource type="Resource" id="Resource_mj12x"]
 script = ExtResource("7_8sgyl")
+phys_dmg = 6
+hp = -1
+def = 3
+build_weight = 6
 
 [resource]
 script = ExtResource("1_tpagi")
@@ -19,7 +23,7 @@ tags = PackedStringArray("big", "far")
 sheet = ExtResource("2_dmya5")
 attach = Vector2i(12, 6)
 counterpart = &"arm_beetleon_near"
-stats = SubResource("Resource_v7n3p")
+stats = SubResource("Resource_mj12x")
 added_cards = Array[ExtResource("2_k0agq")]([ExtResource("3_5uy00")])
 name_adjective = "Strong"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

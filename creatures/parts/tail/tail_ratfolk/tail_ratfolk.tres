@@ -1,8 +1,19 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cea5wh4qln7ai"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_j4b15"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_k6pjr"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_64a36"]
 [ext_resource type="Texture2D" uid="uid://dv6g42uunocrq" path="res://creatures/parts/tail/tail_ratfolk/tail_ratfolk.png" id="2_eu8h7"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_vna1k"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_m05a4"]
+
+[sub_resource type="Resource" id="Resource_8vdpn"]
+script = ExtResource("6_m05a4")
+phys_dmg = 2
+spc_dmg = -1
+hp = 2
+res = 1
+build_weight = 2
 
 [resource]
 script = ExtResource("1_j4b15")
@@ -10,4 +21,5 @@ id = &"tail_ratfolk"
 type = &"tail"
 sheet = ExtResource("2_eu8h7")
 attach = Vector2i(35, 2)
+stats = SubResource("Resource_8vdpn")
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

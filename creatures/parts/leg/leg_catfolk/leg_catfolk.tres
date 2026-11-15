@@ -6,10 +6,16 @@
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_ah3ls"]
 [ext_resource type="Texture2D" uid="uid://c10l0dp4efqpa" path="res://creatures/parts/leg/leg_catfolk/leg_catfolk.png" id="2_mm8o5"]
 [ext_resource type="Resource" uid="uid://d4a1wg03rl87d" path="res://creatures/cards/card_step.tres" id="3_lk7n4"]
+[ext_resource type="Resource" uid="uid://bhj4v63a35rfu" path="res://creatures/cards/card_cat_jump.tres" id="4_ah3ls"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="7_8vgh2"]
 
 [sub_resource type="Resource" id="Resource_csoch"]
 script = ExtResource("7_8vgh2")
+phys_dmg = 1
+hp = 2
+def = 2
+res = 2
+build_weight = 2
 
 [resource]
 script = ExtResource("1_u8swu")
@@ -19,5 +25,5 @@ tags = PackedStringArray("bipedal")
 sheet = ExtResource("2_mm8o5")
 attach = Vector2i(12, 2)
 stats = SubResource("Resource_csoch")
-added_cards = Array[ExtResource("2_ah3ls")]([ExtResource("3_lk7n4")])
+added_cards = Array[ExtResource("2_ah3ls")]([ExtResource("3_lk7n4"), ExtResource("4_ah3ls")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

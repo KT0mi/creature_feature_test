@@ -1,8 +1,20 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://b5nlsa7e6nnvu"]
 
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_dqtm7"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_i2e7c"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_3y77i"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_eryba"]
 [ext_resource type="Texture2D" uid="uid://7rcmecoqhgch" path="res://creatures/parts/wing/wing_amphitere_near/wing_amphitere_near.png" id="2_hqcjl"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_bf1u0"]
+
+[sub_resource type="Resource" id="Resource_n3xqh"]
+script = ExtResource("6_bf1u0")
+phys_dmg = 1
+spc_dmg = 1
+hp = 1
+def = -2
+res = 2
+build_weight = 4
 
 [resource]
 script = ExtResource("1_i2e7c")
@@ -12,5 +24,6 @@ tags = PackedStringArray("near")
 sheet = ExtResource("2_hqcjl")
 attach = Vector2i(46, 31)
 counterpart = &"wing_amphitere_far"
+stats = SubResource("Resource_n3xqh")
 name_adjective = "Winged"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

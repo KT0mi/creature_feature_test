@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BattleCard" format=3 uid="uid://bhj4v63a35rfu"]
+
+[ext_resource type="Script" uid="uid://0pr8s3jbyoo2" path="res://core/battle/data_driven_cards/card_effect.gd" id="1_fojkl"]
+[ext_resource type="Script" uid="uid://f0ihby6g3ch7" path="res://core/battle/data_driven_cards/move_self_effect.gd" id="2_b67xu"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_so28v"]
+
+[sub_resource type="Resource" id="Resource_ahrmu"]
+script = ExtResource("2_b67xu")
+metadata/_custom_type_script = "uid://f0ihby6g3ch7"
+
+[resource]
+script = ExtResource("2_so28v")
+id = &"cat_jump"
+name = "Cat Jump"
+kind = 0
+cooldown = 1
+pattern = Array[Vector2i]([Vector2i(1, 0), Vector2i(2, 0), Vector2i(1, 1), Vector2i(1, -1)])
+effects = Array[ExtResource("1_fojkl")]([SubResource("Resource_ahrmu")])
+metadata/_custom_type_script = "uid://cok13ywyqlu1s"

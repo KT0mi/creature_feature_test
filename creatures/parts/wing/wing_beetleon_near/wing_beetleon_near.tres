@@ -1,8 +1,18 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://bi8qk3vcyuamc"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_6gqxd"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_gskq3"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_0xy5i"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_emho4"]
 [ext_resource type="Texture2D" uid="uid://dwntvuuxk8r36" path="res://creatures/parts/wing/wing_beetleon_near/wing_beetleon.png" id="2_t1l5h"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_cxh3e"]
+
+[sub_resource type="Resource" id="Resource_2mueo"]
+script = ExtResource("6_cxh3e")
+phys_dmg = 2
+hp = -1
+def = 4
+build_weight = 5
 
 [resource]
 script = ExtResource("1_6gqxd")
@@ -12,5 +22,6 @@ tags = PackedStringArray("near", "big", "back")
 sheet = ExtResource("2_t1l5h")
 attach = Vector2i(13, 3)
 counterpart = &"wing_beetleon_far"
+stats = SubResource("Resource_2mueo")
 name_adjective = "Winged"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"
