@@ -1,8 +1,20 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://deggqwommuk1e"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_2fhta"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_878qh"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_uj1dv"]
 [ext_resource type="Texture2D" uid="uid://ewyx0500traf" path="res://creatures/parts/arm/arm_circle_biped/arm_circle_biped.png" id="2_3ptws"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_h110k"]
+[ext_resource type="Resource" uid="uid://ciyuo7hbxwbmj" path="res://creatures/cards/card_punch.tres" id="2_oib6u"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_oib6u"]
+
+[sub_resource type="Resource" id="Resource_878qh"]
+script = ExtResource("5_oib6u")
+phys_dmg = 1
+hp = 1
+def = 1
+res = -1
+build_weight = 2
 
 [resource]
 script = ExtResource("1_2fhta")
@@ -10,4 +22,6 @@ id = &"arm_circle_biped"
 type = &"arm"
 sheet = ExtResource("2_3ptws")
 attach = Vector2i(7, 2)
+stats = SubResource("Resource_878qh")
+added_cards = Array[ExtResource("1_uj1dv")]([ExtResource("2_oib6u")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

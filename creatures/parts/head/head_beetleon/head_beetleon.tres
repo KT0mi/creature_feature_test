@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_ahdnf"]
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_fk3a6"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_sjby5"]
 [ext_resource type="Texture2D" uid="uid://c4j8qevlbbmbr" path="res://creatures/parts/head/head_beetleon/head_beetleon.png" id="2_14tvy"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_h16b8"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_sjby5"]

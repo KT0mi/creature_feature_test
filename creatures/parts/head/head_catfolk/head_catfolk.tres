@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://cg15vdtgob5my"]
 
 [ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="1_2ek7f"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_igac1"]
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="1_j0plo"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_2lvyj"]
 [ext_resource type="Texture2D" uid="uid://dvlko2paeb5it" path="res://creatures/parts/head/head_catfolk/head_catfolk.png" id="2_obq7o"]
