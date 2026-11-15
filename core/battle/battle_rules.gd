@@ -140,7 +140,9 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 	# cooldown 0 = usable again next turn, 1 = skips one turn, etc.
 	u.cooldowns[action.slot] = card.cooldown + 1
 
-	if card.kind == BattleCard.Kind.ATTACK and CombatRules.TURN_TO_ATTACK:
+	# Aimed attacks turn the user towards the aim (aim SELF cards don't).
+	if card.kind == BattleCard.Kind.ATTACK and card.aim == BattleCard.Aim.CELL \
+			and CombatRules.TURN_TO_ATTACK:
 		var facing := Grid.facing_of(action.target - u.position)
 		if facing != -1:
 			turn(u, facing)
@@ -149,17 +151,26 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 	played.to = action.target
 	played.card = card
 	_emit(played)
+	# Every unit in the attack's area is ATTACKED (in the area's fixed order)
+	# and reacts right away: one that dodges out of the area isn't hit,
+	# because effects hit CELLS, not the units listed here.
 	if card.kind == BattleCard.Kind.ATTACK:
-		var victim := unit_at(action.target)
-		if victim != null and victim != u:
+		for victim in card.victims(self, u, action.target):
+			if victim == u or not victim.is_alive():
+				continue
 			var attacked := _event(BattleEvent.Type.ATTACKED, victim)
 			attacked.source = u
-			attacked.to = action.target
+			attacked.to = victim.position
 			attacked.card = card
 			_emit(attacked)
 
 	if u.is_alive() and not state.is_over():
+		# The target is the center of the card's area (see PushEffect).
+		# Saved and restored in case a reaction plays a card meanwhile.
+		var saved_target := action_target
+		action_target = action.target
 		card.play(self, u, action.target)
+		action_target = saved_target
 	_check_winner()
 	return state.battle_log.slice(mark)
 

@@ -44,6 +44,29 @@ func targets(ctx: BattleContext, user: BattleUnit) -> Array[Vector2i]
 ## What happens when it's played on `target`. Default: run `effects`.
 func play(ctx: BattleContext, user: BattleUnit, target: Vector2i) -> void
 
+## Area attacks (aim vs area)
+A card separates **where you aim** from **what it hits**:
+- `aim`: **CELL** (pick a cell from `pattern`) or **SELF** (no pick: the target is the user's own cell).
+- `area`: offsets from the target that get hit, authored as if aiming right and **rotated to the aim** (the user's facing for SELF, otherwise the direction from the user to the target). Default `[(0, 0)]` = only the target, so normal cards are unchanged.
+- `hits_self` (default off), `hits_allies` (friendly fire, default on). Enemies are always hit.
+
+| Card | aim | pattern | area |
+|---|---|---|---|
+| Tail Swipe | SELF | — | the 8 cells around (0,0) |
+| Fireball | CELL | (2,0), (3,0) | (0,0) + its 4 neighbours |
+| Breath (cone) | CELL | (1,0) | (0,0), (1,-1), (1,0), (1,1) |
+| Punch | CELL | (1,0) | (0,0) |
+
+How it resolves:
+1. Every unit in the area gets `ATTACKED` (and reacts at once). One that dodges out isn't hit, because effects hit **cells**.
+2. Effects run **effect by effect** over all affected cells (all damage, then all pushes).
+3. Cells are processed **farthest from the target first**, so outward pushes don't make units bump into each other.
+4. Aim SELF cards don't turn the user.
+
+The action is still "card + one cell", so the AI, previews and replays need nothing special: the AI simulates the action and sees every victim. `affected_cells()` and `victims()` can also be asked directly (UI highlight, AI pruning). Script cards may override `affected_cells()`; it must only read the board.
+
+New push direction **AWAY_FROM_CENTER** (center = the target cell) for blasts; the unit on the center is pushed away from the user.
+
 ## Reactions only (see below).
 func is_reaction() -> bool
 func reacts_to(ctx: BattleContext, owner: BattleUnit, event: BattleEvent) -> bool
