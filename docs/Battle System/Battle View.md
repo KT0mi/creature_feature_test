@@ -8,7 +8,34 @@ Back to [[Battle System Overview]]
 
 The view **shows** the battle and turns clicks into `BattleAction`s. It never changes the battle state itself; it only calls the [[Rules Engine]] and animates the events it gets back.
 
-## Scene layout
+## Status
+First playable version on branch `claude/battle-scene` (`res://battle/`). Open it from the creature lab (select 2 creatures, press **V**) or run `battle_scene.tscn` directly (F6) for a random match-up.
+
+## Board: isometric
+- 5×5 isometric board, like Into the Breach but flatter: one cell fits in a **166 × 83** rectangle (`BoardView.cell_size`, easy to change).
+- Grid +x goes down-right on screen, +y goes down-left; cell (0,0) is the top corner.
+- `BoardView.tile_texture`: put the tile art there (cell_size big, diamond centered). Without it, placeholder diamonds are drawn in code.
+- **Pixel note:** with an odd height (83) half a cell is 41.5 px, so rows alternate 41/42 px (positions are floored). An even height (e.g. 166 × 84) avoids a possible 1 px unevenness in tile art.
+
+## Facing on screen
+Only left/right exist for sprites: grid RIGHT and UP look right on screen, DOWN and LEFT look left (`UnitView.ART_FACES_LEFT` if the art faces left). A small arrow on the ground shows the exact direction, in team color.
+
+## Scene layout (as built)
+```
+BattleScene (Node2D, battle_scene.gd)   controller: input, AI turns, event playback
+├── BoardView                            board, highlights, mouse → cell
+├── Units (y-sorted)                     UnitView × n: sprite, HP bar, arrow, "!", selection
+├── FX                                   floating texts
+└── CanvasLayer / BattleHUD              turn + build, unit info, log, cards, End turn, result
+```
+
+## Controls
+Click your creature → click a card (or 1–9) → click a highlighted cell. Hovering a target shows the walk **path** or the attack **area**. Aim-SELF cards (Tail Swipe): press the card again, or click any cell of the area. Right click / Esc: cancel. Space: end turn.
+
+## Event playback
+The rules apply an action instantly and return its events; the scene replays them in order (steps walked cell by cell, pushes faster, damage flash + numbers, statuses, reactions "!", deaths). Views follow the events, then snap to the real state. Hidden enemy statuses (e.g. traps) are not shown or logged.
+
+## Original plan: scene layout
 ```
 BattleScene (Node2D)
 ├── Board          the 5×5 grid, tile highlights

@@ -8,6 +8,8 @@
 ##   F            fuse the 2 selected: cell 1 = parent A, cell 2 = parent B,
 ##                every other cell = a child with a different fusion seed
 ##   Esc          clear selection / back to the random grid
+##   V            PLAY a battle: first selected creature (you) vs the second
+##                (AI), in the battle scene
 ##   B            auto-battle the 2 selected creatures (greedy AI vs greedy
 ##                AI, 1v1) and print the battle log
 ##   P            print the selected creatures (name, stats, cards, genome IDs)
@@ -82,6 +84,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					_build_random_grid()
 				selected.clear()
 				queue_redraw()
+			KEY_V:
+				_play_battle()
 			KEY_B:
 				_auto_battle()
 			KEY_P:
@@ -160,6 +164,16 @@ func _show(list: Array[Genome]) -> void:
 	queue_redraw()
 	_update_hud()
 
+## Opens the battle scene: first selected creature (player) vs second (AI).
+func _play_battle() -> void:
+	if selected.size() != 2:
+		_update_hud("Select exactly 2 creatures to battle.")
+		return
+	var a: Array[Genome] = [genomes[selected[0]]]
+	var b: Array[Genome] = [genomes[selected[1]]]
+	BattleScene.open(get_tree(), a, b, hash([a[0].seed, b[0].seed]))
+
+
 ## Fights the 2 selected creatures (AI vs AI) and prints every event.
 func _auto_battle() -> void:
 	if selected.size() != 2:
@@ -233,7 +247,7 @@ func _update_hud(extra: String = "") -> void:
 	if PartRegistry.parts.is_empty():
 		lines.append("No parts found in %s" % PartRegistry.PARTS_DIR)
 	elif fusion_parents.is_empty():
-		lines.append("seed %d   R/Shift+R: seed   click: select   F: fuse" % grid_seed)
+		lines.append("seed %d   R/Shift+R: seed   click: select   F: fuse   V: play battle   B: auto-battle" % grid_seed)
 	else:
 		lines.append("fusion of seeds %d x %d   Esc: back" % [fusion_parents[0].seed, fusion_parents[1].seed])
 	lines.append("selected: %s   P: print   wheel/+/-: zoom   arrows: move" % [selected])

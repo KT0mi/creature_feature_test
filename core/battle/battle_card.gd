@@ -94,7 +94,7 @@ func targets(ctx: BattleContext, user: BattleUnit) -> Array[Vector2i]:
 	if aim == Aim.SELF or (is_reaction() and pattern.is_empty()):
 		out.append(user.position)
 		return out
-	var move_effect := _move_effect() if kind == Kind.MOVE else null
+	var move_effect := move_effect() if kind == Kind.MOVE else null
 	for offset in pattern:
 		var cell := user.position + Grid.rotate(offset, user.facing)
 		if not Grid.in_bounds(cell):
@@ -109,7 +109,7 @@ func targets(ctx: BattleContext, user: BattleUnit) -> Array[Vector2i]:
 
 
 ## The card's first MoveSelfEffect, or null.
-func _move_effect() -> MoveSelfEffect:
+func move_effect() -> MoveSelfEffect:
 	for effect in effects:
 		if effect is MoveSelfEffect:
 			return effect

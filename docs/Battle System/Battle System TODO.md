@@ -50,7 +50,13 @@ Back to [[Battle System Overview]]. One branch per phase.
 - [x] PushEffect AWAY_FROM_CENTER
 - [ ] Make a Tail Swipe card for a tail part
 
-## Phase 3: Playable 1v1
+## Phase 3: Playable 1v1 (branch `claude/battle-scene`)
+- [x] Isometric board (166×83 cells), y-sorted unit views, facing arrows
+- [x] Select unit → card → target; path / area preview on hover; end turn
+- [x] Event animations (steps, pushes, damage, heals, statuses, reactions, deaths)
+- [x] HUD: cards with cooldowns and budget, unit info, build/initiative, log, result
+- [x] Start from the creature lab (V); rematch / back to lab
+- [ ] Plug in the tile art (`BoardView.tile_texture`)
 - [ ] `BattleScene`: board, y-sorted unit views, facing arrows ([[Battle View]])
 - [ ] Select unit → card → target; end turn
 - [ ] Event animations (move, turn, push, damage, reaction, death)
