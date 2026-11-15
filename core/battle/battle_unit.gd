@@ -16,8 +16,9 @@ var team: int = 0
 var position: Vector2i
 var facing: Grid.Facing = Grid.Facing.RIGHT
 var hp: int = 0
-## card id (StringName) -> turns left before it can be played again.
-## Missing or 0 = ready.
+## deck slot (index in profile.battle_cards) -> turns left before it can be
+## played again. Missing or 0 = ready. Per SLOT, not per card id, so two
+## copies of the same card cool down independently.
 var cooldowns: Dictionary = {}
 ## Statuses, attributes and armed reactions currently on this unit.
 var statuses: Array[StatusInstance] = []
@@ -36,9 +37,14 @@ func is_alive() -> bool:
 	return hp > 0
 
 
-## True if `card` is off cooldown.
-func is_ready(card: BattleCard) -> bool:
-	return cooldowns.get(card.id, 0) <= 0
+## True if the card in deck slot `slot` is off cooldown.
+func is_slot_ready(slot: int) -> bool:
+	return cooldowns.get(slot, 0) <= 0
+
+
+## The unit's cards (its deck), by slot.
+func deck() -> Array[BattleCard]:
+	return profile.battle_cards
 
 ## The StatusInstance of status `id`, or null.
 func get_status(id: StringName) -> StatusInstance:

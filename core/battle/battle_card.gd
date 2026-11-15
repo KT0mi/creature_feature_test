@@ -56,6 +56,10 @@ enum Kind { MOVE, ATTACK }
 ## Movement cards also need the cell to be free.
 func targets(ctx: BattleContext, user: BattleUnit) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
+	# A reaction with no pattern is played on its user (it just arms).
+	if is_reaction() and pattern.is_empty():
+		out.append(user.position)
+		return out
 	for offset in pattern:
 		var cell := user.position + Grid.rotate(offset, user.facing)
 		if not Grid.in_bounds(cell):

@@ -8,6 +8,8 @@
 ##   F            fuse the 2 selected: cell 1 = parent A, cell 2 = parent B,
 ##                every other cell = a child with a different fusion seed
 ##   Esc          clear selection / back to the random grid
+##   B            auto-battle the 2 selected creatures (greedy AI vs greedy
+##                AI, 1v1) and print the battle log
 ##   P            print the selected creatures (name, stats, cards, genome IDs)
 ##                to the Output panel
 ##   Arrows/WASD  move the camera       Mouse wheel / +/-  zoom
@@ -80,6 +82,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					_build_random_grid()
 				selected.clear()
 				queue_redraw()
+			KEY_B:
+				_auto_battle()
 			KEY_P:
 				for i in selected:
 					var profile := CombatProfile.from_genome(genomes[i], PartRegistry)
@@ -155,6 +159,34 @@ func _show(list: Array[Genome]) -> void:
 		sprites.append(sprite)
 	queue_redraw()
 	_update_hud()
+
+
+## Fights the 2 selected creatures (AI vs AI) and prints every event.
+func _auto_battle() -> void:
+	if selected.size() != 2:
+		_update_hud("Select exactly 2 creatures to battle.")
+		return
+	var names := PackedStringArray()
+	var profiles: Array[CombatProfile] = []
+	for i in selected:
+		names.append(CreatureNamer.name_of(genomes[i], PartRegistry))
+		profiles.append(CombatProfile.from_genome(genomes[i], PartRegistry))
+	var a: Array[CombatProfile] = [profiles[0]]
+	var b: Array[CombatProfile] = [profiles[1]]
+	var rules := BattleRules.new_battle(a, b, hash([genomes[selected[0]].seed, genomes[selected[1]].seed]),
+		PackedStringArray([names[0]]), PackedStringArray([names[1]]))
+	rules.start()
+	var ai := BattleAI.new(BattleAI.Mode.GREEDY, grid_seed)
+	while not rules.state.is_over():
+		ai.play_turn(rules)
+	print("=== %s vs %s ===" % [names[0], names[1]])
+	for ev in rules.state.log:
+		if ev.type != BattleEvent.Type.TURN_STARTED and ev.type != BattleEvent.Type.TURN_ENDED:
+			print("  " + ev.describe())
+	var w := rules.state.winner
+	var result := "draw" if w < 0 else "%s wins in %d rounds" % [names[w], rules.state.round]
+	print("=== %s ===" % result)
+	_update_hud("Battle: " + result + " (log in Output)")
 
 
 # --------------------------------------------------------------- selection
