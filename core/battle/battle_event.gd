@@ -5,9 +5,12 @@ class_name BattleEvent
 extends RefCounted
 
 enum Type {
-	MOVED,     ## unit went from `from` to `to` by its own move
+	MOVED,     ## a move FINISHED: unit went from `from` to `to` (where it
+	           ## actually ended). `interrupted` = it didn't reach the cell
+	           ## it was going to (blocked, stopped by a reaction, killed...)
 	TURNED,    ## unit's facing changed to `amount` (a Grid.Facing)
-	PUSHED,    ## unit was pushed from `from` to `to` by `source`
+	PUSHED,    ## a push FINISHED: unit was pushed from `from` to `to` by
+	           ## `source` (where it actually ended)
 	COLLIDED,  ## unit was pushed into something at `to` (and stopped)
 	DAMAGED,   ## unit lost `amount` HP, dealt by `source`
 	HEALED,    ## unit gained `amount` HP
@@ -22,6 +25,9 @@ enum Type {
 					 ## (e.g. poison); attack reactions don't see this
 	STATUS_APPLIED,  ## `status` applied to unit by `source`; `amount` = count added
 	STATUS_EXPIRED,  ## `status` removed from unit (count 0, fired, cleansed)
+	MOVE_STARTED,    ## unit starts moving from `from`, intending to reach `to`
+	STEPPED,         ## unit entered cell `to` from `from` (one per cell walked
+	                 ## or pushed). `forced` = pushed, not its own move
 	BATTLE_ENDED,    ## 'amount' = winning team (-2 = draw)
 }
 
@@ -36,8 +42,13 @@ var to: Vector2i
 var amount: int = 0
 ## The card involved (CARD_PLAYED, REACTED), if any.
 var card: BattleCard
-## The status involved (STATUS_APPLIED, STATUS_EXPIRED), if any.
+## The status involved (STATUS_APPLIED, STATUS_EXPIRED), if any. For a
+## status on a CELL, `unit` is null and `to` is the cell.
 var status: StatusEffect
+## STEPPED: the unit was pushed rather than moving by itself.
+var forced: bool = false
+## MOVED / PUSHED: the unit stopped before reaching where it was going.
+var interrupted: bool = false
 ## How deep in a reaction chain this event happened (0 = caused directly
 ## by an action). Events deeper than CombatRules.MAX_CHAIN_DEPTH still
 ## happen but nothing reacts to them.
@@ -54,11 +65,15 @@ func describe() -> String:
 	var who := unit.label() if unit else "-"
 	match type:
 		Type.MOVED, Type.PUSHED:
-			return "%s %s %s -> %s" % [Type.keys()[type], who, from, to]
+			return "%s %s %s -> %s%s" % [Type.keys()[type], who, from, to,
+				" (interrupted)" if interrupted else ""]
+		Type.MOVE_STARTED, Type.STEPPED:
+			return "%s %s %s -> %s%s" % [Type.keys()[type], who, from, to, " (forced)" if forced else ""]
 		Type.DAMAGED, Type.HEALED, Type.HP_LOST:
 			return "%s %s %d" % [Type.keys()[type], who, amount]
 		Type.CARD_PLAYED, Type.REACTED:
 			return "%s %s %s" % [Type.keys()[type], who, card.id if card else &"?"]
 		Type.STATUS_APPLIED, Type.STATUS_EXPIRED:
-			return "%s %s %s" % [Type.keys()[type], who, status.id if status else &"?"]
+			var where := who if unit else "cell %s" % to
+			return "%s %s %s" % [Type.keys()[type], where, status.id if status else &"?"]
 	return "%s %s" % [Type.keys()[type], who]

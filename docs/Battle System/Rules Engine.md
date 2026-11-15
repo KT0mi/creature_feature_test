@@ -30,6 +30,9 @@ func apply(state: BattleState, action: BattleAction) -> Array[BattleEvent]
 - **Previews**: run `apply` on a copy of the state and show the result (predicted damage, where pushes end).
 - **AI** and **headless simulations** use the same two functions.
 
+## Movement
+Own moves and pushes go **cell by cell**; see [[Movement]].
+
 ## Turn structure
 - Sides alternate. On its turn, each unit may play **up to 2 cards**, in **any order**:
   - 1 move + 1 attack, or 2 moves, or 1, or none.
@@ -56,16 +59,20 @@ special:  max(1, card_power + spc_dmg - res)
 Each attack card says whether it's physical or special. All formulas live in `CombatRules` so tuning never touches the rest of the code.
 
 ## Events and triggers (needed for reactions)
-`apply` doesn't change the state in one go. It pushes events through a small **event queue**:
-1. An effect produces an event (e.g. "enemy moved to (2,3)").
-2. The event is applied to the state and logged.
-3. Every armed **reaction** and **passive** gets a chance to respond (see [[Cards and Effects]]). Their own effects produce new events, which go into the queue.
-4. Repeat until the queue is empty.
+**Events resolve immediately (depth-first).** The moment something happens, its event is logged and every status on the board gets to react to it, **before** the code that caused it continues:
+1. An effect changes the state (e.g. a unit steps into (2,3)) and emits the event.
+2. Every status reacts right away, in a fixed order: units in order (their statuses in the order applied), then cell statuses row by row ([[Statuses and Attributes]]).
+3. Whatever a reaction does is itself an event, one level deeper, and resolves the same way.
+4. Only then does the original code continue, and it must re-check the board (the context functions do: alive? cell free?).
+
+This is what makes **interruptions** possible: a trap stops a walk at the step that entered it, a dodge moves away before the hit lands ([[Movement]]).
 
 Safety rules so chains stay sane:
-- A given reaction triggers at most once per action.
-- A maximum chain depth (e.g. 8) stops infinite loops.
-- Queue order is fixed (first in, first out), so results are deterministic.
+- A status reacts at most `max_triggers_per_action` times (default **1**) per top-level call (`apply`, `end_turn`, `start`). Raise it for per-step effects.
+- Events deeper than `MAX_CHAIN_DEPTH` (8) get no reactions.
+- The reaction order is fixed, so results are deterministic (replays, AI).
+
+> History: the first version used a first-in-first-out queue processed after the whole action. It couldn't interrupt anything, so it was replaced.
 
 ## Winning
 All units of one side at 0 HP. (Later maybe: turn limit, objectives.)

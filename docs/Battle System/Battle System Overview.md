@@ -47,6 +47,7 @@ The **model** never waits for the **view**: it applies an action and returns a l
 - [[Combat Profile]]: how stats, build and deck come from the genome
 - [[Rules Engine]]: state, turn structure, initiative, cooldowns, damage, events
 - [[Grid and Facing]]: the 5×5 board, 4-way facing, pattern rotation
+- [[Movement]]: walking step by step, move modes, interruptions, paths
 - [[Cards and Effects]]: card data, effects, script cards, **reactions**, passives
 - [[Statuses and Attributes]]: Poisoned-like statuses, permanent attributes, armed reactions as statuses
 - [[Battle View]]: scenes, sprites on the board, HUD, animations
@@ -54,3 +55,4 @@ The **model** never waits for the **view**: it applies an action and returns a l
 - [[Integration with Creature Systems]]: how it plugs into parts, fusion, baker, tools
 - [[Battle Open Questions]]
 - [[Battle System TODO]]
+- Pending (designed, not built): [[Terrain]], [[Battle Maps]]

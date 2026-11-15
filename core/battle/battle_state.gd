@@ -17,6 +17,10 @@ var first_team: int = 0
 ##-1 while fighting, else the winning team; -2 = draw (after MAX_ROUNDS).
 var winner: int = -1
 
+## Statuses placed on cells (traps, burning ground...): cell (Vector2i) ->
+## Array[StatusInstance]. Cells without any aren't in the dictionary.
+var cell_statuses: Dictionary = {}
+
 ##Every event so far
 var battle_log: Array[BattleEvent] = []
 
@@ -26,6 +30,35 @@ var rng := RandomNumberGenerator.new()
 func is_over() -> bool:
 	return winner != -1
 	
+## Statuses on `cell` (empty array if none). Don't modify the result.
+func statuses_at(cell: Vector2i) -> Array:
+	return cell_statuses.get(cell, [])
+
+
+## Cell statuses a unit of `viewer_team` can see: everything placed by its
+## own team; for the other team's, SHOWN and HIDDEN_DETAILS ones (the view
+## shows only "something is there" for the latter). HIDDEN ones (traps)
+## are left out.
+func cell_statuses_visible_to(cell: Vector2i, viewer_team: int) -> Array[StatusInstance]:
+	var out: Array[StatusInstance] = []
+	for inst in statuses_at(cell):
+		var placer: BattleUnit = inst.source
+		if (placer != null and placer.team == viewer_team) \
+				or inst.status.reveal != StatusEffect.Reveal.HIDDEN:
+			out.append(inst)
+	return out
+
+
+## Cells that hold statuses, in a fixed order (row by row), so they react
+## in the same order every time.
+func status_cells() -> Array[Vector2i]:
+	var cells: Array[Vector2i] = []
+	cells.assign(cell_statuses.keys())
+	cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		return a.y < b.y or (a.y == b.y and a.x < b.x))
+	return cells
+
+
 ## The living unit on `cell`, or null.
 func unit_at(cell: Vector2i) -> BattleUnit:
 	for u in units:
@@ -67,4 +100,12 @@ func clone() -> BattleState:
 	for i in units.size():
 		for s in units[i].statuses:
 			copy.units[i].statuses.append(StatusInstance.new(s.status, s.count, mapping.get(s.source)))
+	for cell in cell_statuses:
+		var list: Array[StatusInstance] = []
+		for s in cell_statuses[cell]:
+			var c := StatusInstance.new(s.status, s.count, mapping.get(s.source))
+			c.on_cell = true
+			c.cell = cell
+			list.append(c)
+		copy.cell_statuses[cell] = list
 	return copy

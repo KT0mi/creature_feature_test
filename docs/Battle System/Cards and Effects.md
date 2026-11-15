@@ -62,6 +62,8 @@ Lifecycle (proposal, to confirm in tests):
 5. If it hasn't fired by the start of your next turn, it **expires**.
 6. **Open:** cooldown starts when played, or when it fires?
 
+> **Update:** Backstep now reacts to `STEPPED` (an enemy *entering* an adjacent cell, mid-walk) rather than `MOVED`. See [[Movement]].
+
 ### Example: Backstep
 > Move. Reaction. When an enemy enters a cell next to this creature, step 1 cell directly away from it.
 
@@ -74,7 +76,7 @@ func is_reaction() -> bool:
 	return true
 
 func reacts_to(ctx: BattleContext, owner: BattleUnit, event: BattleEvent) -> bool:
-	return event.type == BattleEvent.Type.MOVED \
+	return event.type == BattleEvent.Type.STEPPED \
 		and ctx.is_enemy(event.unit, owner) \
 		and Grid.is_orthogonally_adjacent(event.to, owner.position)
 
@@ -96,8 +98,9 @@ Small `CardEffect` resources, each with one job:
 |---|---|
 | `DamageEffect` | power, physical/special |
 | `PushEffect` | direction (away from user / user's facing…), distance; collisions deal damage |
-| `MoveSelfEffect` | (moves the user to the target cell) |
+| `MoveSelfEffect` | mode: WALK / DASH / JUMP / TELEPORT (see [[Movement]]); face movement |
 | `HealEffect` | amount |
+| `ApplyStatusEffect` | status, amount, target: the unit there / self / **the cell** (traps) |
 | later: status effects | … |
 
 If an effect gets too specific, write a script card instead.

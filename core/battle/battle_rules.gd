@@ -1,30 +1,52 @@
 @tool
-##Rules Engine: Runs a battle on BattleState
+## The rules engine: runs a battle on a BattleState.
 ##
-## Event processing: changes happen immediately and their events go into a
-## queue; _flush() then offers each event to the statuses, whose own changes
-## add more events (one level deeper). Safety rules:
-##   * a status instance reacts at most once per top-level call
-##     (apply / end_turn / start);
+## It IS the BattleContext cards and statuses act through, so everything
+## they do (move, push, damage, statuses...) is recorded as a BattleEvent
+## and offered to every status on the board: on units (statuses,
+## attributes, armed reactions) and on cells (traps...).
+##
+## Typical use:
+##   var rules := BattleRules.new_battle([profile_a], [profile_b], seed)
+##   rules.start()                        # attributes, initiative, 1st turn
+##   rules.legal_actions(unit_index)      # what a unit may do now
+##   rules.apply(action)                  # -> events, in order (to animate)
+##   rules.end_turn()                     # -> events
+##   rules.clone()                        # independent copy, for AI/previews
+##
+## EVENTS RESOLVE IMMEDIATELY (depth-first): the moment something happens,
+## its event is logged and every status gets to react to it, BEFORE the
+## code that caused it continues. So reactions can interrupt: a trap stops
+## a walk at the step that entered it, a dodge moves away before the hit.
+## Whatever a reaction does is itself an event, one level deeper. Safety:
+##   * a status reacts at most `max_triggers_per_action` times (default 1)
+##     during one top-level call (apply / end_turn / start);
 ##   * events deeper than CombatRules.MAX_CHAIN_DEPTH get no reactions;
-##   * the queue is first in, first out, so results are deterministic.
+##   * statuses are offered events in a fixed order (units in order, then
+##     cells row by row), so results are deterministic.
+## Code that runs after an event must not assume the board is unchanged:
+## every context function re-checks (alive? cell free?) before acting.
 class_name BattleRules
 extends BattleContext
 
 var state: BattleState
 
-var _queue: Array[BattleEvent] = []
-# Depth given to events emitted
+# Depth given to events emitted right now (0 = by the action itself).
 var _depth := 0
-# StatusInstances that already reacted
+# StatusInstance -> times it reacted during the current top-level call.
 var _fired := {}
+# Units currently moving or being pushed (BattleUnit -> true), and those
+# asked to stop by stop_move().
+var _moving := {}
+var _stop := {}
+
 
 func _init(p_state: BattleState = null) -> void:
 	state = p_state if p_state else BattleState.new()
 
-## A new battle: team 0 on the left column facing right,
-## team 1 on the right column facing left, spread over middle rows. 
-##Call start() next.
+
+## A new battle: team 0 on the left column facing right, team 1 on the
+## right column facing left, spread over the middle rows. Call start() next.
 static func new_battle(team_a: Array[CombatProfile], team_b: Array[CombatProfile], seed: int,
 		names_a := PackedStringArray(), names_b := PackedStringArray()) -> BattleRules:
 	var s := BattleState.new()
@@ -49,6 +71,8 @@ func clone() -> BattleRules:
 	return BattleRules.new(state.clone())
 
 
+# ---------------------------------------------------------------- flow
+
 ## Applies every unit's attributes, decides who goes first (lower build)
 ## and starts that team's turn. Returns the events.
 func start() -> Array[BattleEvent]:
@@ -57,11 +81,10 @@ func start() -> Array[BattleEvent]:
 	for u in state.units:
 		for attribute in u.profile.attributes:
 			apply_status(null, u, attribute, 1)
-	_flush()
 	state.active_team = CombatRules.first_team(state.units, state.rng)
 	state.first_team = state.active_team
+	_fired.clear()
 	_start_turn()
-	_flush()
 	return state.battle_log.slice(mark)
 
 
@@ -99,9 +122,10 @@ func is_legal(action: BattleAction) -> bool:
 	return false
 
 
-## Plays a card. Order: (turn to the target) -> CARD_PLAYED -> ATTACKED ->
-## reactions to those (so a dodge can move away BEFORE the hit) -> the
-## card's play() -> reactions to what it did -> win check.
+## Plays a card. Order: (turn to the target) -> CARD_PLAYED -> ATTACKED
+## (reactions to these happen right away, so a dodge can move out BEFORE
+## the hit) -> the card's play(), whose every step is reacted to as it
+## happens -> win check.
 ## Returns the events, or [] (with an error) if the action isn't legal.
 func apply(action: BattleAction) -> Array[BattleEvent]:
 	var mark := state.battle_log.size()
@@ -133,13 +157,10 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 			attacked.to = action.target
 			attacked.card = card
 			_emit(attacked)
-	_flush()
 
 	if u.is_alive() and not state.is_over():
 		card.play(self, u, action.target)
-	_flush()
 	_check_winner()
-	_flush()
 	return state.battle_log.slice(mark)
 
 
@@ -152,7 +173,6 @@ func end_turn() -> Array[BattleEvent]:
 	_fired.clear()
 	for u in state.living(state.active_team):
 		_emit(_event(BattleEvent.Type.TURN_ENDED, u))
-	_flush()
 	_check_winner()
 	if not state.is_over():
 		state.active_team = 1 - state.active_team
@@ -163,7 +183,6 @@ func end_turn() -> Array[BattleEvent]:
 		else:
 			_fired.clear()  # the new turn's statuses may react again
 			_start_turn()
-	_flush()
 	return state.battle_log.slice(mark)
 
 
@@ -195,80 +214,149 @@ func _end_battle(winner: int) -> void:
 	ev.amount = winner
 	_emit(ev)
 
-# ------------------------------------------------------------ event queue
+# ------------------------------------------------------------ events
 
 func _event(type: BattleEvent.Type, unit: BattleUnit) -> BattleEvent:
 	return BattleEvent.new(type, unit)
 
 
-## Logs the event and queues it for reactions.
+## Logs the event and lets every status react to it RIGHT NOW (one level
+## deeper), then does the automatic count-downs of turn start/end.
 func _emit(ev: BattleEvent) -> void:
 	ev.depth = _depth
 	state.battle_log.append(ev)
-	_queue.append(ev)
+	if ev.depth < CombatRules.MAX_CHAIN_DEPTH:
+		var saved := _depth
+		_depth = ev.depth + 1
+		_dispatch(ev)
+		_depth = saved
+	# Count-downs happen AFTER statuses acted on the event.
+	if ev.type == BattleEvent.Type.TURN_STARTED:
+		_tick(ev.unit, StatusEffect.Tick.OWNER_TURN_START)
+	elif ev.type == BattleEvent.Type.TURN_ENDED:
+		_tick(ev.unit, StatusEffect.Tick.OWNER_TURN_END)
 
 
-func _flush() -> void:
-	while not _queue.is_empty():
-		var ev: BattleEvent = _queue.pop_front()
-		if ev.depth < CombatRules.MAX_CHAIN_DEPTH:
-			var saved := _depth
-			_depth = ev.depth + 1  # whatever reacts happens one level deeper
-			_dispatch(ev)
-			_depth = saved
-		# Automatic count-downs happen AFTER statuses acted on the event.
-		if ev.type == BattleEvent.Type.TURN_STARTED:
-			_tick(ev.unit, StatusEffect.Tick.OWNER_TURN_START)
-		elif ev.type == BattleEvent.Type.TURN_ENDED:
-			_tick(ev.unit, StatusEffect.Tick.OWNER_TURN_END)
-
-
-## Offers `ev` to every status of every living unit (units in order, each
-## unit's statuses in the order they were applied).
+## Offers `ev` to every status: first each living unit's (units in order,
+## statuses in the order they were applied), then each cell's (row by row).
 func _dispatch(ev: BattleEvent) -> void:
 	for u in state.units:
 		if not u.is_alive():
 			continue
 		for inst in u.statuses.duplicate():
-			if not u.statuses.has(inst) or _fired.has(inst):
-				continue  # removed meanwhile, or already reacted this call
-			if not inst.status.reacts_to(self, u, inst, ev):
-				continue
-			_fired[inst] = true
-			if inst.status.is_reaction():
-				var reacted := _event(BattleEvent.Type.REACTED, u)
-				reacted.card = inst.status.card
-				_emit(reacted)
-			inst.status.react(self, u, inst, ev)
-			# A status that used up its count goes away.
-			if inst.count <= 0 and u.statuses.has(inst):
-				remove_status(u, inst)
+			if u.statuses.has(inst):  # not removed by an earlier reaction
+				_offer(inst, u, ev)
+	for cell in state.status_cells():
+		for inst in state.statuses_at(cell).duplicate():
+			if state.statuses_at(cell).has(inst):
+				_offer(inst, null, ev)
 
 
+## Lets one status react to `ev` (owner = its unit, or null on a cell).
+func _offer(inst: StatusInstance, owner: BattleUnit, ev: BattleEvent) -> void:
+	if _fired.get(inst, 0) >= inst.status.max_triggers_per_action:
+		return
+	if not inst.status.reacts_to(self, owner, inst, ev):
+		return
+	_fired[inst] = _fired.get(inst, 0) + 1
+	if inst.status.is_reaction():
+		var reacted := _event(BattleEvent.Type.REACTED, owner)
+		reacted.card = inst.status.card
+		_emit(reacted)
+	inst.status.react(self, owner, inst, ev)
+	# A status that used up its count goes away.
+	if inst.count <= 0:
+		remove_status(owner, inst)
+
+
+## Count-downs for `when`: the unit's own statuses, and statuses on cells
+## that this unit placed (a trap ticks on its placer's turns).
 func _tick(unit: BattleUnit, when: StatusEffect.Tick) -> void:
 	if unit == null:
 		return
 	for inst in unit.statuses.duplicate():
-		if inst.status.permanent or inst.status.tick_on != when:
-			continue
-		inst.count -= 1
-		if inst.count <= 0:
-			remove_status(unit, inst)
+		_tick_one(unit, inst, when)
+	for cell in state.status_cells():
+		for inst in state.statuses_at(cell).duplicate():
+			if inst.source == unit:
+				_tick_one(null, inst, when)
+
+
+func _tick_one(owner: BattleUnit, inst: StatusInstance, when: StatusEffect.Tick) -> void:
+	if inst.status.permanent or inst.status.tick_on != when:
+		return
+	inst.count -= 1
+	if inst.count <= 0:
+		remove_status(owner, inst)
+
 
 # ------------------------------------------------- BattleContext (for cards)
 
 func unit_at(cell: Vector2i) -> BattleUnit:
 	return state.unit_at(cell)
 
-func move(unit: BattleUnit, cell: Vector2i) -> bool:
-	if unit == null or not unit.is_alive() or not is_free(cell):
+
+## See BattleContext.move. Steps: MOVE_STARTED, then per cell entered a
+## STEPPED (reacted to immediately), then MOVED with where it really ended.
+## The walk stops early if, after a step's reactions, the unit is dead, was
+## moved by something else, was asked to stop (stop_move), or the next cell
+## is no longer free.
+func move(unit: BattleUnit, cell: Vector2i, mode: Grid.MoveMode = Grid.MoveMode.WALK,
+		face_movement: bool = true) -> bool:
+	if unit == null or not unit.is_alive():
 		return false
-	var ev := _event(BattleEvent.Type.MOVED, unit)
-	ev.from = unit.position
-	ev.to = cell
-	unit.position = cell
-	_emit(ev)
-	return true
+	var path := Grid.find_path(unit.position, cell, mode, unit.facing, is_free)
+	if path.is_empty():
+		return false
+	var start := unit.position
+	var was_moving := _moving.has(unit)
+	_moving[unit] = true
+	_stop.erase(unit)
+
+	var started := _event(BattleEvent.Type.MOVE_STARTED, unit)
+	started.from = start
+	started.to = cell
+	_emit(started)  # e.g. "when an enemy starts moving, root it"
+
+	var expected := start
+	var last_step := Vector2i.ZERO
+	var interrupted := false
+	for next in path:
+		if not unit.is_alive() or unit.position != expected or _stop.has(unit) \
+				or not is_free(next):
+			interrupted = true
+			break
+		var from := unit.position
+		unit.position = next
+		expected = next
+		last_step = next - from
+		if mode != Grid.MoveMode.TELEPORT:  # a teleport touches no cell
+			var stepped := _event(BattleEvent.Type.STEPPED, unit)
+			stepped.from = from
+			stepped.to = next
+			_emit(stepped)
+	# The last step's reactions may have moved it again.
+	interrupted = interrupted or unit.position != cell
+
+	if not was_moving:
+		_moving.erase(unit)
+	_stop.erase(unit)
+	if face_movement and unit.is_alive() and not interrupted:
+		var facing := Grid.facing_of(last_step)
+		if facing != -1:
+			turn(unit, facing)
+	var moved := _event(BattleEvent.Type.MOVED, unit)
+	moved.from = start
+	moved.to = unit.position
+	moved.interrupted = interrupted
+	_emit(moved)
+	return not interrupted
+
+
+func stop_move(unit: BattleUnit) -> void:
+	if unit != null and _moving.has(unit):
+		_stop[unit] = true
+
 
 func turn(unit: BattleUnit, facing: Grid.Facing) -> void:
 	if unit == null or unit.facing == facing:
@@ -279,18 +367,29 @@ func turn(unit: BattleUnit, facing: Grid.Facing) -> void:
 	_emit(ev)
 
 
-## Moves `unit` cell by cell. Hitting the board edge or a unit stops it and
-## both (unit and the one hit) 25% of source's physical damage.
+## Moves `unit` cell by cell, each cell a forced STEPPED (so pushes trigger
+## traps too). Hitting the board edge or a unit stops it: COLLIDED, and
+## both it and the unit hit take CombatRules.collision_damage(). Reactions
+## to a step can stop the push there (no collision then). Ends with PUSHED
+## (where it really ended) if it moved at all.
 func push(source: BattleUnit, unit: BattleUnit, direction: Vector2i, distance: int) -> void:
 	if unit == null or not unit.is_alive() or direction == Vector2i.ZERO:
 		return
 	var start := unit.position
-	var pos := start
-	var collided := false
+	var was_moving := _moving.has(unit)
+	_moving[unit] = true
+	_stop.erase(unit)
+
+	var expected := start
+	var interrupted := false
 	var blocker: BattleUnit = null
 	var hit_cell := Vector2i.ZERO
+	var collided := false
 	for i in distance:
-		var next := pos + direction
+		if not unit.is_alive() or unit.position != expected or _stop.has(unit):
+			interrupted = true
+			break
+		var next := unit.position + direction
 		if not Grid.in_bounds(next):
 			collided = true
 			hit_cell = next
@@ -300,24 +399,38 @@ func push(source: BattleUnit, unit: BattleUnit, direction: Vector2i, distance: i
 			collided = true
 			hit_cell = next
 			break
-		pos = next
-	if pos != start:
-		unit.position = pos
+		var from := unit.position
+		unit.position = next
+		expected = next
+		var stepped := _event(BattleEvent.Type.STEPPED, unit)
+		stepped.from = from
+		stepped.to = next
+		stepped.forced = true
+		stepped.source = source
+		_emit(stepped)
+	interrupted = interrupted or unit.position != expected
+
+	if not was_moving:
+		_moving.erase(unit)
+	_stop.erase(unit)
+	if unit.position != start:
 		var pushed := _event(BattleEvent.Type.PUSHED, unit)
 		pushed.source = source
 		pushed.from = start
-		pushed.to = pos
+		pushed.to = unit.position
+		pushed.interrupted = interrupted
 		_emit(pushed)
-	if collided:
+	if collided and not interrupted and unit.is_alive():
 		var hit := _event(BattleEvent.Type.COLLIDED, unit)
 		hit.source = source
-		hit.from = pos
+		hit.from = unit.position
 		hit.to = hit_cell
 		_emit(hit)
-		var dmg: int = ceili(source.effective_stat(&"phys_dmg") * 0.25)
-		_hurt(unit, dmg, source)
-		if blocker != null:
-			_hurt(blocker, dmg, source)
+		var dmg := CombatRules.collision_damage(source)
+		if dmg > 0:
+			_hurt(unit, dmg, source)
+			if blocker != null:
+				_hurt(blocker, dmg, source)
 
 
 func damage(source: BattleUnit, target: BattleUnit, power: int, type: DamageEffect.Type) -> void:
@@ -363,14 +476,54 @@ func apply_status(source: BattleUnit, target: BattleUnit, status: StatusEffect, 
 	_emit(ev)
 
 
-## Attributes (permanent) can't be removed.
+func apply_cell_status(source: BattleUnit, cell: Vector2i, status: StatusEffect, amount: int) -> void:
+	if not Grid.in_bounds(cell) or status == null:
+		return
+	var list: Array = state.cell_statuses.get(cell, [])
+	var existing: StatusInstance = null
+	for inst in list:
+		if inst.status.id == status.id:
+			existing = inst
+	if existing != null:
+		existing.count = status.stacked_count(existing.count, amount)
+	else:
+		var inst := StatusInstance.new(status, amount, source)
+		inst.on_cell = true
+		inst.cell = cell
+		list.append(inst)
+		state.cell_statuses[cell] = list
+	var ev := _event(BattleEvent.Type.STATUS_APPLIED, null)
+	ev.source = source
+	ev.status = status
+	ev.amount = amount
+	ev.to = cell
+	_emit(ev)
+
+
+func cell_statuses(cell: Vector2i) -> Array:
+	return state.statuses_at(cell)
+
+
+## Removes a unit's or a cell's status. Permanent ones (attributes) can't
+## be removed.
 func remove_status(unit: BattleUnit, instance: StatusInstance) -> void:
-	if unit == null or instance == null or instance.status.permanent:
+	if instance == null or instance.status.permanent:
 		return
-	if not unit.statuses.has(instance):
-		return
-	unit.statuses.erase(instance)
-	var ev := _event(BattleEvent.Type.STATUS_EXPIRED, unit)
+	var ev: BattleEvent
+	if instance.on_cell:
+		var list: Array = state.cell_statuses.get(instance.cell, [])
+		if not list.has(instance):
+			return
+		list.erase(instance)
+		if list.is_empty():
+			state.cell_statuses.erase(instance.cell)
+		ev = _event(BattleEvent.Type.STATUS_EXPIRED, null)
+		ev.to = instance.cell
+	else:
+		if unit == null or not unit.statuses.has(instance):
+			return
+		unit.statuses.erase(instance)
+		ev = _event(BattleEvent.Type.STATUS_EXPIRED, unit)
 	ev.status = instance.status
 	_emit(ev)
 

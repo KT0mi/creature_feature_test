@@ -34,6 +34,16 @@ Back to [[Battle System Overview]]. One branch per phase.
 - [x] Simple AI (random, then greedy) ([[AI and Balance Testing]])
 - [x] Headless balance script: win rate vs part count / build / cards
 
+### Phase 2b: Depth-first events and movement (branch `claude/rules-engine-depth-refactor`)
+- [x] Events resolve immediately (depth-first), `max_triggers_per_action`
+- [x] `MOVE_STARTED` / `STEPPED` / `MOVED`, interruption, `stop_move`
+- [x] Move modes WALK / DASH / JUMP / TELEPORT with deterministic shortest paths
+- [x] Pushes step cell by cell (forced steps)
+- [x] Statuses on cells (traps), reveal and ticks
+- [ ] Set **Cat Jump**'s move mode to JUMP
+- [ ] Write a real trap card + status
+- [ ] AI: score the board after `end_turn()` too (it can't see end-of-turn damage yet)
+
 ## Phase 3: Playable 1v1
 - [ ] `BattleScene`: board, y-sorted unit views, facing arrows ([[Battle View]])
 - [ ] Select unit → card → target; end turn
