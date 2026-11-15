@@ -247,6 +247,9 @@ func _add_card(card: BattleCard, path: String) -> void:
 		push_error("Duplicate card id '%s' in %s and %s"
 			% [card.id, cards[card.id].resource_path, path])
 		return
+	if card.kind == BattleCard.Kind.ATTACK and card.area.is_empty():
+		push_warning("Card '%s' has an empty area: it hits nothing (use [(0,0)] for the target cell). %s"
+			% [card.id, path])
 	cards[card.id] = card
 
 func _add_status(status: StatusEffect, path: String) -> void:

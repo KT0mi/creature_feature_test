@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_64a36"]
 [ext_resource type="Texture2D" uid="uid://dv6g42uunocrq" path="res://creatures/parts/tail/tail_ratfolk/tail_ratfolk.png" id="2_eu8h7"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_vna1k"]
+[ext_resource type="Resource" uid="uid://dlal1d0r15wp8" path="res://creatures/cards/card_tail_swipe.tres" id="3_64a36"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_m05a4"]
 
 [sub_resource type="Resource" id="Resource_8vdpn"]
@@ -22,4 +23,5 @@ type = &"tail"
 sheet = ExtResource("2_eu8h7")
 attach = Vector2i(35, 2)
 stats = SubResource("Resource_8vdpn")
+added_cards = Array[ExtResource("2_64a36")]([ExtResource("3_64a36")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

@@ -7,6 +7,11 @@
 class_name BattleContext
 extends RefCounted
 
+## The target cell of the card being played right now (set by the rules
+## engine). Area effects use it as the CENTER of the area, e.g.
+## PushEffect AWAY_FROM_CENTER. For aim SELF cards it's the user's cell.
+var action_target: Vector2i
+
 # ------------------------------------------------------------------ queries
 
 ## The living unit on `cell`, or null.

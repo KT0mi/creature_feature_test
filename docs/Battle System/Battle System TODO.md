@@ -44,6 +44,12 @@ Back to [[Battle System Overview]]. One branch per phase.
 - [ ] Write a real trap card + status
 - [ ] AI: score the board after `end_turn()` too (it can't see end-of-turn damage yet)
 
+### Phase 2c: Area attacks (branch `claude/aoe-cards`)
+- [x] `aim` (CELL / SELF), `area`, `hits_self`, `hits_allies`
+- [x] One ATTACKED per victim, effect-by-effect resolution, farthest-first order
+- [x] PushEffect AWAY_FROM_CENTER
+- [ ] Make a Tail Swipe card for a tail part
+
 ## Phase 3: Playable 1v1
 - [ ] `BattleScene`: board, y-sorted unit views, facing arrows ([[Battle View]])
 - [ ] Select unit → card → target; end turn
