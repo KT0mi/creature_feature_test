@@ -12,7 +12,6 @@ var _battles := 200
 var _seed := 1
 var _mode := BattleAI.Mode.GREEDY
 
-
 func _init() -> void:
 	# Autoloads (PartRegistry) are ready after the first frame.
 	process_frame.connect(_run, CONNECT_ONE_SHOT)
@@ -40,7 +39,7 @@ func _run() -> void:
 			ai.play_turn(rules)
 		results.append({
 			"winner": rules.state.winner, "first": first, "rounds": rules.state.round,
-			"parts": [genomes[0].root.count(), genomes[1].root.count()],
+			"part_count": [genomes[0].root.count(), genomes[1].root.count()],
 			"build": [profiles[0].build, profiles[1].build],
 			"cards": [_card_ids(profiles[0]), _card_ids(profiles[1])],
 		})
@@ -111,7 +110,7 @@ func _report(results: Array, ms: int) -> void:
 	print("draws (no winner by round %d):  %d" % [CombatRules.MAX_ROUNDS, draws])
 	print("average rounds:                %.1f" % (float(rounds) / maxi(results.size(), 1)))
 	print("first team wins:               %s" % ("%.0f%% of %d" % [100.0 * first_wins / decided, decided] if decided else "n/a"))
-	print("MORE PARTS wins:               %s" % _rate(results, "parts"))
+	print("MORE PARTS wins:               %s" % _rate(results, "part_count"))
 	print("HIGHER BUILD wins:             %s" % _rate(results, "build"))
 	print("(ideal: near 50% -- more parts shouldn't simply win)")
 	if not card_games.is_empty():
