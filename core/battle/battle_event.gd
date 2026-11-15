@@ -6,8 +6,8 @@ extends RefCounted
 
 enum Type {
 	MOVED,     ## a move FINISHED: unit went from `from` to `to` (where it
-	           ## actually ended). `interrupted` = it didn't reach the cell
-	           ## it was going to (blocked, stopped by a reaction, killed...)
+			   ## actually ended). `interrupted` = it didn't reach the cell
+			   ## it was going to (blocked, stopped by a reaction, killed...)
 	TURNED,    ## unit's facing changed to `amount` (a Grid.Facing)
 	PUSHED,    ## a push FINISHED: unit was pushed from `from` to `to` by
 	           ## `source` (where it actually ended)
