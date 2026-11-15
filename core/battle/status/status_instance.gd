@@ -1,6 +1,7 @@
 @tool
-## One status on one creature during a battle: which status, its count, and
-## who applied it. (The StatusEffect itself is shared by every creature.)
+## One status on one creature, or on one CELL, during a battle: which
+## status, its count, and who applied it. (The StatusEffect itself is
+## shared by everything that has it.)
 class_name StatusInstance
 extends RefCounted
 
@@ -17,6 +18,11 @@ var source: BattleUnit:
 		_source = weakref(value) if value else null
 
 var _source: WeakRef
+
+## True for statuses placed on a cell (traps...), false for unit statuses.
+var on_cell: bool = false
+## The cell, when on_cell.
+var cell: Vector2i
 
 
 func _init(p_status: StatusEffect = null, p_count: int = 1, p_source: BattleUnit = null) -> void:

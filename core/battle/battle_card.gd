@@ -53,21 +53,35 @@ enum Kind { MOVE, ATTACK }
 
 ## Cells this card can target right now.
 ## Default: `pattern` rotated to the user's facing, kept on the board.
-## Movement cards also need the cell to be free.
+## Movement cards also need the cell to be free and, if the card has a
+## MoveSelfEffect, a path to it for that effect's mode (e.g. a WALK can't
+## go through units; a DASH needs a free straight line).
 func targets(ctx: BattleContext, user: BattleUnit) -> Array[Vector2i]:
 	var out: Array[Vector2i] = []
 	# A reaction with no pattern is played on its user (it just arms).
 	if is_reaction() and pattern.is_empty():
 		out.append(user.position)
 		return out
+	var move_effect := _move_effect() if kind == Kind.MOVE else null
 	for offset in pattern:
 		var cell := user.position + Grid.rotate(offset, user.facing)
 		if not Grid.in_bounds(cell):
 			continue
 		if kind == Kind.MOVE and not ctx.is_free(cell):
 			continue
+		if move_effect != null and Grid.find_path(user.position, cell, move_effect.mode,
+				user.facing, ctx.is_free).is_empty():
+			continue
 		out.append(cell)
 	return out
+
+
+## The card's first MoveSelfEffect, or null.
+func _move_effect() -> MoveSelfEffect:
+	for effect in effects:
+		if effect is MoveSelfEffect:
+			return effect
+	return null
 
 
 ## What happens when `user` plays this card on `target`.

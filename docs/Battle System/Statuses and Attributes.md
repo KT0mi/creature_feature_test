@@ -26,10 +26,23 @@ Same **hybrid** as cards ([[Cards and Effects]]): data-only, or a script that `e
 | `stack_rule` | applied again: **ADD** counts (default), **KEEP_HIGHER**, **REPLACE** |
 | `tick_on` | count −1 by itself at the owner's turn start/end (after the status acted) |
 | `reveal` | what the **opponent** sees: SHOWN, HIDDEN_DETAILS ("something is there"), HIDDEN |
+| `max_triggers_per_action` | reactions allowed per action (default 1) |
 | `power` | a number scripts can use (e.g. Poisoned's x), so one script makes several statuses |
 | `stat_modifiers` | a `PartStats` added while the status is on (e.g. Weakened: phys −1) |
 
 The number in "Poisoned 2" is the **count**, stored per unit in a `StatusInstance` (with who applied it). What the count means is up to the status: turns, triggers, intensity.
+
+## Statuses on cells (traps)
+A status can also sit on a **cell** instead of a unit: traps, burning ground, a poison cloud.
+- Placed with `ctx.apply_cell_status(source, cell, status, amount)`, or by a data-only card with `ApplyStatusEffect` target **CELL**.
+- Hooks get `owner = null`; `instance.cell` says where it is and `instance.source` who placed it.
+- **Reveal**: the placer's team sees it; the other team sees it only if not **HIDDEN** (a hidden trap is invisible to the enemy).
+- **Ticks** (`tick_on`) follow the turns of the unit that placed it.
+- Cell statuses react after unit statuses, cells row by row.
+- Permanent cell statuses are the basis of terrain (see [[Terrain]], pending).
+
+## How often a status can react
+`max_triggers_per_action` (default 1): how many times it may react during one action. 1 stops "when an enemy steps next to me" from firing on every step of a single walk; raise it for things that should act per step.
 
 ## Attributes
 - Parts have **Added Attributes** (next to Added Cards): permanent `StatusEffect`s.

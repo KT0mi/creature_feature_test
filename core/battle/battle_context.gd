@@ -27,10 +27,23 @@ func is_free(cell: Vector2i) -> bool:
 # ------------------------------------------------------------------ actions
 # Each records the matching BattleEvent(s) and lets reactions respond.
 
-## Moves `unit` to `cell` by its own movement. Returns false (and does
-## nothing) if the cell is off the board or taken.
-func move(_unit: BattleUnit, _cell: Vector2i) -> bool:
+## Moves `unit` to `cell` by its own movement, using `mode` (see
+## Grid.MoveMode). WALK and DASH go cell by cell: each step is a STEPPED
+## event that reactions answer at once, and may stop the move. Records
+## MOVE_STARTED, the STEPPED events, then MOVED (where it really ended).
+## `face_movement`: turn the unit towards its last step at the end.
+## Returns true if it reached `cell`; false if it couldn't start (no path,
+## cell taken) or was interrupted on the way.
+func move(_unit: BattleUnit, _cell: Vector2i, _mode: Grid.MoveMode = Grid.MoveMode.WALK,
+		_face_movement: bool = true) -> bool:
 	return _todo("move")
+
+
+## Asks a unit that is moving or being pushed right now to stop after the
+## step it just took (for reactions such as "root", "trap: stops you").
+## Does nothing if it isn't moving.
+func stop_move(_unit: BattleUnit) -> void:
+	_todo("stop_move")
 
 
 ## Turns `unit` to `facing`.
@@ -66,9 +79,22 @@ func apply_status(_source: BattleUnit, _target: BattleUnit, _status: StatusEffec
 	_todo("apply_status")
 
 
-## Removes a status instance (not attributes). Records STATUS_EXPIRED.
+## Removes a status instance (not attributes), from a unit or from a cell
+## (then `unit` may be null). Records STATUS_EXPIRED.
 func remove_status(_unit: BattleUnit, _instance: StatusInstance) -> void:
 	_todo("remove_status")
+
+
+## `source` places `amount` of `status` on `cell` (a trap...), following
+## its stack_rule if it's already there. Records STATUS_APPLIED with
+## unit = null and to = cell.
+func apply_cell_status(_source: BattleUnit, _cell: Vector2i, _status: StatusEffect, _amount: int) -> void:
+	_todo("apply_cell_status")
+
+
+## Statuses on `cell`.
+func cell_statuses(_cell: Vector2i) -> Array:
+	return _todo("cell_statuses")
 
 func _todo(what: String) -> Variant:
 	push_error("BattleContext.%s() is implemented by the rules engine." % what)

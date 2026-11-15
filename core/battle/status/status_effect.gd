@@ -26,6 +26,8 @@ enum StackRule {
 ## When the count goes down by 1 by itself (removed at 0). The rules engine
 ## does this AFTER the status's own reaction to that event, so a status
 ## that acts at the end of the turn still acts on its last count.
+## "Owner" = the unit that has it; for a status on a CELL (a trap), the
+## unit that placed it (its source).
 enum Tick { NEVER, OWNER_TURN_START, OWNER_TURN_END }
 
 ## What the OPPONENT can see of this status on a creature.
@@ -34,6 +36,11 @@ enum Reveal {
 	HIDDEN_DETAILS,  ## only that "something" is there (e.g. a reaction is ready)
 	HIDDEN,          ## nothing
 }
+
+## A status can sit on a UNIT (Poisoned, attributes, armed reactions) or
+## on a CELL (traps, burning ground...). For cell statuses the hooks get
+## `owner` = null; `instance.cell` says where it is and `instance.source`
+## who placed it.
 
 ## Stable unique id.
 @export var id: StringName
@@ -47,6 +54,13 @@ enum Reveal {
 @export var stack_rule: StackRule = StackRule.ADD
 @export var tick_on: Tick = Tick.NEVER
 @export var reveal: Reveal = Reveal.SHOWN
+
+## How many times this status may react during ONE action (a card played,
+## or a turn end/start). 1 = once, so e.g. "when an enemy steps next to
+## me" doesn't fire on every step of a single walk. Raise it for things
+## that should act per step (poisonous ground hurting on each cell...).
+## Together with CombatRules.MAX_CHAIN_DEPTH this also stops endless loops.
+@export_range(1, 99) var max_triggers_per_action: int = 1
 
 ## A number scripted statuses can use for their effect (e.g. Poisoned's
 ## damage per trigger), so the same script can make several statuses.
