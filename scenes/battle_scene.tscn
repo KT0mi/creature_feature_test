@@ -4,3 +4,4 @@
 
 [node name="BattleScene" type="Node2D" unique_id=90263359]
 script = ExtResource("1_idkgt")
+board_origin = null

@@ -451,11 +451,18 @@ func _play(events: Array[BattleEvent]) -> void:
 					_float(view, ev.card.name if ev.card.name != "" else String(ev.card.id), Color(1, 0.9, 0.4))
 				await _wait(0.15)
 			BattleEvent.Type.STEPPED:
-				await view.step_to(ev.to, PUSH_STEP_TIME if ev.forced else STEP_TIME).finished
+				var dist := absi(ev.to.x - ev.from.x) + absi(ev.to.y - ev.from.y)
+				if not ev.forced and dist > 1:
+					# A step to a non-adjacent cell is a JUMP landing: arc it,
+					# higher and longer the farther it goes.
+					await view.jump_to(ev.to, JUMP_TIME * dist, 12.0 + 8.0 * dist).finished
+				else:
+					await view.step_to(ev.to, PUSH_STEP_TIME if ev.forced else STEP_TIME).finished
 			BattleEvent.Type.MOVED:
 				# Moves without steps (teleport) haven't moved the view yet.
 				if view.position != board.position + board.cell_center(ev.to):
-					await view.jump_to(ev.to, JUMP_TIME).finished
+					var dist := absi(ev.to.x - ev.from.x) + absi(ev.to.y - ev.from.y)
+					await view.jump_to(ev.to, JUMP_TIME * dist, 12.0 + 8.0 * dist).finished
 			BattleEvent.Type.TURNED:
 				view.set_facing(ev.amount)
 			BattleEvent.Type.COLLIDED:

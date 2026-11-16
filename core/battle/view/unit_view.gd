@@ -52,11 +52,11 @@ func set_facing(facing: Grid.Facing) -> void:
 	_facing = facing
 	var looks_left := facing == Grid.Facing.DOWN or facing == Grid.Facing.LEFT
 	_sprite.flip_h = looks_left
-	# The feet pixel (baked origin) must stay on the cell when mirrored.
-	var origin := _baked.origin
+	# The feet pixel (baked ground) must stay on the cell when mirrored.
+	var ground := _baked.ground
 	if _sprite.flip_h:
-		origin.x = _baked.frame_size.x - 1 - origin.x
-	_sprite.position = -Vector2(origin)
+		ground.x = _baked.frame_size.x - 1 - ground.x
+	_sprite.position = -Vector2(ground)
 	queue_redraw()
 
 
@@ -69,6 +69,7 @@ func sync(player_team: int) -> void:
 	reaction_visible = seen.any(func(s): return s.status.is_reaction())
 	visible = unit.is_alive()
 	modulate = Color.WHITE
+	_sprite.offset = Vector2.ZERO
 	queue_redraw()
 
 # --------- animation
@@ -80,12 +81,13 @@ func step_to(cell: Vector2i, seconds: float) -> Tween:
 	return tween
 
 ##Jump to cell (for now, any move without steps)
-func jump_to(cell: Vector2i, seconds: float) -> Tween:
+func jump_to(cell: Vector2i, seconds: float, height: float = 24.0) -> Tween:
 	var tween := create_tween()
-	var jump_tween := create_tween()
 	tween.tween_property(self, "position", board.position + board.cell_center(cell), seconds)
-	jump_tween.tween_property(self, "_sprite.offset.y", 100, seconds / 2).set_ease(Tween.EASE_OUT)
-	jump_tween.tween_property(self, "_sprite.offset.y", 0, seconds / 2).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(_sprite, "offset:y", -height, seconds /2) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_sprite, "offset:y", 0.0, seconds / 2) \
+		.set_delay(seconds / 2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	return tween
 
 
@@ -122,7 +124,7 @@ func die() -> Tween:
 
 ## Top of the sprite, relative to the unit's feet (for floating text).
 func head_offset() -> Vector2:
-	return Vector2(0, -_baked.origin.y - 6)
+	return Vector2(0, -_baked.ground.y - 6)
 
 
 
@@ -141,7 +143,7 @@ func _draw() -> void:
 	var dir := Vector2((step.x - step.y) * hw, (step.x + step.y) * hh).normalized()
 	var tip := dir * hh * 0.85
 	var side := Vector2(-dir.y, dir.x) * 5.0
-	var team_color := Color(0.4, 0.8, 1.0) if unit.team == 0 else Color(1.0, 0.45, 0.4)
+	var team_color := Color(0.0, 0.684, 0.923, 1.0) if unit.team == 0 else Color(1.0, 0.145, 0.121, 1.0)
 	draw_colored_polygon(PackedVector2Array([tip, tip - dir * 10 + side, tip - dir * 10 - side]), team_color)
 	# HP bar under the feet.
 	var w := 40.0
