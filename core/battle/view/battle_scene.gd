@@ -34,7 +34,8 @@ var _selected_unit := -1      # index in rules.state.units
 var _selected_slot := -1      # deck slot of the chosen card
 var _hover_cell := Vector2i(-1, -1)
 
-
+@export var camera_speed := 300.0
+@onready var camera: Camera2D = $Camera2D
 
 ## Replaces the current scene with a battle between `a` (player) and `b`.
 static func open(tree: SceneTree, a: Array[Genome], b: Array[Genome], seed: int) -> void:
@@ -67,11 +68,23 @@ func _ready() -> void:
 	hud.end_turn_pressed.connect(_on_end_turn)
 	hud.rematch_pressed.connect(func(): BattleScene.open(get_tree(), genomes_a, genomes_b, battle_seed + 1))
 	hud.back_pressed.connect(func(): get_tree().change_scene_to_file(LAB_PATH))
-
+	
+	camera.position = Vector2(get_viewport_rect().size / 2.0)
+	
 	if genomes_a.is_empty() or genomes_b.is_empty():
 		_random_matchup()
 	_start_battle()
 
+func _process(delta: float) -> void:
+	# Camera movement (debug only, so raw keys instead of the InputMap).
+	var dir := Vector2(
+		float(Input.is_key_pressed(KEY_RIGHT) or Input.is_key_pressed(KEY_D))
+			- float(Input.is_key_pressed(KEY_LEFT) or Input.is_key_pressed(KEY_A)),
+		float(Input.is_key_pressed(KEY_DOWN) or Input.is_key_pressed(KEY_S))
+			- float(Input.is_key_pressed(KEY_UP) or Input.is_key_pressed(KEY_W)))
+	# Divided by zoom so panning feels the same speed at every zoom level.
+	# (No rounding needed: "Snap 2D Transforms to Pixel" is on in the project.)
+	camera.position += dir * camera_speed * delta / camera.zoom.x
 
 ## Two random creatures, for running the scene on its own.
 func _random_matchup() -> void:
@@ -182,10 +195,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_set_hover(board.cell_at(board.get_local_mouse_position()))
 	elif event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_LEFT:
-			_on_cell_clicked(board.cell_at(board.get_local_mouse_position()))
-		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			_clear_card()
+		match event.button_index:
+			MOUSE_BUTTON_LEFT:
+				_on_cell_clicked(board.cell_at(board.get_local_mouse_position()))
+			MOUSE_BUTTON_RIGHT:
+				_clear_card()
+			MOUSE_BUTTON_WHEEL_UP:
+				camera.zoom = (camera.zoom * 2.0).clamp(Vector2.ONE * 0.25, Vector2.ONE * 8.0)
+			MOUSE_BUTTON_WHEEL_DOWN:
+				camera.zoom = (camera.zoom * 0.5).clamp(Vector2.ONE * 0.25, Vector2.ONE * 8.0)
+
 	elif event is InputEventKey and event.pressed and not event.echo:
 		match event.keycode:
 			KEY_ESCAPE:

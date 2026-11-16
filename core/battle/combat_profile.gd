@@ -7,6 +7,9 @@ extends RefCounted
 ## (Copies from paired parts are always merged, whatever this says.)
 static var merge_duplicate_cards := false
 
+const BACKUP_ATTACK_CARD = preload("res://creatures/cards/card_feeble_attack.tres")
+const BACKUP_MOVE_CARD = preload("res://creatures/cards/card_crawl.tres")
+
 ##Stats
 var phys_dmg: int
 var spc_dmg: int
@@ -25,6 +28,8 @@ static func from_genome(genome: Genome, _registry: Node = null) -> CombatProfile
 	profile._add_node(genome.root, false)
 	# A creature can't fight with 0 HP, whatever its parts subtract.
 	profile.hp = maxi(profile.hp, 1)
+	#Check the need for adding backup cards and add them if so.
+	profile._check_for_backup()
 	return profile
 
 ## Adds `node`'s part and then its children, in socket order.
@@ -49,6 +54,19 @@ func _add_node(node: PartNode, in_copy: bool) -> void:
 		if child != null:
 			_add_node(child, in_copy or socket.copy_from != &"")
 
+
+func _check_for_backup() -> void:
+	var move := true
+	var attack := true
+	for c in battle_cards:
+		if c.kind == BattleCard.Kind.MOVE:
+			move = false
+			continue
+		elif c.kind == BattleCard.Kind.ATTACK:
+			attack = true
+			continue
+	if move: battle_cards.append(BACKUP_MOVE_CARD)
+	if attack: battle_cards.append(BACKUP_ATTACK_CARD)
 
 func _add_card(card: BattleCard) -> void:
 	if card == null:

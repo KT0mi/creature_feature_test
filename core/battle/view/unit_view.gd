@@ -133,6 +133,8 @@ func head_offset() -> Vector2:
 func _draw() -> void:
 	var hw := board.cell_size.x / 2.0
 	var hh := board.cell_size.y / 2.0
+	#Draw shadow
+	draw_ellipse( Vector2(0,0) , 40, 20, Color(0.0, 0.0, 0.0, 0.50))
 	# Selection ring: a smaller diamond under the feet.
 	if selected:
 		var r := PackedVector2Array([Vector2(0, -hh * 0.6), Vector2(hw * 0.6, 0),
