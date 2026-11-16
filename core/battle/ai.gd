@@ -52,6 +52,15 @@ func play_unit(rules: BattleRules, unit_index: int) -> Array[BattleAction]:
 		taken.append(choice)
 	return taken
 
+## The action the AI would play next for unit `unit_index`, or null if it
+## would stop (no options, or doing nothing scores best). Doesn't apply it:
+## the battle scene applies it itself so it can animate each action.
+func choose_action(rules: BattleRules, unit_index: int) -> BattleAction:
+	var options := rules.legal_actions(unit_index)
+	if options.is_empty():
+		return null
+	return _choose(rules, unit_index, options)
+
 
 func _choose(rules: BattleRules, unit_index: int, options: Array[BattleAction]) -> BattleAction:
 	if mode == Mode.RANDOM:
