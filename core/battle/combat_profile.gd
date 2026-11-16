@@ -63,7 +63,7 @@ func _check_for_backup() -> void:
 			move = false
 			continue
 		elif c.kind == BattleCard.Kind.ATTACK:
-			attack = true
+			attack = false
 			continue
 	if move: battle_cards.append(BACKUP_MOVE_CARD)
 	if attack: battle_cards.append(BACKUP_ATTACK_CARD)

@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cakt6tn574qx1" path="res://creatures/parts/wing/wing_amphitere_far/wing_amphitere_far.png" id="2_27i46"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_gcyrw"]
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_xlmk5"]
+[ext_resource type="Resource" uid="uid://7738py3ebt8m" path="res://creatures/cards/card_leap.tres" id="3_xlmk5"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_rxyao"]
 
 [sub_resource type="Resource" id="Resource_86v56"]
@@ -25,5 +26,6 @@ sheet = ExtResource("2_27i46")
 attach = Vector2i(3, 30)
 counterpart = &"wing_amphitere_near"
 stats = SubResource("Resource_86v56")
+added_cards = Array[ExtResource("2_xlmk5")]([ExtResource("3_xlmk5")])
 name_adjective = "Winged"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

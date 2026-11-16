@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_2oxck"]
 [ext_resource type="Texture2D" uid="uid://chvasqvtt4u5b" path="res://creatures/parts/wing/wing_beetleon_far/wing_beetleon_far.png" id="2_7ewph"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_srnbp"]
+[ext_resource type="Resource" uid="uid://7738py3ebt8m" path="res://creatures/cards/card_leap.tres" id="3_2oxck"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="6_s0m8w"]
 
 [sub_resource type="Resource" id="Resource_uhnxg"]
@@ -23,5 +24,6 @@ sheet = ExtResource("2_7ewph")
 attach = Vector2i(14, 4)
 counterpart = &"wing_beetleon_near"
 stats = SubResource("Resource_uhnxg")
+added_cards = Array[ExtResource("2_2oxck")]([ExtResource("3_2oxck")])
 name_adjective = "Winged"
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"
