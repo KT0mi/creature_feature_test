@@ -24,9 +24,15 @@ class Baked:
 	var texture: ImageTexture
 	var frame_count: int = 1
 	var frame_size: Vector2i
-	## Where the root part's attach pixel ended up inside each frame.
-	## Use it to stand the creature on the ground: sprite.position = ground - origin.
+	## Where the root part's attach pixel (the torso's attach) ended up
+	## inside each frame. That's the creature's anchor in CREATURE space,
+	## usually somewhere in the body, NOT its feet.
 	var origin: Vector2i
+	## Where the creature STANDS inside each frame: x = origin.x (the body's
+	## center line), y = the lowest opaque row over all frames (the bottom
+	## of the feet, outline included). Put this pixel on the ground to stand
+	## the creature on it: sprite.position = ground_position - ground.
+	var ground: Vector2i
 
 ## Padding around the bounding box so the outline fits.
 const OUTLINE_PAD := 1
@@ -166,12 +172,25 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 	result.frame_count = frames
 	result.frame_size = frame_size
 	result.origin = offset
+	result.ground = Vector2i(offset.x, _lowest_opaque_row(sheet))
 	_cache[cache_key] = result
 	return result
 
 
 static func clear_cache() -> void:
 	_cache.clear()
+
+
+## The lowest row (y) of `img` that has any opaque pixel; scanned from the
+## bottom up, so it stops early. Every frame shares the sheet's rows, so
+## this covers all frames at once (the creature doesn't jitter between
+## frames). 0 for an empty image.
+static func _lowest_opaque_row(img: Image) -> int:
+	for y in range(img.get_height() - 1, -1, -1):
+		for x in img.get_width():
+			if img.get_pixel(x, y).a8 != 0:
+				return y
+	return 0
 
 
 ## Maps every key color (as RGBA32 int) to its tone index (0..3).
