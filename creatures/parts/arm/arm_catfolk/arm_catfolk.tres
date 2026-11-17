@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_23pju"]
 [ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_321ew"]
 [ext_resource type="Texture2D" uid="uid://dxsr6q2p1ttih" path="res://creatures/parts/arm/arm_catfolk/arm_catfolk.png" id="2_vib2g"]
-[ext_resource type="Resource" uid="uid://ciyuo7hbxwbmj" path="res://creatures/cards/card_punch.tres" id="3_a4me1"]
+[ext_resource type="Resource" uid="uid://dwyv6jopccbtg" path="res://creatures/cards/card_scratch.tres" id="3_75uco"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="7_p2ra0"]
 
 [sub_resource type="Resource" id="Resource_wkhmd"]
@@ -23,5 +23,5 @@ type = &"arm"
 sheet = ExtResource("2_vib2g")
 attach = Vector2i(10, 2)
 stats = SubResource("Resource_wkhmd")
-added_cards = Array[ExtResource("2_321ew")]([ExtResource("3_a4me1")])
+added_cards = Array[ExtResource("2_321ew")]([ExtResource("3_75uco")])
 metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

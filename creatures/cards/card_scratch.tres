@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="BattleCard" format=3 uid="uid://dwyv6jopccbtg"]
+
+[ext_resource type="Script" uid="uid://0pr8s3jbyoo2" path="res://core/battle/data_driven_cards/card_effect.gd" id="1_5gf2f"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_4d86i"]
+[ext_resource type="Script" uid="uid://dgi3jhghrr6jr" path="res://core/battle/data_driven_cards/damage_effect.gd" id="2_hfg20"]
+[ext_resource type="Script" uid="uid://dcdwtf1jar5ou" path="res://core/battle/data_driven_cards/apply_status_effect.gd" id="3_8rwf2"]
+[ext_resource type="Resource" uid="uid://cye2itxshpfbr" path="res://creatures/statuses/status_bleeding/status_bleeding.tres" id="4_6egd4"]
+
+[sub_resource type="Resource" id="Resource_43i5f"]
+script = ExtResource("2_hfg20")
+power = 0
+metadata/_custom_type_script = "uid://dgi3jhghrr6jr"
+
+[sub_resource type="Resource" id="Resource_eqnr6"]
+script = ExtResource("3_8rwf2")
+status = ExtResource("4_6egd4")
+amount = 2
+metadata/_custom_type_script = "uid://dcdwtf1jar5ou"
+
+[resource]
+script = ExtResource("2_4d86i")
+id = &"scratch"
+name = "Scratch"
+description = "	"
+pattern = Array[Vector2i]([Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)])
+effects = Array[ExtResource("1_5gf2f")]([SubResource("Resource_43i5f"), SubResource("Resource_eqnr6")])
+metadata/_custom_type_script = "uid://cok13ywyqlu1s"

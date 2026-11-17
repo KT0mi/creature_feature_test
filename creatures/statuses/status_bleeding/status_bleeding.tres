@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="StatusEffectBleeding" format=3 uid="uid://cye2itxshpfbr"]
+
+[ext_resource type="Script" uid="uid://c5i42mpqqcmqh" path="res://creatures/statuses/status_bleeding/status_bleeding.gd" id="1_4yebt"]
+[ext_resource type="Texture2D" uid="uid://dowe7g7tjtrdo" path="res://assets/staging/status_icons/icon_bleeding.png" id="1_levwm"]
+
+[resource]
+script = ExtResource("1_4yebt")
+id = &"bleeding"
+name = "Bleeding"
+description = "At the end of your creature's turn lose the amount of Bleeding of it's health."
+icon = ExtResource("1_levwm")
+metadata/_custom_type_script = "uid://c5i42mpqqcmqh"
