@@ -55,4 +55,4 @@ The **model** never waits for the **view**: it applies an action and returns a l
 - [[Integration with Creature Systems]]: how it plugs into parts, fusion, baker, tools
 - [[Battle Open Questions]]
 - [[Battle System TODO]]
-- Pending (designed, not built): [[Terrain]], [[Battle Maps]]
+- Pending (designed, not built): [[Terrain]], [[Battle Maps]]; prototype: [[Active Time Turns]]

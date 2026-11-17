@@ -51,6 +51,7 @@ static func new_battle(team_a: Array[CombatProfile], team_b: Array[CombatProfile
 		names_a := PackedStringArray(), names_b := PackedStringArray()) -> BattleRules:
 	var s := BattleState.new()
 	s.rng.seed = seed
+	s.turn_system = CombatRules.turn_system
 	_place(s, team_a, 0, names_a)
 	_place(s, team_b, 1, names_b)
 	return BattleRules.new(s)
@@ -81,10 +82,15 @@ func start() -> Array[BattleEvent]:
 	for u in state.units:
 		for attribute in u.profile.attributes:
 			apply_status(null, u, attribute, 1)
-	state.active_team = CombatRules.first_team(state.units, state.rng)
-	state.first_team = state.active_team
 	_fired.clear()
-	_start_turn()
+	if state.is_active_time():
+		_init_schedule()
+		_advance()
+		state.first_team = state.active_team
+	else:
+		state.active_team = CombatRules.first_team(state.units, state.rng)
+		state.first_team = state.active_team
+		_start_turn()
 	return state.battle_log.slice(mark)
 
 
@@ -96,6 +102,9 @@ func legal_actions(unit_index: int) -> Array[BattleAction]:
 		return out
 	var u := state.units[unit_index]
 	if not u.is_alive() or u.team != state.active_team:
+		return out
+	# Active time: only the unit whose turn it is may act.
+	if state.is_active_time() and unit_index != state.active_unit:
 		return out
 	if u.played_this_turn.size() >= CombatRules.MAX_CARDS_PER_TURN:
 		return out
@@ -181,6 +190,9 @@ func end_turn() -> Array[BattleEvent]:
 	var mark := state.battle_log.size()
 	if state.is_over():
 		return []
+	if state.is_active_time():
+		_end_unit_turn()
+		return state.battle_log.slice(mark)
 	_fired.clear()
 	for u in state.living(state.active_team):
 		_emit(_event(BattleEvent.Type.TURN_ENDED, u))
@@ -197,13 +209,108 @@ func end_turn() -> Array[BattleEvent]:
 	return state.battle_log.slice(mark)
 
 
+## ALTERNATING: starts the active team's turn for all its living units.
 func _start_turn() -> void:
-	for u in state.living(state.active_team):
+	_start_turn_for(state.living(state.active_team))
+
+
+## Resets the card budget and counts cooldowns down for `units`, then
+## sends their TURN_STARTED events.
+func _start_turn_for(units: Array[BattleUnit]) -> void:
+	for u in units:
 		u.played_this_turn.clear()
 		for slot in u.cooldowns.keys():
 			u.cooldowns[slot] = maxi(0, u.cooldowns[slot] - 1)
-	for u in state.living(state.active_team):
+	for u in units:
 		_emit(_event(BattleEvent.Type.TURN_STARTED, u))
+
+
+# ------------------------------------------------- active time (prototype)
+
+## Every unit's first turn comes after one delay, so lighter creatures
+## start first; tie-breakers are drawn once, from the battle's seed.
+func _init_schedule() -> void:
+	state.next_turn_at.clear()
+	state.tiebreak.clear()
+	for u in state.units:
+		state.next_turn_at.append(CombatRules.turn_delay(u))
+		state.tiebreak.append(state.rng.randi())
+
+
+## The living unit due next: earliest tick, then lower build, then the
+## seeded tie-breaker. -1 if nobody is alive.
+func _next_actor(times: Array[int]) -> int:
+	var best := -1
+	for i in state.units.size():
+		var u := state.units[i]
+		if not u.is_alive():
+			continue
+		if best == -1 or _before(i, best, times):
+			best = i
+	return best
+
+
+func _before(a: int, b: int, times: Array[int]) -> bool:
+	if times[a] != times[b]:
+		return times[a] < times[b]
+	var build_a := state.units[a].profile.build
+	var build_b := state.units[b].profile.build
+	if build_a != build_b:
+		return build_a < build_b
+	return state.tiebreak[a] < state.tiebreak[b]
+
+
+## Starts the next unit's turn: the clock jumps to its tick.
+func _advance() -> void:
+	var i := _next_actor(state.next_turn_at)
+	if i == -1:
+		return
+	state.active_unit = i
+	state.active_team = state.units[i].team
+	state.clock = state.next_turn_at[i]
+	var just_this: Array[BattleUnit] = [state.units[i]]
+	_start_turn_for(just_this)
+
+
+## Ends the active unit's turn and starts the next one.
+func _end_unit_turn() -> void:
+	_fired.clear()
+	var i := state.active_unit
+	var u := state.units[i]
+	if u.is_alive():
+		_emit(_event(BattleEvent.Type.TURN_ENDED, u))
+	_check_winner()
+	if state.is_over():
+		return
+	state.next_turn_at[i] += CombatRules.turn_delay(u)
+	state.turns_taken += 1
+	# A "round" = as many unit turns as there are units (for the draw limit
+	# and the HUD; there are no real rounds in active time).
+	state.round = 1 + state.turns_taken / maxi(state.units.size(), 1)
+	if state.round > CombatRules.MAX_ROUNDS:
+		_end_battle(-2)
+		return
+	_fired.clear()  # the new turn's statuses may react again
+	_advance()
+
+
+## ACTIVE_TIME: the indices of the next `count` turns, starting with the
+## current one (for a turn-order bar, the AI, or tests). Assumes nobody
+## dies and no delay changes. Empty in ALTERNATING battles.
+func turn_order(count: int) -> Array[int]:
+	var out: Array[int] = []
+	if not state.is_active_time() or state.active_unit == -1 or state.is_over():
+		return out
+	var times: Array[int] = state.next_turn_at.duplicate()
+	out.append(state.active_unit)
+	times[state.active_unit] += CombatRules.turn_delay(state.units[state.active_unit])
+	while out.size() < count:
+		var i := _next_actor(times)
+		if i == -1:
+			break
+		out.append(i)
+		times[i] += CombatRules.turn_delay(state.units[i])
+	return out
 
 
 func _check_winner() -> void:
