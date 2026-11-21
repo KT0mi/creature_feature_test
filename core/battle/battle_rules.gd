@@ -103,7 +103,7 @@ func legal_actions(unit_index: int) -> Array[BattleAction]:
 	var u := state.units[unit_index]
 	if not u.is_alive() or u.team != state.active_team:
 		return out
-		# Active time: only the unit whose turn it is may act.
+	# Active time: only the unit whose turn it is may act.
 	if state.is_active_time() and unit_index != state.active_unit:
 		return out
 	if u.played_this_turn.size() >= CombatRules.MAX_CARDS_PER_TURN:
@@ -190,6 +190,12 @@ func end_turn() -> Array[BattleEvent]:
 	var mark := state.battle_log.size()
 	if state.is_over():
 		return []
+	# Active time: only the active UNIT's turn ends, and the schedule picks
+	# the next one. (Without this, the team-turn code below would run and
+	# active_unit would never change.)
+	if state.is_active_time():
+		_end_unit_turn()
+		return state.battle_log.slice(mark)
 	_fired.clear()
 	for u in state.living(state.active_team):
 		_emit(_event(BattleEvent.Type.TURN_ENDED, u))
