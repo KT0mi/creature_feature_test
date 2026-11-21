@@ -6,7 +6,7 @@ extends  RefCounted
 ##All units in a fixed order
 var units: Array[BattleUnit] = []
 
-##Team that is active on this turn
+## Team of the unit whose turn it is.
 var active_team: int = 0
 
 var round: int = 1
@@ -16,10 +16,6 @@ var first_team: int = 0
 
 ##-1 while fighting, else the winning team; -2 = draw (after MAX_ROUNDS).
 var winner: int = -1
-
-## The turn system this battle uses (copied from CombatRules.turn_system
-## when the battle is created; never changes during it).
-var turn_system: CombatRules.TurnSystem = CombatRules.TurnSystem.ALTERNATING
 
 ## ACTIVE_TIME only:
 ## Index of the unit whose turn it is (-1 before the battle starts).
@@ -43,10 +39,6 @@ var battle_log: Array[BattleEvent] = []
 
 ##The battle's only source of randomness (seeded).
 var rng := RandomNumberGenerator.new()
-
-func is_active_time() -> bool:
-	return turn_system == CombatRules.TurnSystem.ACTIVE_TIME
-
 
 func is_over() -> bool:
 	return winner != -1
@@ -104,7 +96,6 @@ func clone() -> BattleState:
 	copy.active_team = active_team
 	copy.round = round
 	copy.first_team = first_team
-	copy.turn_system = turn_system
 	copy.active_unit = active_unit
 	copy.clock = clock
 	copy.next_turn_at = next_turn_at.duplicate()
@@ -120,6 +111,7 @@ func clone() -> BattleState:
 		c.position = u.position
 		c.facing = u.facing
 		c.hp = u.hp
+		c.grit = u.grit
 		c.cooldowns = u.cooldowns.duplicate()
 		c.played_this_turn = u.played_this_turn.duplicate()
 		copy.units.append(c)

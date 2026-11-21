@@ -7,6 +7,8 @@ extends CardEffect
 ## True: heal the card's user. False: heal the unit on the target cell.
 @export var heal_self: bool = true
 
+func acts_on_user() -> bool:
+	return heal_self
 
 func apply(ctx: BattleContext, user: BattleUnit, target: Vector2i) -> void:
 	var who := user if heal_self else ctx.unit_at(target)

@@ -20,6 +20,8 @@ var hp: int = 0
 ## played again. Missing or 0 = ready. Per SLOT, not per card id, so two
 ## copies of the same card cool down independently.
 var cooldowns: Dictionary = {}
+## Grit: re-rolls for missed attacks (0..CombatRules.MAX_GRIT).
+var grit: int = CombatRules.START_GRIT
 ## Statuses, attributes and armed reactions currently on this unit.
 var statuses: Array[StatusInstance] = []
 ## Cards played this turn, to enforce the 2-card budget (max 1 attack).
@@ -86,6 +88,14 @@ func effective_stat(stat: StringName) -> int:
 		if s.status.stat_modifiers != null:
 			value += s.status.stat_modifiers.get(stat)
 	return value
+
+## Sum of a luck field ("miss_chance", "crit_chance", "crit_damage") over
+## all of this unit's statuses (attributes included).
+func luck_modifier(field: StringName) -> float:
+	var total := 0.0
+	for s in statuses:
+		total += s.status.get(field)
+	return total
 
 func label() -> String:
 	return display_name if display_name != "" else "unit(team %d)" % team

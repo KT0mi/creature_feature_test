@@ -9,6 +9,9 @@ var unit_index: int
 ## Index into the unit's profile.battle_cards.
 var slot: int
 var target: Vector2i
+## Attacks: if a roll misses, spend grit (while the user has some) to roll
+## it again. Not part of what makes an action legal.
+var use_grit: bool = false
 
 
 func _init(p_unit_index: int = 0, p_slot: int = 0, p_target: Vector2i = Vector2i.ZERO) -> void:

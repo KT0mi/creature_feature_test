@@ -68,6 +68,18 @@ func damage(_source: BattleUnit, _target: BattleUnit, _power: int, _type: Damage
 	_todo("damage")
 
 
+## `unit` gains `amount` grit (negative = spends), within 0..MAX_GRIT.
+## Records GRIT_CHANGED if it changed.
+func gain_grit(_unit: BattleUnit, _amount: int) -> void:
+	_todo("gain_grit")
+
+
+## True if the attack being played right now MISSED `unit` (its effects
+## then skip that unit). Always false outside an attack.
+func attack_missed(_unit: BattleUnit) -> bool:
+	return false
+
+
 ## Heals `target` by `amount`, up to its max HP.
 func heal(_target: BattleUnit, _amount: int) -> void:
 	_todo("heal")

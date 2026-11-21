@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AttributeRecipe" format=3 uid="uid://t6q7qp0c12aj"]
+
+[ext_resource type="Resource" uid="uid://bxhq30g5u2q3f" path="res://creatures/statuses/attributes/attribute_blind.tres" id="1_rchji"]
+[ext_resource type="Script" uid="uid://d06tg7nb8nqm6" path="res://core/battle/status/attribute_recipe.gd" id="1_x8n2x"]
+
+[resource]
+script = ExtResource("1_x8n2x")
+attribute = ExtResource("1_rchji")
+value = &"eye"
+metadata/_custom_type_script = "uid://d06tg7nb8nqm6"

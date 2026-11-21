@@ -33,6 +33,7 @@ var _busy := false            # animating / enemy turn: no player input
 var _selected_unit := -1      # index in rules.state.units
 var _selected_slot := -1      # deck slot of the chosen card
 var _hover_cell := Vector2i(-1, -1)
+var _use_grit := true         # spend grit to re-roll the player's misses
 
 @export var camera_speed := 300.0
 @onready var camera: Camera2D = $Camera2D
@@ -66,6 +67,7 @@ func _ready() -> void:
 	layer.add_child(hud)
 	hud.card_pressed.connect(_on_card_pressed)
 	hud.end_turn_pressed.connect(_on_end_turn)
+	hud.grit_toggled.connect(func(on): _use_grit = on)
 	hud.rematch_pressed.connect(func(): BattleScene.open(get_tree(), genomes_a, genomes_b, battle_seed + 1))
 	hud.back_pressed.connect(func(): get_tree().change_scene_to_file(LAB_PATH))
 	
@@ -145,12 +147,9 @@ func _next() -> void:
 		_enemy_turn()
 		return
 	_busy = false
-	if rules.state.is_active_time():
-		# Active time: only the unit whose turn it is can act, so always
-		# select it (keeping an older selection would grey out every card).
-		_select_unit(rules.state.active_unit)
-	elif _selected_unit == -1 or not rules.state.units[_selected_unit].is_alive():
-		_select_unit(_first_player_unit())
+	# Only the unit whose turn it is can act, so always select it (keeping
+	# an older selection would grey out every card).
+	_select_unit(rules.state.active_unit)
 	_refresh_ui()
 
 
@@ -183,14 +182,6 @@ func _on_end_turn() -> void:
 	_busy = true
 	await _play(rules.end_turn())
 	_next()
-
-
-func _first_player_unit() -> int:
-	for i in rules.state.units.size():
-		var u := rules.state.units[i]
-		if u.team == PLAYER_TEAM and u.is_alive():
-			return i
-	return -1
 
 
 # ----------------------------------------------------------------- input
@@ -227,6 +218,7 @@ func _set_hover(cell: Vector2i) -> void:
 	board.set_hover(cell)
 	_refresh_marks()
 	_refresh_unit_info()
+	_refresh_hint()  # the hit/crit odds depend on what's under the mouse
 
 
 
@@ -240,12 +232,9 @@ func _on_cell_clicked(cell: Vector2i) -> void:
 			return
 	# Otherwise: select one of the player's units, or drop the card.
 	var unit := rules.state.unit_at(cell)
-	# Active time: the acting unit stays selected (others can't act now;
-	# hovering them still shows their info).
-	if unit != null and unit.team == PLAYER_TEAM and not rules.state.is_active_time():
-		_select_unit(rules.state.units.find(unit))
-	else:
-		_clear_card()
+	# The acting unit stays selected: others can't act now (hovering them
+	# still shows their info). Clicking elsewhere just drops the card.
+	_clear_card()
 
 
 ## The legal action for the selected card on `cell`. For aim-SELF cards,
@@ -283,6 +272,7 @@ func _on_card_pressed(slot: int) -> void:
 
 
 func _play_action(action: BattleAction) -> void:
+	action.use_grit = _use_grit
 	_selected_slot = -1
 	_busy = true
 	board.clear_marks()
@@ -336,32 +326,56 @@ func _legal_slots() -> Array[int]:
 func _refresh_ui() -> void:
 	var s := rules.state
 	var mine := s.active_team == PLAYER_TEAM
-	var first := "you" if s.first_team == PLAYER_TEAM else "the enemy"
-	if s.is_active_time():
-		# Whose turn, and the predicted order of the next turns, so a run
-		# of turns by the lighter creature is visible in advance.
-		var active: BattleUnit = s.units[s.active_unit] if s.active_unit != -1 else null
-		var who := active.label() if active else "?"
-		var short := " [%s]" % _short_label(s.active_unit) if s.units.size() > 2 and active else ""
-		hud.set_turn("Turn %d - %s (%s)%s" % [s.turns_taken + 1, who, "you" if mine else "enemy", short],
-			"Next: %s\nBuild: you %d, enemy %d (lower build = shorter wait between turns)"
-			% [_turn_order_text(8), _team_build(0), _team_build(1)])
-	else:
-		hud.set_turn("Round %d - %s" % [s.round, "Your turn" if mine else "Enemy turn"],
-			"Build: you %d, enemy %d (lower goes first: %s)" % [_team_build(0), _team_build(1), first])
+	# Whose turn, and the predicted order of the next turns, so a run of
+	# turns by the lighter creature is visible in advance.
+	var active: BattleUnit = s.units[s.active_unit] if s.active_unit != -1 else null
+	var who := active.label() if active else "?"
+	var short := " [%s]" % _short_label(s.active_unit) if s.units.size() > 2 and active else ""
+	hud.set_turn("Turn %d - %s (%s)%s" % [s.turns_taken + 1, who, "you" if mine else "enemy", short],
+		"Next: %s\nBuild: you %d, enemy %d (lower build = shorter wait between turns)"
+		% [_turn_order_text(8), _team_build(0), _team_build(1)])
 	hud.set_end_turn_enabled(mine and not _busy)
+	if active != null:
+		hud.set_grit(active.grit if mine else 0, CombatRules.MAX_GRIT)
 	_refresh_cards()
 	_refresh_marks()
 	_refresh_unit_info()
+	_refresh_hint()
+
+
+func _refresh_hint() -> void:
 	var card := _selected_card()
-	if not mine or _busy:
+	if rules.state.active_team != PLAYER_TEAM or _busy:
 		hud.set_hint("")
 	elif card == null:
 		hud.set_hint("Pick a card (1-9), or End turn (Space)")
 	elif card.aim == BattleCard.Aim.SELF:
-		hud.set_hint("%s: press it again or click the area to play it" % card.name)
+		hud.set_hint("%s: press it again or click the area to play it%s" % [card.name, _odds_text()])
 	else:
-		hud.set_hint("%s: click a highlighted cell (right click to cancel)" % card.name)
+		hud.set_hint("%s: click a highlighted cell (right click to cancel)%s" % [card.name, _odds_text()])
+
+
+
+
+## Hit / crit odds of the selected attack on the unit under the mouse,
+## e.g. "  -  Hit 87%, Crit 16% (x1.5)". Empty if there's nothing to hit.
+func _odds_text() -> String:
+	var card := _selected_card()
+	if card == null or card.kind != BattleCard.Kind.ATTACK or not Grid.in_bounds(_hover_cell):
+		return ""
+	var user := rules.state.units[_selected_unit]
+	var aim := _hover_cell
+	var actions := _legal_for_slot()
+	if card.aim == BattleCard.Aim.SELF and actions.size() == 1:
+		aim = actions[0].target
+	var victims := card.victims(rules, user, aim)
+	var victim: BattleUnit = rules.state.unit_at(_hover_cell)
+	if victim == null or not victims.has(victim):
+		if victims.is_empty():
+			return ""
+		victim = victims[0]
+	return "  -  Hit %d%%, Crit %d%% (x%.1f)" % [roundi(100 * (1.0 - CombatRules.miss_chance(user, victim))),
+		roundi(100 * CombatRules.crit_chance(user, victim)), CombatRules.crit_damage(user)]
 
 
 
@@ -464,7 +478,8 @@ func _refresh_unit_info() -> void:
 		return
 	var lines := PackedStringArray()
 	lines.append("[b]%s[/b]  (%s)" % [u.label(), "you" if u.team == PLAYER_TEAM else "enemy"])
-	lines.append("HP %d/%d   Build %d" % [u.hp, u.profile.hp, u.profile.build])
+	lines.append("HP %d/%d   Build %d   Grit %d/%d" % [u.hp, u.profile.hp, u.profile.build,
+		u.grit, CombatRules.MAX_GRIT])
 	lines.append("PHY %d  SPC %d  DEF %d  RES %d" % [u.effective_stat(&"phys_dmg"),
 		u.effective_stat(&"spc_dmg"), u.effective_stat(&"def"), u.effective_stat(&"res")])
 	var seen := PackedStringArray()
@@ -528,7 +543,19 @@ func _play(events: Array[BattleEvent]) -> void:
 				await view.shake().finished
 			BattleEvent.Type.DAMAGED:
 				_float(view, "-%d" % ev.amount, Color(1, 0.35, 0.3))
+				if ev.critical:
+					_float(view, "-%d CRIT!" % ev.amount, Color(1, 0.85, 0.2))
+				else:
+					_float(view, "-%d" % ev.amount, Color(1, 0.35, 0.3))
 				await view.show_damage(ev.amount).finished
+			BattleEvent.Type.MISSED:
+				_float(view, "Miss", Color(0.75, 0.75, 0.75))
+				await _wait(0.25)
+			BattleEvent.Type.REROLLED:
+				_float(view, "Re-roll!", Color(0.6, 0.9, 1.0))
+				await _wait(0.25)
+			BattleEvent.Type.GRIT_CHANGED:
+				_float(view, "%+d grit" % ev.amount, Color(0.6, 0.9, 1.0))
 			BattleEvent.Type.HP_LOST:
 				_float(view, "-%d" % ev.amount, Color(0.8, 0.4, 1.0))
 				await view.show_damage(ev.amount).finished

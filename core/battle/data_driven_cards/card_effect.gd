@@ -10,6 +10,12 @@ extends Resource
 func apply(_ctx: BattleContext, _user: BattleUnit, _target: Vector2i) -> void:
 	pass
 
+## True if this effect acts on the card's USER whatever cell is hit (heal
+## self, gain grit...). Such effects run once per card, not once per
+## affected cell, and aren't blocked by "the area doesn't hit its user".
+func acts_on_user() -> bool:
+	return false
+
 
 ## Short text for card descriptions and tooltips, e.g. "Deal 3 physical".
 func describe() -> String:
