@@ -33,7 +33,7 @@ var _busy := false            # animating / enemy turn: no player input
 var _selected_unit := -1      # index in rules.state.units
 var _selected_slot := -1      # deck slot of the chosen card
 var _hover_cell := Vector2i(-1, -1)
-var _use_grit := true         # spend grit to re-roll the player's misses
+var _use_grit := false        # spend 1 grit on the next attack (advantage)
 
 @export var camera_speed := 300.0
 @onready var camera: Camera2D = $Camera2D
@@ -67,7 +67,7 @@ func _ready() -> void:
 	layer.add_child(hud)
 	hud.card_pressed.connect(_on_card_pressed)
 	hud.end_turn_pressed.connect(_on_end_turn)
-	hud.grit_toggled.connect(func(on): _use_grit = on)
+	hud.grit_toggled.connect(func(on): _use_grit = on; _refresh_hint())
 	hud.rematch_pressed.connect(func(): BattleScene.open(get_tree(), genomes_a, genomes_b, battle_seed + 1))
 	hud.back_pressed.connect(func(): get_tree().change_scene_to_file(LAB_PATH))
 	
@@ -272,7 +272,10 @@ func _on_card_pressed(slot: int) -> void:
 
 
 func _play_action(action: BattleAction) -> void:
-	action.use_grit = _use_grit
+	var card := rules.state.units[action.unit_index].deck()[action.slot]
+	action.use_grit = _use_grit and card.kind == BattleCard.Kind.ATTACK
+	if action.use_grit:
+		hud.set_grit_on(false)  # one attack per grit: switch it back off
 	_selected_slot = -1
 	_busy = true
 	board.clear_marks()
@@ -374,8 +377,12 @@ func _odds_text() -> String:
 		if victims.is_empty():
 			return ""
 		victim = victims[0]
-	return "  -  Hit %d%%, Crit %d%% (x%.1f)" % [roundi(100 * (1.0 - CombatRules.miss_chance(user, victim))),
-		roundi(100 * CombatRules.crit_chance(user, victim)), CombatRules.crit_damage(user)]
+	# Odds of the actual results (crit counted out of all rolls), with
+	# advantage if grit is switched on and the unit has some.
+	var advantage := _use_grit and user.grit > 0
+	var odds := CombatRules.outcome_odds(user, victim, advantage)
+	return "  -  Hit %d%%, Crit %d%% (x%.1f)%s" % [roundi(100 * (1.0 - odds.miss)), roundi(100 * odds.crit),
+		CombatRules.crit_damage(user), " with grit" if advantage else ""]
 
 
 
@@ -542,7 +549,6 @@ func _play(events: Array[BattleEvent]) -> void:
 			BattleEvent.Type.COLLIDED:
 				await view.shake().finished
 			BattleEvent.Type.DAMAGED:
-				_float(view, "-%d" % ev.amount, Color(1, 0.35, 0.3))
 				if ev.critical:
 					_float(view, "-%d CRIT!" % ev.amount, Color(1, 0.85, 0.2))
 				else:
@@ -551,8 +557,8 @@ func _play(events: Array[BattleEvent]) -> void:
 			BattleEvent.Type.MISSED:
 				_float(view, "Miss", Color(0.75, 0.75, 0.75))
 				await _wait(0.25)
-			BattleEvent.Type.REROLLED:
-				_float(view, "Re-roll!", Color(0.6, 0.9, 1.0))
+			BattleEvent.Type.GRIT_USED:
+				_float(view, "Grit! (advantage)", Color(0.6, 0.9, 1.0))
 				await _wait(0.25)
 			BattleEvent.Type.GRIT_CHANGED:
 				_float(view, "%+d grit" % ev.amount, Color(0.6, 0.9, 1.0))

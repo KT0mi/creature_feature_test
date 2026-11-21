@@ -107,17 +107,17 @@ func _turn_counts(state: BattleState) -> Dictionary:
 
 
 
-## From the battle log: attacks rolled, misses, crits and grit re-rolls.
+## From the battle log: attacks rolled, misses, crits and grit uses.
 func _luck_counts(state: BattleState) -> Dictionary:
-	var out := {"attacks": 0, "misses": 0, "crits": 0, "rerolls": 0}
+	var out := {"attacks": 0, "misses": 0, "crits": 0, "grit": 0}
 	for ev in state.battle_log:
 		match ev.type:
 			BattleEvent.Type.ATTACKED:
 				out.attacks += 1
 			BattleEvent.Type.MISSED:
 				out.misses += 1
-			BattleEvent.Type.REROLLED:
-				out.rerolls += 1
+			BattleEvent.Type.GRIT_USED:
+				out.grit += 1
 			BattleEvent.Type.DAMAGED:
 				if ev.critical:
 					out.crits += 1
@@ -223,15 +223,15 @@ func _print_turns(results: Array) -> void:
 	print("double turns per battle:       %.2f" % (float(doubles) / maxi(results.size(), 1)))
 
 
-## How often attacks missed / crit, and grit re-rolls per battle.
+## How often attacks missed / crit, and grit uses per battle.
 func _print_luck(results: Array) -> void:
-	var t := {"attacks": 0, "misses": 0, "crits": 0, "rerolls": 0}
+	var t := {"attacks": 0, "misses": 0, "crits": 0, "grit": 0}
 	for r in results:
 		for k in t:
 			t[k] += r.luck[k]
 	var attacks := maxi(t.attacks, 1)
-	print("misses / crits per attack:     %.0f%% / %.0f%%  (grit re-rolls per battle: %.2f)"
-		% [100.0 * t.misses / attacks, 100.0 * t.crits / attacks, float(t.rerolls) / maxi(results.size(), 1)])
+	print("misses / crits per attack:     %.0f%% / %.0f%%  (grit used per battle: %.2f)"
+		% [100.0 * t.misses / attacks, 100.0 * t.crits / attacks, float(t.grit) / maxi(results.size(), 1)])
 
 
 ## Win rate of the LOWER-build side ("upsets" at large differences), by

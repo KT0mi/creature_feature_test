@@ -53,6 +53,8 @@ var luck: Luck = Luck.ROLL
 # The attack being resolved right now: its user, the victims it missed
 # and those it crit (BattleUnit -> true). Empty outside an attack.
 var _attack_source: BattleUnit = null
+# The attack being resolved uses grit (advantage).
+var _advantage := false
 var _missed := {}
 var _crits := {}
 
@@ -185,14 +187,23 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 			_emit(attacked)
 			attacked_units.append(victim)
 	
-	# Luck: after the ATTACKED reactions, roll each victim once (miss, then
+	# Luck: after the ATTACKED reactions, roll each victim (miss / hit /
 	# crit). Missed victims are skipped by every effect of the card.
+	# Grit: 1 grit for the whole attack, spent up front whatever the rolls
+	# give, for advantage on every victim.
 	_attack_source = u if card.kind == BattleCard.Kind.ATTACK else null
 	_missed.clear()
 	_crits.clear()
+	_advantage = false
+	if action.use_grit and _attack_source != null and u.grit > 0 and not attacked_units.is_empty():
+		_advantage = true
+		gain_grit(u, -1)
+		var used := _event(BattleEvent.Type.GRIT_USED, u)
+		used.card = card
+		_emit(used)
 	for victim in attacked_units:
 		if victim.is_alive() and u.is_alive():
-			_roll_attack(u, victim, action.use_grit)
+			_roll_attack(u, victim, _advantage)
 
 	if u.is_alive() and not state.is_over():
 		# The target is the center of the card's area (see PushEffect).
@@ -202,6 +213,7 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 		card.play(self, u, action.target)
 		action_target = saved_target
 	_attack_source = null
+	_advantage = false
 	_missed.clear()
 	_crits.clear()
 	_check_winner()
@@ -562,7 +574,7 @@ func damage(source: BattleUnit, target: BattleUnit, power: int, type: DamageEffe
 	var critical := false
 	if source != null and source == _attack_source:
 		if luck == Luck.EXPECTED:
-			amount = roundi(amount * _expected_factor(source, target))
+			amount = roundi(amount * CombatRules.expected_factor(source, target, _advantage))
 		elif _crits.has(target):
 			amount = roundi(amount * CombatRules.crit_damage(source))
 			critical = true
@@ -585,37 +597,40 @@ func gain_grit(unit: BattleUnit, amount: int) -> void:
 	_emit(ev)
 
 
-## Rolls one attack on one victim (ROLL mode only):
-##   miss? -> with use_grit, spend 1 grit per re-roll while misses go on
-##   still a miss -> MISSED, and the attacker gains 1 grit (olive branch)
-##   a hit -> crit?
-func _roll_attack(attacker: BattleUnit, victim: BattleUnit, use_grit: bool) -> void:
+## Rolls one attack on one victim (ROLL mode only): miss / hit / crit,
+## twice with `advantage` (grit), keeping the better result.
+## A final miss -> MISSED, and the attacker gains 1 grit (olive branch).
+func _roll_attack(attacker: BattleUnit, victim: BattleUnit, advantage: bool) -> void:
 	if luck == Luck.EXPECTED:
 		return
-	var miss := state.rng.randf() < CombatRules.miss_chance(attacker, victim)
-	while miss and use_grit and attacker.grit > 0:
-		gain_grit(attacker, -1)
-		var reroll := _event(BattleEvent.Type.REROLLED, attacker)
-		reroll.to = victim.position
-		_emit(reroll)
-		miss = state.rng.randf() < CombatRules.miss_chance(attacker, victim)
-	if miss:
+	var result := _roll_once(attacker, victim)
+	if advantage:
+		result = maxi(result, _roll_once(attacker, victim))
+	if result == ROLL_MISS:
 		_missed[victim] = true
 		var missed := _event(BattleEvent.Type.MISSED, victim)
 		missed.source = attacker
 		missed.to = victim.position
 		_emit(missed)
 		gain_grit(attacker, 1)
-		return
-	if state.rng.randf() < CombatRules.crit_chance(attacker, victim):
+	elif result == ROLL_CRIT:
 		_crits[victim] = true
 
 
-## Expected damage multiplier of an attack: (1 - miss) x (1 + crit x (mult - 1)).
-func _expected_factor(attacker: BattleUnit, victim: BattleUnit) -> float:
-	var hit := 1.0 - CombatRules.miss_chance(attacker, victim)
-	var crit := CombatRules.crit_chance(attacker, victim)
-	return hit * (1.0 + crit * (CombatRules.crit_damage(attacker) - 1.0))
+## Results of one roll, ordered worst to best (advantage keeps the max).
+const ROLL_MISS := 0
+const ROLL_HIT := 1
+const ROLL_CRIT := 2
+
+
+## One roll: miss? if not, crit? (always two random numbers, so a roll
+## takes the same RNG steps whatever it gives: replays stay aligned).
+func _roll_once(attacker: BattleUnit, victim: BattleUnit) -> int:
+	var miss := state.rng.randf() < CombatRules.miss_chance(attacker, victim)
+	var crit := state.rng.randf() < CombatRules.crit_chance(attacker, victim)
+	if miss:
+		return ROLL_MISS
+	return ROLL_CRIT if crit else ROLL_HIT
 
 
 func heal(target: BattleUnit, amount: int) -> void:

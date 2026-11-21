@@ -29,7 +29,8 @@ enum Type {
 	STEPPED,         ## unit entered cell `to` from `from` (one per cell walked
 					 ## or pushed). `forced` = pushed, not its own move
 	MISSED,          ## `source`'s attack missed `unit` (nothing happens to it)
-	REROLLED,        ## `unit` spent 1 grit to roll a miss on `to` again
+	GRIT_USED,       ## `unit` spent 1 grit on its attack: every victim is
+	                 ## rolled twice, the better result counts
 	GRIT_CHANGED,    ## `unit` gained (amount > 0) or spent (< 0) grit
 	BATTLE_ENDED,    ## 'amount' = winning team (-2 = draw)
 }

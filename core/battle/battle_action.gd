@@ -9,8 +9,10 @@ var unit_index: int
 ## Index into the unit's profile.battle_cards.
 var slot: int
 var target: Vector2i
-## Attacks: if a roll misses, spend grit (while the user has some) to roll
-## it again. Not part of what makes an action legal.
+## Attacks: spend 1 grit for ADVANTAGE (each victim rolled twice, the
+## better result counts). Spent whether the attack then hits or not;
+## ignored if the user has no grit, the card isn't an attack, or it has no
+## victims. Not part of what makes an action legal.
 var use_grit: bool = false
 
 
