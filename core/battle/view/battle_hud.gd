@@ -7,6 +7,8 @@ signal card_pressed(slot: int)
 signal end_turn_pressed
 signal rematch_pressed
 signal back_pressed
+## The "use grit on a miss" toggle changed.
+signal grit_toggled(on: bool)
 
 var _turn_label: Label
 var _initiative_label: Label
@@ -15,6 +17,7 @@ var _log: RichTextLabel
 var _cards_box: HBoxContainer
 var _budget_label: Label
 var _end_turn: Button
+var _grit_toggle: CheckButton
 var _result_panel: PanelContainer
 var _result_label: Label
 var _hint: Label
@@ -56,6 +59,13 @@ func _ready() -> void:
 	_cards_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_cards_box.add_theme_constant_override("separation", 8)
 	bottom.add_child(_cards_box)
+	# Grit: re-roll this turn's missed attacks (only spent on a miss).
+	_grit_toggle = CheckButton.new()
+	_grit_toggle.text = "Use grit\non a miss"
+	_grit_toggle.button_pressed = true
+	_grit_toggle.focus_mode = Control.FOCUS_NONE
+	_grit_toggle.toggled.connect(func(on): grit_toggled.emit(on))
+	bottom.add_child(_grit_toggle)
 	_end_turn = Button.new()
 	_end_turn.text = "End turn\n(Space)"
 	_end_turn.custom_minimum_size = Vector2(120, 0)
@@ -142,6 +152,12 @@ func set_unit_info(bbcode: String) -> void:
 
 func add_log(line: String) -> void:
 	_log.append_text(line + "\n")
+
+
+## Shows the acting unit's grit on the toggle, e.g. "Use grit (1/2)".
+func set_grit(grit: int, max_grit: int) -> void:
+	_grit_toggle.text = "Use grit\non a miss (%d/%d)" % [grit, max_grit]
+	_grit_toggle.disabled = grit == 0
 
 
 func set_end_turn_enabled(on: bool) -> void:

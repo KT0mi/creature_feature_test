@@ -28,6 +28,9 @@ enum Type {
 	MOVE_STARTED,    ## unit starts moving from `from`, intending to reach `to`
 	STEPPED,         ## unit entered cell `to` from `from` (one per cell walked
 	                 ## or pushed). `forced` = pushed, not its own move
+	MISSED,          ## `source`'s attack missed `unit` (nothing happens to it)
+	REROLLED,        ## `unit` spent 1 grit to roll a miss on `to` again
+	GRIT_CHANGED,    ## `unit` gained (amount > 0) or spent (< 0) grit
 	BATTLE_ENDED,    ## 'amount' = winning team (-2 = draw)
 }
 
@@ -45,6 +48,8 @@ var card: BattleCard
 ## The status involved (STATUS_APPLIED, STATUS_EXPIRED), if any. For a
 ## status on a CELL, `unit` is null and `to` is the cell.
 var status: StatusEffect
+## DAMAGED: the hit was a critical one.
+var critical: bool = false
 ## STEPPED: the unit was pushed rather than moving by itself.
 var forced: bool = false
 ## MOVED / PUSHED: the unit stopped before reaching where it was going.
@@ -70,7 +75,9 @@ func describe() -> String:
 		Type.MOVE_STARTED, Type.STEPPED:
 			return "%s %s %s -> %s%s" % [Type.keys()[type], who, from, to, " (forced)" if forced else ""]
 		Type.DAMAGED, Type.HEALED, Type.HP_LOST:
-			return "%s %s %d" % [Type.keys()[type], who, amount]
+			return "%s %s %d%s" % [Type.keys()[type], who, amount, " (critical)" if critical else ""]
+		Type.GRIT_CHANGED:
+			return "%s %s %+d" % [Type.keys()[type], who, amount]
 		Type.CARD_PLAYED, Type.REACTED:
 			return "%s %s %s" % [Type.keys()[type], who, card.id if card else &"?"]
 		Type.STATUS_APPLIED, Type.STATUS_EXPIRED:

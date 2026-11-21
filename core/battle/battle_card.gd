@@ -135,10 +135,20 @@ func play(ctx: BattleContext, user: BattleUnit, target: Vector2i) -> void:
 	for effect in effects:
 		if effect == null:
 			continue
+		# Effects on the user (heal self, gain grit...) happen once, even
+		# if the user isn't in (or may not be hit by) the area.
+		if effect.acts_on_user():
+			effect.apply(ctx, user, target)
+			continue
 		for cell in cells:
 			# Checked again for every effect: an earlier effect may have moved units
-			if may_hit(ctx, user, ctx.unit_at(cell)):
-				effect.apply(ctx, user, cell)
+			var unit := ctx.unit_at(cell)
+			if not may_hit(ctx, user, unit):
+				continue
+			# A missed victim is untouched by every effect of the attack.
+			if kind == Kind.ATTACK and unit != null and ctx.attack_missed(unit):
+				continue
+			effect.apply(ctx, user, cell)
 
 
 ## Cells hit when `user` plays this card on `target`: `area` rotated to the

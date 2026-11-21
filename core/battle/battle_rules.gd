@@ -40,6 +40,21 @@ var _fired := {}
 var _moving := {}
 var _stop := {}
 
+## How attacks roll for miss / crit:
+##   ROLL      real rolls with the battle's seeded RNG (normal battles)
+##   EXPECTED  no rolls: every attack hits, and its damage is scaled by
+##             its expected value (miss and crit odds). The AI simulates on
+##             clones in this mode, so it can't foresee the real rolls (a
+##             clone copies the RNG's position).
+enum Luck { ROLL, EXPECTED }
+var luck: Luck = Luck.ROLL
+
+# The attack being resolved right now: its user, the victims it missed
+# and those it crit (BattleUnit -> true). Empty outside an attack.
+var _attack_source: BattleUnit = null
+var _missed := {}
+var _crits := {}
+
 
 func _init(p_state: BattleState = null) -> void:
 	state = p_state if p_state else BattleState.new()
@@ -51,7 +66,6 @@ static func new_battle(team_a: Array[CombatProfile], team_b: Array[CombatProfile
 		names_a := PackedStringArray(), names_b := PackedStringArray()) -> BattleRules:
 	var s := BattleState.new()
 	s.rng.seed = seed
-	s.turn_system = CombatRules.turn_system
 	_place(s, team_a, 0, names_a)
 	_place(s, team_b, 1, names_b)
 	return BattleRules.new(s)
@@ -74,8 +88,9 @@ func clone() -> BattleRules:
 
 # ---------------------------------------------------------------- flow
 
-## Applies every unit's attributes, decides who goes first (lower build)
-## and starts that team's turn. Returns the events.
+## Applies every unit's attributes, sets up the turn schedule (lighter
+## units act first and more often) and starts the first unit's turn.
+## Returns the events.
 func start() -> Array[BattleEvent]:
 	var mark := state.battle_log.size()
 	_fired.clear()
@@ -83,14 +98,9 @@ func start() -> Array[BattleEvent]:
 		for attribute in u.profile.attributes:
 			apply_status(null, u, attribute, 1)
 	_fired.clear()
-	if state.is_active_time():
-		_init_schedule()
-		_advance()
-		state.first_team = state.active_team
-	else:
-		state.active_team = CombatRules.first_team(state.units, state.rng)
-		state.first_team = state.active_team
-		_start_turn()
+	_init_schedule()
+	_advance()
+	state.first_team = state.active_team
 	return state.battle_log.slice(mark)
 
 
@@ -103,8 +113,8 @@ func legal_actions(unit_index: int) -> Array[BattleAction]:
 	var u := state.units[unit_index]
 	if not u.is_alive() or u.team != state.active_team:
 		return out
-		# Active time: only the unit whose turn it is may act.
-	if state.is_active_time() and unit_index != state.active_unit:
+	# Only the unit whose turn it is may act.
+	if unit_index != state.active_unit:
 		return out
 	if u.played_this_turn.size() >= CombatRules.MAX_CARDS_PER_TURN:
 		return out
@@ -163,6 +173,7 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 	# Every unit in the attack's area is ATTACKED (in the area's fixed order)
 	# and reacts right away: one that dodges out of the area isn't hit,
 	# because effects hit CELLS, not the units listed here.
+	var attacked_units: Array[BattleUnit] = []
 	if card.kind == BattleCard.Kind.ATTACK:
 		for victim in card.victims(self, u, action.target):
 			if victim == u or not victim.is_alive():
@@ -172,6 +183,16 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 			attacked.to = victim.position
 			attacked.card = card
 			_emit(attacked)
+			attacked_units.append(victim)
+
+	# Luck: after the ATTACKED reactions, roll each victim once (miss, then
+	# crit). Missed victims are skipped by every effect of the card.
+	_attack_source = u if card.kind == BattleCard.Kind.ATTACK else null
+	_missed.clear()
+	_crits.clear()
+	for victim in attacked_units:
+		if victim.is_alive() and u.is_alive():
+			_roll_attack(u, victim, action.use_grit)
 
 	if u.is_alive() and not state.is_over():
 		# The target is the center of the card's area (see PushEffect).
@@ -180,40 +201,21 @@ func apply(action: BattleAction) -> Array[BattleEvent]:
 		action_target = action.target
 		card.play(self, u, action.target)
 		action_target = saved_target
+	_attack_source = null
+	_missed.clear()
+	_crits.clear()
 	_check_winner()
 	return state.battle_log.slice(mark)
 
 
-## Ends the active team's turn: TURN_ENDED for its units (end-of-turn
-## statuses act and tick), then the other team's turn starts.
+## Ends the active unit's turn (TURN_ENDED: end-of-turn statuses act and
+## tick), reschedules it and starts the next unit's turn.
 func end_turn() -> Array[BattleEvent]:
 	var mark := state.battle_log.size()
 	if state.is_over():
 		return []
-	# Active time: only the active UNIT's turn ends, and the schedule picks
-	# the next one. (Without this, the team-turn code below would run and
-	# active_unit would never change.)
-	if state.is_active_time():
-		_end_unit_turn()
-		return state.battle_log.slice(mark)
-	_fired.clear()
-	for u in state.living(state.active_team):
-		_emit(_event(BattleEvent.Type.TURN_ENDED, u))
-	_check_winner()
-	if not state.is_over():
-		state.active_team = 1 - state.active_team
-		if state.active_team == state.first_team:
-			state.round += 1
-		if state.round > CombatRules.MAX_ROUNDS:
-			_end_battle(-2)
-		else:
-			_fired.clear()  # the new turn's statuses may react again
-			_start_turn()
+	_end_unit_turn()
 	return state.battle_log.slice(mark)
-
-
-func _start_turn() -> void:
-	_start_turn_for(state.living(state.active_team))
 
 
 ## Resets the card budget and counts cooldowns down for `units`, then
@@ -227,7 +229,7 @@ func _start_turn_for(units: Array[BattleUnit]) -> void:
 		_emit(_event(BattleEvent.Type.TURN_STARTED, u))
 
 
-# ------------------------------------------------- active time (prototype)
+# ------------------------------------------------------- turn schedule
 
 ## Every unit's first turn comes after one delay, so lighter creatures
 ## start first; tie-breakers are drawn once, from the battle's seed.
@@ -296,12 +298,12 @@ func _end_unit_turn() -> void:
 	_advance()
 
 
-## ACTIVE_TIME: the indices of the next `count` turns, starting with the
-## current one (for a turn-order bar, the AI, or tests). Assumes nobody
-## dies and no delay changes. Empty in ALTERNATING battles.
+## The indices of the next `count` turns, starting with the current one
+## (for the turn-order bar, the AI, or tests). Assumes nobody dies and no
+## delay changes.
 func turn_order(count: int) -> Array[int]:
 	var out: Array[int] = []
-	if not state.is_active_time() or state.active_unit == -1 or state.is_over():
+	if state.active_unit == -1 or state.is_over():
 		return out
 	var times: Array[int] = state.next_turn_at.duplicate()
 	out.append(state.active_unit)
@@ -552,10 +554,70 @@ func push(source: BattleUnit, unit: BattleUnit, direction: Vector2i, distance: i
 				_hurt(blocker, dmg, source)
 
 
+## Damage from the attack being played gets its luck: x crit damage if the
+## roll crit (ROLL), or x its expected value (EXPECTED). Damage from
+## anything else (reactions, statuses) has no luck.
 func damage(source: BattleUnit, target: BattleUnit, power: int, type: DamageEffect.Type) -> void:
 	if target == null or not target.is_alive():
 		return
-	_hurt(target, CombatRules.attack_damage(power, type, source, target), source)
+	var amount := CombatRules.attack_damage(power, type, source, target)
+	var critical := false
+	if source != null and source == _attack_source:
+		if luck == Luck.EXPECTED:
+			amount = roundi(amount * _expected_factor(source, target))
+		elif _crits.has(target):
+			amount = roundi(amount * CombatRules.crit_damage(source))
+			critical = true
+	_hurt(target, amount, source, critical)
+
+
+func attack_missed(unit: BattleUnit) -> bool:
+	return _missed.has(unit)
+
+
+func gain_grit(unit: BattleUnit, amount: int) -> void:
+	if unit == null or not unit.is_alive():
+		return
+	var new_grit := clampi(unit.grit + amount, 0, CombatRules.MAX_GRIT)
+	if new_grit == unit.grit:
+		return
+	var ev := _event(BattleEvent.Type.GRIT_CHANGED, unit)
+	ev.amount = new_grit - unit.grit
+	unit.grit = new_grit
+	_emit(ev)
+
+
+## Rolls one attack on one victim (ROLL mode only):
+##   miss? -> with use_grit, spend 1 grit per re-roll while misses go on
+##   still a miss -> MISSED, and the attacker gains 1 grit (olive branch)
+##   a hit -> crit?
+func _roll_attack(attacker: BattleUnit, victim: BattleUnit, use_grit: bool) -> void:
+	if luck == Luck.EXPECTED:
+		return
+	var miss := state.rng.randf() < CombatRules.miss_chance(attacker, victim)
+	while miss and use_grit and attacker.grit > 0:
+		gain_grit(attacker, -1)
+		var reroll := _event(BattleEvent.Type.REROLLED, attacker)
+		reroll.to = victim.position
+		_emit(reroll)
+		miss = state.rng.randf() < CombatRules.miss_chance(attacker, victim)
+	if miss:
+		_missed[victim] = true
+		var missed := _event(BattleEvent.Type.MISSED, victim)
+		missed.source = attacker
+		missed.to = victim.position
+		_emit(missed)
+		gain_grit(attacker, 1)
+		return
+	if state.rng.randf() < CombatRules.crit_chance(attacker, victim):
+		_crits[victim] = true
+
+
+## Expected damage multiplier of an attack: (1 - miss) x (1 + crit x (mult - 1)).
+func _expected_factor(attacker: BattleUnit, victim: BattleUnit) -> float:
+	var hit := 1.0 - CombatRules.miss_chance(attacker, victim)
+	var crit := CombatRules.crit_chance(attacker, victim)
+	return hit * (1.0 + crit * (CombatRules.crit_damage(attacker) - 1.0))
 
 
 func heal(target: BattleUnit, amount: int) -> void:
@@ -648,13 +710,14 @@ func remove_status(unit: BattleUnit, instance: StatusInstance) -> void:
 
 
 ## Damage (attacks, collisions): DAMAGED event, then death check.
-func _hurt(unit: BattleUnit, amount: int, source: BattleUnit) -> void:
+func _hurt(unit: BattleUnit, amount: int, source: BattleUnit, critical: bool = false) -> void:
 	if not unit.is_alive():
 		return
 	unit.hp -= amount
 	var ev := _event(BattleEvent.Type.DAMAGED, unit)
 	ev.source = source
 	ev.amount = amount
+	ev.critical = critical
 	_emit(ev)
 	_check_death(unit, source)
 

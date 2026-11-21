@@ -7,11 +7,9 @@
 ## Options: --battles N (default 200), --seed S (default 1),
 ##          --ai greedy|random (default greedy),
 ##          --min-games N: hide cards/parts seen in fewer battles (default 5),
-##          --turns alternating|atb: turn system (default: CombatRules'),
 ##          --atb-base N, --atb-factor F: active-time delay formula
-##                                   (delay = N + build * F ticks).
-## Compare turn systems on the same creatures by running twice with the
-## same --seed, once with --turns alternating and once with --turns atb.
+##                                   (delay = N + build * F ticks),
+##          --luck off: no misses or crits (to compare with/without luck).
 ##
 ## Card/part win rates: "when ONE side has it, how often does that side
 ## win?" Battles where both sides have it (mirrors) and draws are left out,
@@ -59,6 +57,7 @@ func _run() -> void:
 			"cards": [_card_ids(profiles[0]), _card_ids(profiles[1])],
 			"parts": [_part_ids(genomes[0]), _part_ids(genomes[1])],
 			"turns": _turn_counts(rules.state),
+			"luck": _luck_counts(rules.state),
 		})
 	_report(results, Time.get_ticks_msec() - started)
 	quit()
@@ -76,11 +75,13 @@ func _read_args() -> void:
 				_mode = BattleAI.Mode.RANDOM if args[i + 1] == "random" else BattleAI.Mode.GREEDY
 			"--min-games":
 				_min_games = args[i + 1].to_int()
-			# The turn settings are static vars on CombatRules, read when
-			# each battle is created.
-			"--turns":
-				CombatRules.turn_system = CombatRules.TurnSystem.ACTIVE_TIME \
-					if args[i + 1] == "atb" else CombatRules.TurnSystem.ALTERNATING
+			# The delay settings are static vars on CombatRules.
+			"--luck":
+				if args[i + 1] == "off":
+					CombatRules.base_miss_chance = 0.0
+					CombatRules.miss_per_build = 0.0
+					CombatRules.base_crit_chance = 0.0
+					CombatRules.crit_per_build = 0.0
 			"--atb-base":
 				CombatRules.atb_base_delay = args[i + 1].to_int()
 			"--atb-factor":
@@ -96,16 +97,28 @@ func _turn_counts(state: BattleState) -> Dictionary:
 	for ev in state.battle_log:
 		if ev.type != BattleEvent.Type.TURN_STARTED:
 			continue
-		# In ALTERNATING battles a team turn sends one TURN_STARTED per
-		# unit; count it once (the first unit) by skipping repeats of the
-		# same team within the same team turn: those can't be "doubles".
-		if not state.is_active_time() and ev.unit.team == last_team:
-			continue
 		per_team[ev.unit.team] += 1
 		if ev.unit.team == last_team:
 			doubles += 1
 		last_team = ev.unit.team
 	return {"per_team": per_team, "doubles": doubles}
+
+
+## From the battle log: attacks rolled, misses, crits and grit re-rolls.
+func _luck_counts(state: BattleState) -> Dictionary:
+	var out := {"attacks": 0, "misses": 0, "crits": 0, "rerolls": 0}
+	for ev in state.battle_log:
+		match ev.type:
+			BattleEvent.Type.ATTACKED:
+				out.attacks += 1
+			BattleEvent.Type.MISSED:
+				out.misses += 1
+			BattleEvent.Type.REROLLED:
+				out.rerolls += 1
+			BattleEvent.Type.DAMAGED:
+				if ev.critical:
+					out.crits += 1
+	return out
 
 
 func _card_ids(p: CombatProfile) -> PackedStringArray:
@@ -168,11 +181,8 @@ func _report(results: Array, ms: int) -> void:
 	print("")
 	print("=== Balance report: %d battles, AI %s, seed %d (%.1fs) ==="
 		% [results.size(), BattleAI.Mode.keys()[_mode].to_lower(), _seed, ms / 1000.0])
-	if CombatRules.turn_system == CombatRules.TurnSystem.ACTIVE_TIME:
-		print("turn system:                   ACTIVE TIME (delay = %d + build x %.2f ticks)"
-			% [CombatRules.atb_base_delay, CombatRules.atb_build_factor])
-	else:
-		print("turn system:                   ALTERNATING (lower build starts)")
+	print("turn delay:                    %d + build x %.2f ticks"
+		% [CombatRules.atb_base_delay, CombatRules.atb_build_factor])
 	print("draws (no winner by round %d):  %d" % [CombatRules.MAX_ROUNDS, draws])
 	print("average rounds:                %.1f" % (float(rounds) / maxi(results.size(), 1)))
 	print("first team wins:               %s" % ("%.0f%% of %d" % [100.0 * first_wins / decided, decided] if decided else "n/a"))
@@ -180,6 +190,7 @@ func _report(results: Array, ms: int) -> void:
 	print("HIGHER BUILD wins:             %s" % _rate(results, "build"))
 	print("(ideal: near 50% -- more parts shouldn't simply win)")
 	_print_turns(results)
+	_print_luck(results)
 	_print_build_buckets(results)
 	_print_table("CARDS", _presence_rates(results, "cards"), func(_id): return "")
 	var reg: Node = root.get_node("PartRegistry")
@@ -210,7 +221,19 @@ func _print_turns(results: Array) -> void:
 	print("double turns per battle:       %.2f" % (float(doubles) / maxi(results.size(), 1)))
 
 
-## Win rate of the LOWER-build side, by how big the build difference is.
+## How often attacks missed / crit, and grit re-rolls per battle.
+func _print_luck(results: Array) -> void:
+	var t := {"attacks": 0, "misses": 0, "crits": 0, "rerolls": 0}
+	for r in results:
+		for k in t:
+			t[k] += r.luck[k]
+	var attacks := maxi(t.attacks, 1)
+	print("misses / crits per attack:     %.0f%% / %.0f%%  (grit re-rolls per battle: %.2f)"
+		% [100.0 * t.misses / attacks, 100.0 * t.crits / attacks, float(t.rerolls) / maxi(results.size(), 1)])
+
+
+## Win rate of the LOWER-build side ("upsets" at large differences), by
+## how big the build difference is.
 ## With active time, bigger differences mean more extra turns for it.
 func _print_build_buckets(results: Array) -> void:
 	var buckets := [[1, 5], [6, 10], [11, 20], [21, 40], [41, 9999]]

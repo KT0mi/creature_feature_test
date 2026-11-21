@@ -17,6 +17,8 @@ const CARDS_DIR := "res://creatures/cards"
 ## Status library: StatusEffect .tres files (statuses and attributes),
 ## scripted ones keep their .gd next to their .tres.
 const STATUSES_DIR := "res://creatures/statuses/"
+## AttributeRecipe .tres files (attributes from conditions, e.g. Blind).
+const ATTRIBUTE_RECIPES_DIR := "res://creatures/attribute_recipes/"
 ## Name of the sub-folder (next to a part's .tres) that holds its patterns.
 const PATTERNS_SUBDIR := "patterns"
 ## The palette whose colors parts are DRAWN with (see CreaturePalette).
@@ -47,6 +49,8 @@ var naming: CreatureNaming
 var cards: Dictionary = {}
 ## id (StringName) -> StatusEffect
 var statuses: Dictionary = {}
+## Every AttributeRecipe, in file path order (deterministic).
+var attribute_recipes: Array[AttributeRecipe] = []
 
 func _ready() -> void:
 	reload()
@@ -61,6 +65,7 @@ func reload() -> void:
 	recipes.clear()
 	cards.clear()
 	statuses.clear()
+	attribute_recipes.clear()
 
 	for path in _find_tres(PARTS_DIR):
 		var res := load(path)
@@ -107,6 +112,17 @@ func reload() -> void:
 		if res is BattleCard:
 			_add_card(res, path)
 	
+	var recipe_files := _find_tres(ATTRIBUTE_RECIPES_DIR)
+	recipe_files.sort()
+	for path in recipe_files:
+		var res := load(path)
+		if res is AttributeRecipe:
+			if res.attribute == null:
+				push_error("Attribute recipe without an attribute: %s" % path)
+			else:
+				if not res.attribute.permanent:
+					push_warning("Attribute recipe %s: '%s' isn't marked permanent." % [path, res.attribute.id])
+				attribute_recipes.append(res)
 	var status_paths := _find_tres(STATUSES_DIR)
 	status_paths.sort()
 	for path in status_paths:

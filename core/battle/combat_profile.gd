@@ -20,12 +20,19 @@ var build: int
 var battle_cards : Array[BattleCard] = []
 var attributes: Array[StatusEffect] = []
 
-static func from_genome(genome: Genome, _registry: Node = null) -> CombatProfile:
+## Builds the profile of `genome`. With a `registry` (the PartRegistry),
+## its attribute recipes are checked too (e.g. no eyes -> Blind).
+static func from_genome(genome: Genome, registry: Node = null) -> CombatProfile:
 	if genome == null or genome.root == null:
 		push_warning("CombatProfile: attempted to get combat profile from invalid genome!")
 		return null
 	var profile := CombatProfile.new()
 	profile._add_node(genome.root, false)
+	# Attributes that come from conditions on the whole creature.
+	if registry != null and "attribute_recipes" in registry:
+		for recipe in registry.attribute_recipes:
+			if recipe.matches(genome):
+				profile._add_attribute(recipe.attribute)
 	# A creature can't fight with 0 HP, whatever its parts subtract.
 	profile.hp = maxi(profile.hp, 1)
 	#Check the need for adding backup cards and add them if so.

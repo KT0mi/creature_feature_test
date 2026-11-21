@@ -48,6 +48,7 @@ func play_unit(rules: BattleRules, unit_index: int) -> Array[BattleAction]:
 		var choice := _choose(rules, unit_index, options)
 		if choice == null:
 			break  # doing nothing scored best
+		choice.use_grit = true  # only spent if the attack misses
 		rules.apply(choice)
 		taken.append(choice)
 	return taken
@@ -59,7 +60,11 @@ func choose_action(rules: BattleRules, unit_index: int) -> BattleAction:
 	var options := rules.legal_actions(unit_index)
 	if options.is_empty():
 		return null
-	return _choose(rules, unit_index, options)
+	var choice := _choose(rules, unit_index, options)
+	# Grit is only spent if the attack misses: always worth allowing.
+	if choice != null:
+		choice.use_grit = true
+	return choice
 
 
 func _choose(rules: BattleRules, unit_index: int, options: Array[BattleAction]) -> BattleAction:
@@ -70,6 +75,9 @@ func _choose(rules: BattleRules, unit_index: int, options: Array[BattleAction]) 
 	var best_score := score(rules.state, team)  # baseline: do nothing
 	for option in options:
 		var sim := rules.clone()
+		# Expected values instead of rolls: the clone has the same RNG
+		# position, so real rolls would let the AI foresee misses/crits.
+		sim.luck = BattleRules.Luck.EXPECTED
 		sim.apply(option)
 		var s := score(sim.state, team)
 		if s > best_score + 0.001:

@@ -66,6 +66,15 @@ enum Reveal {
 ## damage per trigger), so the same script can make several statuses.
 @export var power: int = 0
 
+@export_group("Luck")
+## Added to the owner's chance to MISS its attacks (0.2 = +20%).
+@export var miss_chance: float = 0.0
+## Added to the owner's chance to CRIT (0.1 = +10%).
+@export var crit_chance: float = 0.0
+## Added to the owner's crit damage multiplier (0.5: 1.5x -> 2x).
+@export var crit_damage: float = 0.0
+@export_group("")
+
 ## Optional stat changes while the creature has this status (e.g. Weakened:
 ## phys_dmg -1). Applied once per status, whatever its count.
 @export var stat_modifiers: PartStats

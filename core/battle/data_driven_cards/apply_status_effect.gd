@@ -18,6 +18,10 @@ enum Target {
 @export var target_mode: Target = Target.TARGET_UNIT
 
 
+func acts_on_user() -> bool:
+	return target_mode == Target.SELF
+
+
 func apply(ctx: BattleContext, user: BattleUnit, target: Vector2i) -> void:
 	if status == null:
 		return
