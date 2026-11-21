@@ -1,12 +1,13 @@
-
 ---
-tags: [battle-system, pending, prototype]
+tags: [battle-system]
 created: 2026-11-17
-status: headless prototype (branch claude/atb-prototype), not used by the battle scene
+status: implemented, the only turn system (branch claude/luck-and-grit)
 ---
 # Active Time Turns
 
 Back to [[Battle System Overview]]. Context: making **build** matter more than "who goes first".
+
+> **Final:** active time is now the only turn system; the ALTERNATING switch, `--turns` and the team-turn code were removed. The battle scene shows whose turn it is and the next 8 turns.
 
 ## Idea
 Instead of teams alternating, every **unit** has its own schedule. After acting it waits
