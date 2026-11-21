@@ -17,6 +17,23 @@ var first_team: int = 0
 ##-1 while fighting, else the winning team; -2 = draw (after MAX_ROUNDS).
 var winner: int = -1
 
+## The turn system this battle uses (copied from CombatRules.turn_system
+## when the battle is created; never changes during it).
+var turn_system: CombatRules.TurnSystem = CombatRules.TurnSystem.ALTERNATING
+
+## ACTIVE_TIME only:
+## Index of the unit whose turn it is (-1 before the battle starts).
+var active_unit: int = -1
+## The battle clock: the tick the current turn started at.
+var clock: int = 0
+## Per unit (same index as `units`): the tick of its next turn.
+var next_turn_at: Array[int] = []
+## Per unit: a seeded random number, last tie-breaker when two units are
+## due at the same tick with the same build (keeps replays exact).
+var tiebreak: Array[int] = []
+## Unit turns taken so far (rounds are counted from this).
+var turns_taken: int = 0
+
 ## Statuses placed on cells (traps, burning ground...): cell (Vector2i) ->
 ## Array[StatusInstance]. Cells without any aren't in the dictionary.
 var cell_statuses: Dictionary = {}
@@ -26,6 +43,10 @@ var battle_log: Array[BattleEvent] = []
 
 ##The battle's only source of randomness (seeded).
 var rng := RandomNumberGenerator.new()
+
+func is_active_time() -> bool:
+	return turn_system == CombatRules.TurnSystem.ACTIVE_TIME
+
 
 func is_over() -> bool:
 	return winner != -1
@@ -83,6 +104,12 @@ func clone() -> BattleState:
 	copy.active_team = active_team
 	copy.round = round
 	copy.first_team = first_team
+	copy.turn_system = turn_system
+	copy.active_unit = active_unit
+	copy.clock = clock
+	copy.next_turn_at = next_turn_at.duplicate()
+	copy.tiebreak = tiebreak.duplicate()
+	copy.turns_taken = turns_taken
 	copy.winner = winner
 	copy.rng.seed = rng.seed
 	copy.rng.state = rng.state

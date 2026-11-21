@@ -13,7 +13,7 @@ script = ExtResource("6_s0m8w")
 phys_dmg = 2
 hp = -1
 def = 4
-build_weight = 5
+build_weight = 6
 
 [resource]
 script = ExtResource("1_8q72o")

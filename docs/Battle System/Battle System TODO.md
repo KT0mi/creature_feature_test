@@ -51,11 +51,11 @@ Back to [[Battle System Overview]]. One branch per phase.
 - [ ] Make a Tail Swipe card for a tail part
 
 ## Phase 3: Playable 1v1
-- [ ] `BattleScene`: board, y-sorted unit views, facing arrows ([[Battle View]])
-- [ ] Select unit → card → target; end turn
-- [ ] Event animations (move, turn, push, damage, reaction, death)
-- [ ] Battle HUD: cards with cooldowns, stats, initiative
-- [ ] Start a battle from the creature lab with two selected creatures
+- [x] `BattleScene`: board, y-sorted unit views, facing arrows ([[Battle View]])
+- [x] Select unit → card → target; end turn
+- [x] Event animations (move, turn, push, damage, reaction, death)
+- [x] Battle HUD: cards with cooldowns, stats, initiative
+- [x] Start a battle from the creature lab with two selected creatures
 
 ## Phase 4: Feel
 - [ ] Action previews (apply on a copy, show results)

@@ -54,7 +54,6 @@ func _add_node(node: PartNode, in_copy: bool) -> void:
 		if child != null:
 			_add_node(child, in_copy or socket.copy_from != &"")
 
-
 func _check_for_backup() -> void:
 	var move := true
 	var attack := true

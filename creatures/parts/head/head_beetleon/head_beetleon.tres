@@ -39,7 +39,7 @@ spc_dmg = 2
 hp = 2
 def = 4
 res = 2
-build_weight = 4
+build_weight = 7
 
 [resource]
 script = ExtResource("1_fk3a6")

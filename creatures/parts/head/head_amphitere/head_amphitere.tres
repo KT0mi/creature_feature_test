@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_hw5x6"]
 [ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="2_4p4uq"]
 [ext_resource type="Texture2D" uid="uid://dwsgv76bsqk0y" path="res://creatures/parts/head/head_amphitere/head_amphitere.png" id="2_a47bg"]
+[ext_resource type="Resource" uid="uid://daiaumsmtdt5l" path="res://creatures/cards/card_snakebite.tres" id="3_eajgy"]
 [ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_hw5x6"]
 
 [sub_resource type="Resource" id="Resource_dhpso"]
@@ -62,6 +63,7 @@ sheet = ExtResource("2_a47bg")
 attach = Vector2i(5, 13)
 sockets = Array[ExtResource("2_4p4uq")]([SubResource("Resource_dhpso"), SubResource("Resource_4p4uq"), SubResource("Resource_a47bg"), SubResource("Resource_hw5x6")])
 stats = SubResource("Resource_eajgy")
+added_cards = Array[ExtResource("1_dhpso")]([ExtResource("3_eajgy")])
 name_front = "Snake"
 name_back = "serpent"
 name_full = "Amphitere"
