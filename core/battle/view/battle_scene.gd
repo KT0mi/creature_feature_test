@@ -145,7 +145,11 @@ func _next() -> void:
 		_enemy_turn()
 		return
 	_busy = false
-	if _selected_unit == -1 or not rules.state.units[_selected_unit].is_alive():
+	if rules.state.is_active_time():
+		# Active time: only the unit whose turn it is can act, so always
+		# select it (keeping an older selection would grey out every card).
+		_select_unit(rules.state.active_unit)
+	elif _selected_unit == -1 or not rules.state.units[_selected_unit].is_alive():
 		_select_unit(_first_player_unit())
 	_refresh_ui()
 
@@ -236,7 +240,9 @@ func _on_cell_clicked(cell: Vector2i) -> void:
 			return
 	# Otherwise: select one of the player's units, or drop the card.
 	var unit := rules.state.unit_at(cell)
-	if unit != null and unit.team == PLAYER_TEAM:
+	# Active time: the acting unit stays selected (others can't act now;
+	# hovering them still shows their info).
+	if unit != null and unit.team == PLAYER_TEAM and not rules.state.is_active_time():
 		_select_unit(rules.state.units.find(unit))
 	else:
 		_clear_card()
@@ -331,8 +337,18 @@ func _refresh_ui() -> void:
 	var s := rules.state
 	var mine := s.active_team == PLAYER_TEAM
 	var first := "you" if s.first_team == PLAYER_TEAM else "the enemy"
-	hud.set_turn("Round %d - %s" % [s.round, "Your turn" if mine else "Enemy turn"],
-		"Build: you %d, enemy %d (lower goes first: %s)" % [_team_build(0), _team_build(1), first])
+	if s.is_active_time():
+		# Whose turn, and the predicted order of the next turns, so a run
+		# of turns by the lighter creature is visible in advance.
+		var active: BattleUnit = s.units[s.active_unit] if s.active_unit != -1 else null
+		var who := active.label() if active else "?"
+		var short := " [%s]" % _short_label(s.active_unit) if s.units.size() > 2 and active else ""
+		hud.set_turn("Turn %d - %s (%s)%s" % [s.turns_taken + 1, who, "you" if mine else "enemy", short],
+			"Next: %s\nBuild: you %d, enemy %d (lower build = shorter wait between turns)"
+			% [_turn_order_text(8), _team_build(0), _team_build(1)])
+	else:
+		hud.set_turn("Round %d - %s" % [s.round, "Your turn" if mine else "Enemy turn"],
+			"Build: you %d, enemy %d (lower goes first: %s)" % [_team_build(0), _team_build(1), first])
 	hud.set_end_turn_enabled(mine and not _busy)
 	_refresh_cards()
 	_refresh_marks()
@@ -346,6 +362,30 @@ func _refresh_ui() -> void:
 		hud.set_hint("%s: press it again or click the area to play it" % card.name)
 	else:
 		hud.set_hint("%s: click a highlighted cell (right click to cancel)" % card.name)
+
+
+
+## The next `count` turns (active time), e.g. "YOU > enemy > YOU > YOU".
+## With several units per side: "You A > Foe A > You B..." (letters in unit
+## order), short enough to fit on one line.
+func _turn_order_text(count: int) -> String:
+	var names := PackedStringArray()
+	for i in rules.turn_order(count):
+		names.append(_short_label(i))
+	return " > ".join(names)
+
+
+func _short_label(index: int) -> String:
+	var u := rules.state.units[index]
+	var mine := u.team == PLAYER_TEAM
+	if rules.state.units.size() <= 2:
+		return "YOU" if mine else "enemy"
+	var letter := 0
+	for j in index:
+		if rules.state.units[j].team == u.team:
+			letter += 1
+	return "%s %s" % ["You" if mine else "Foe", "ABC"[mini(letter, 2)]]
+
 
 
 func _team_build(team: int) -> int:

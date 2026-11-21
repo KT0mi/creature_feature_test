@@ -190,6 +190,12 @@ func end_turn() -> Array[BattleEvent]:
 	var mark := state.battle_log.size()
 	if state.is_over():
 		return []
+	# Active time: only the active UNIT's turn ends, and the schedule picks
+	# the next one. (Without this, the team-turn code below would run and
+	# active_unit would never change.)
+	if state.is_active_time():
+		_end_unit_turn()
+		return state.battle_log.slice(mark)
 	_fired.clear()
 	for u in state.living(state.active_team):
 		_emit(_event(BattleEvent.Type.TURN_ENDED, u))

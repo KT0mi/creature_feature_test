@@ -47,11 +47,15 @@ static func collision_damage(source: BattleUnit) -> int:
 
 
 #Damage calculation
+#Min damage is 10% of expected damage (defaults to 1 if 10% is lower)
 static func attack_damage(power: int, type: DamageEffect.Type,
 		attacker: BattleUnit, defender: BattleUnit) -> int:
+	var dmg : int
 	if type == DamageEffect.Type.SPECIAL:
-		return maxi(1, power + attacker.effective_stat(&"spc_dmg") - defender.effective_stat(&"res"))
-	return maxi(1, power + attacker.effective_stat(&"phys_dmg") - defender.effective_stat(&"def"))
+		dmg = power + attacker.effective_stat(&"spc_dmg")
+		return maxi(maxi(1,floori(dmg * 0.1)), dmg - defender.effective_stat(&"res"))
+	dmg = power + attacker.effective_stat(&"phys_dmg")
+	return maxi(maxi(1, floori(dmg * 0.1)), dmg - defender.effective_stat(&"def"))
 
 ##Which team acts first: the lower total build.
 ##A tie is broken with battle seeded RNG, so replays stay exact.

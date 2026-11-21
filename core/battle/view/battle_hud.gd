@@ -33,7 +33,7 @@ func _ready() -> void:
 	_anchor(_hint, Vector4(0.5, 1, 0.5, 1), Vector4(-320, -160, 320, -138))
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	_unit_info = _rich(Rect2(12, 64, 270, 230))
+	_unit_info = _rich(Rect2(12, 84, 270, 230))  # below the 2-line turn info
 	_log = _rich(Rect2(0, 0, 0, 0))
 	_anchor(_log, Vector4(1, 0, 1, 0), Vector4(-312, 8, -12, 238))
 	_log.scroll_following = true
