@@ -1,6 +1,21 @@
 [gd_scene format=3 uid="uid://bym4cg3qk06r"]
 
 [ext_resource type="Script" uid="uid://lmmisp2p44bu" path="res://debug/creature_lab.gd" id="1_msmgb"]
+[ext_resource type="PackedScene" uid="uid://dmnh2oed6h5ej" path="res://debug/scrolling_background.tscn" id="2_72aaq"]
+[ext_resource type="Shader" uid="uid://bgtugyabm6ymo" path="res://assets/shaders/material_gold.gdshader" id="3_1gmhq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2nv6j"]
+shader = ExtResource("3_1gmhq")
+shader_parameter/frame_size = Vector2(160, 160)
+shader_parameter/glint_color = Color(1, 0.97, 0.82, 1)
+shader_parameter/glint_strength = 0.85
+shader_parameter/glint_width = 5
+shader_parameter/slope = 1.0
+shader_parameter/sweep_time = 0.6
+shader_parameter/pause_time = 1.8
+shader_parameter/edge_color = Color(1, 1, 1, 1)
+shader_parameter/fps = 14.0
+shader_parameter/min_luma = 0.15
 
 [node name="CreatureLab" type="Node2D" unique_id=2120217419]
 script = ExtResource("1_msmgb")
@@ -16,3 +31,14 @@ theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 14
+metadata/_edit_use_anchors_ = true
+
+[node name="CanvasLayer" parent="." unique_id=1683843549 instance=ExtResource("2_72aaq")]
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1586555894]
+material = SubResource("ShaderMaterial_2nv6j")
+offset_left = -837.7562
+offset_top = 580.8309
+offset_right = -709.0
+offset_bottom = 709.5871
+color = Color(0.38, 0.38, 0.38, 1)

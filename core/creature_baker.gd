@@ -33,6 +33,9 @@ class Baked:
 	## of the feet, outline included). Put this pixel on the ground to stand
 	## the creature on it: sprite.position = ground_position - ground.
 	var ground: Vector2i
+	## The creature's material (or null): its shader goes on the sprite
+	## (see CreatureMaterial.make_sprite_material).
+	var material: CreatureMaterial
 
 ## Padding around the bounding box so the outline fits.
 const OUTLINE_PAD := 1
@@ -121,8 +124,12 @@ static func measure(root: PartNode) -> Rect2i:
 
 
 ## Bakes (or returns the cached bake of) a genome.
-## `palettes`: id -> CreaturePalette, `key`: the palette the art is drawn with.
-static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> Baked:
+## `palettes`: id -> CreaturePalette, `key`: the palette the art is drawn
+## with, `materials`: id -> CreatureMaterial (for genomes with a material:
+## its palette replaces the body palette, patterns are left out, and the
+## outline may be forced).
+static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette,
+		materials: Dictionary = {}) -> Baked:
 	var cache_key := genome.to_key()
 	if _cache.has(cache_key):
 		return _cache[cache_key]
@@ -135,13 +142,22 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 	var offset := -box.position + Vector2i.ONE * OUTLINE_PAD
 
 	var lookup := _build_key_lookup(key)
-	var body: CreaturePalette = palettes.get(genome.palette)
+	var mat: CreatureMaterial = materials.get(genome.material) if genome.material != &"" else null
+	if genome.material != &"" and mat == null:
+		push_warning("Material '%s' not found; using the genome's colors." % genome.material)
+	var body: CreaturePalette = mat.palette if mat else palettes.get(genome.palette)
 	if body == null:
 		push_warning("Genome palette '%s' not found; colors left as drawn." % genome.palette)
 	var outline_color: Color = body.outline() if body else Color.BLACK
-	# Resolve each pattern's palette once (null = draw the pattern unchanged).
+	if mat and mat.override_outline:
+		outline_color = mat.outline_color
+	# Patterns: none with a material (it decides all the colors). Each
+	# pattern's palette is resolved once (null = draw it unchanged).
+	var patterns: Array[Genome.PatternGene] = []
+	if mat == null:
+		patterns = genome.patterns
 	var pattern_palettes: Array[CreaturePalette] = []
-	for gene in genome.patterns:
+	for gene in patterns:
 		pattern_palettes.append(palettes.get(gene.palette))
 
 	var sheet := Image.create_empty(frame_size.x * frames, frame_size.y, false, Image.FORMAT_RGBA8)
@@ -154,8 +170,8 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 			return a.z < b.z or (a.z == b.z and a.order < b.order))
 		for p in placed:
 			var img := _recolor(p.part.get_frame_image(p.frame), lookup, body, p.shade)
-			for i in genome.patterns.size():
-				var pattern := p.part.get_pattern_frame_image(genome.patterns[i].name, p.frame)
+			for i in patterns.size():
+				var pattern := p.part.get_pattern_frame_image(patterns[i].name, p.frame)
 				if pattern != null:
 					_overlay_pattern(img,
 						_recolor(pattern, lookup, pattern_palettes[i], p.shade))
@@ -173,6 +189,7 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette) -> 
 	result.frame_size = frame_size
 	result.origin = offset
 	result.ground = Vector2i(offset.x, _lowest_opaque_row(sheet))
+	result.material = mat
 	_cache[cache_key] = result
 	return result
 

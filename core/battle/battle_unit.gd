@@ -87,6 +87,11 @@ func effective_stat(stat: StringName) -> int:
 	for s in statuses:
 		if s.status.stat_modifiers != null:
 			value += s.status.stat_modifiers.get(stat)
+	# Overrides win over everything (the last status applied wins if two
+	# set the same stat).
+	for s in statuses:
+		if s.status.stat_overrides.has(stat):
+			value = s.status.stat_overrides[stat]
 	return value
 
 ## Sum of a luck field ("miss_chance", "crit_chance", "crit_damage") over

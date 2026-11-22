@@ -112,6 +112,11 @@ func fuse_genomes(a: Genome, b: Genome, p_seed: int) -> Genome:
 		g.palette = _random_palette_id()
 	else:
 		g.palette = (a if rng.randf() < 0.5 else b).palette
+	# Material: if only one parent has one, the child gets it half the
+	# time; if both do, one of the two. Only rolled when a parent has one,
+	# so fusions of ordinary creatures give the same results as before.
+	if a.material != &"" or b.material != &"":
+		g.material = (a if rng.randf() < 0.5 else b).material
 	_fuse_patterns(g, a, b)
 	return g
 

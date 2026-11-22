@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CreatureMaterial" format=3 uid="uid://gp7fg65nx26c"]
+
+[ext_resource type="Resource" uid="uid://certyn81jv0ja" path="res://assets/material_palettes/palette_gold.tres" id="1_if4to"]
+[ext_resource type="Script" uid="uid://d0bubnr5hmfmy" path="res://core/creature_material.gd" id="1_nimm1"]
+[ext_resource type="Shader" uid="uid://bgtugyabm6ymo" path="res://assets/shaders/material_gold.gdshader" id="3_5gtu0"]
+
+[resource]
+script = ExtResource("1_nimm1")
+id = &"gold"
+display_name = "Gold"
+palette = ExtResource("1_if4to")
+shader = ExtResource("3_5gtu0")
+metadata/_custom_type_script = "uid://d0bubnr5hmfmy"

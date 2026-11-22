@@ -105,7 +105,8 @@ func _start_battle() -> void:
 	genomes.append_array(genomes_b)
 	for i in rules.state.units.size():
 		var view := UnitView.new()
-		var baked := CreatureBaker.bake(genomes[i], PartRegistry.palettes, PartRegistry.key)
+		var baked := CreatureBaker.bake(genomes[i], PartRegistry.palettes, PartRegistry.key,
+			PartRegistry.materials)
 		_units_root.add_child(view)
 		view.setup(rules.state.units[i], board, baked)
 		_views[rules.state.units[i]] = view

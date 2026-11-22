@@ -28,6 +28,11 @@ static func from_genome(genome: Genome, registry: Node = null) -> CombatProfile:
 		return null
 	var profile := CombatProfile.new()
 	profile._add_node(genome.root, false)
+	# The material's attribute (e.g. Slime).
+	if registry != null and genome.material != &"" and "materials" in registry:
+		var mat: CreatureMaterial = registry.materials.get(genome.material)
+		if mat != null and mat.attribute != null:
+			profile._add_attribute(mat.attribute)
 	# Attributes that come from conditions on the whole creature.
 	if registry != null and "attribute_recipes" in registry:
 		for recipe in registry.attribute_recipes:

@@ -27,6 +27,10 @@ var root: PartNode
 ## Id of the CreaturePalette used by ALL parts (and for the outline).
 var palette: StringName = &""
 
+## Id of the CreatureMaterial the creature is made of (Gold, Slime...), or
+## empty for none. With a material, palette and patterns don't color it.
+var material: StringName = &""
+
 ## Pattern overlays, drawn in this order (later ones on top). At most
 ## MAX_PATTERNS, and never two with the same name.
 var patterns: Array[PatternGene] = []
@@ -48,13 +52,14 @@ func to_key() -> String:
 	var pats: PackedStringArray = []
 	for p in patterns:
 		pats.append("%s:%s" % [p.name, p.palette])
-	return "%s|%s|%s" % [root.to_key() if root else "", palette, ",".join(pats)]
+	return "%s|%s|%s|%s" % [root.to_key() if root else "", palette, ",".join(pats), material]
 	
 ## Deep copy.
 func duplicate_genome() -> Genome:
 	var g := Genome.new()
 	g.root = root.duplicate_tree() if root else null
 	g.palette = palette
+	g.material = material
 	for p in patterns:
 		g.patterns.append(p.duplicate_gene())
 	g.seed = seed
@@ -70,6 +75,7 @@ func to_dict() -> Dictionary:
 	return {
 		"tree": root.to_dict() if root else {},
 		"palette": String(palette),
+		"material": String(material),
 		"patterns": pats,
 		"seed": seed,
 	}
@@ -79,6 +85,7 @@ static func from_dict(data: Dictionary, parts_by_id: Dictionary) -> Genome:
 	var g := Genome.new()
 	g.root = PartNode.from_dict(data.get("tree", {}), parts_by_id)
 	g.palette = StringName(data.get("palette", ""))
+	g.material = StringName(data.get("material", ""))
 	for p in data.get("patterns", []):
 		if g.patterns.size() >= MAX_PATTERNS:
 			break

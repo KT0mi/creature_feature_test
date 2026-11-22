@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dmnh2oed6h5ej"]
+
+[ext_resource type="Script" uid="uid://k0ppturmr3y5" path="res://core/visual/scrolling_background.gd" id="1_4rfga"]
+
+[node name="CanvasLayer" type="CanvasLayer" unique_id=1683843549]
+layer = -10
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=372735412]
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+script = ExtResource("1_4rfga")
+square_size = 32
+color_a = Color(0.85, 0.49300006, 0.55845004, 1)
+color_b = Color(0.85, 0.75055003, 0.73950005, 1)

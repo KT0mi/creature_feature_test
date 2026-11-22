@@ -1,14 +1,16 @@
 [gd_resource type="Resource" script_class="StatusEffect" format=3 uid="uid://bxhq30g5u2q3f"]
 
-[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_42xr4"]
+[ext_resource type="Texture2D" uid="uid://5o2wwi6o1y57" path="res://assets/staging/status_icons/icon_blind.png" id="1_jjp36"]
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="2_jr1mg"]
 
 [resource]
-script = ExtResource("1_42xr4")
+script = ExtResource("2_jr1mg")
 id = &"blind"
 name = "Blind"
 description = "+20% miss chance but +0.5x critical damage"
+icon = ExtResource("1_jjp36")
 permanent = true
 stack_rule = 2
-miss_chance = 20.0
+miss_chance = 0.2
 crit_damage = 0.5
 metadata/_custom_type_script = "uid://dabo250s1jkuj"

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CreatureMaterial" format=3 uid="uid://d15cunkqfdhay"]
+
+[ext_resource type="Script" uid="uid://d0bubnr5hmfmy" path="res://core/creature_material.gd" id="1_bhib4"]
+[ext_resource type="Resource" uid="uid://eyiclthui7ap" path="res://assets/material_palettes/palette_slime.tres" id="1_wr52x"]
+
+[resource]
+script = ExtResource("1_bhib4")
+id = &"slime"
+display_name = "Slime"
+palette = ExtResource("1_wr52x")
+metadata/_custom_type_script = "uid://d0bubnr5hmfmy"

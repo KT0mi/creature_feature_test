@@ -28,6 +28,9 @@ func setup(p_unit: BattleUnit, p_board: BoardView, baked: CreatureBaker.Baked) -
 	_sprite = Sprite2D.new()
 	_sprite.texture = _baked.texture
 	_sprite.hframes = _baked.frame_count
+	# A creature made of a material (Gold, Void...) gets its shader.
+	if _baked.material:
+		_sprite.material = _baked.material.make_sprite_material(_baked.frame_size)
 	_sprite.centered = false
 	add_child(_sprite)
 	shown_hp = unit.hp
