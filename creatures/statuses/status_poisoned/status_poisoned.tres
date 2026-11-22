@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="StatusEffectPoisoned" format=3 uid="uid://s4pnj3ifm2lw"]
+
+[ext_resource type="Script" uid="uid://bxxxe5c8x3fbn" path="res://creatures/statuses/status_poisoned/status_poisoned.gd" id="1_loiq0"]
+
+[resource]
+script = ExtResource("1_loiq0")
+id = &"poisoned"
+name = "Poisoned"
+metadata/_custom_type_script = "uid://bxxxe5c8x3fbn"
