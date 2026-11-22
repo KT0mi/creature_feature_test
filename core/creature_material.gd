@@ -28,10 +28,11 @@ extends Resource
 @export var outline_color: Color = Color.WHITE
 
 @export_group("Rim light")
-## A 1-pixel edge of reflected light on one side of the creature (e.g. gold
-## catching the light): body pixels whose neighbor in `rim_direction` is
-## outside the creature turn `rim_color`. Done when baking, BEFORE the
-## outline is added, so the outline doesn't get in the way.
+## A 1-pixel edge of reflected light on one side of EVERY PART (e.g. gold
+## catching the light): pixels whose neighbor in `rim_direction` is outside
+## that part turn `rim_color`. Done per part while baking, before parts are
+## stacked and before the outline, so parts in front get a lit edge against
+## the parts behind them, and the outline doesn't get in the way.
 @export var rim_light: bool = false
 @export var rim_color: Color = Color(1.0, 0.95, 0.7)
 ## Which side gets the rim: (1, 0) = right, (1, -1) = top-right...

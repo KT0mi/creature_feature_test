@@ -168,17 +168,8 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette,
 		# Godot's sort isn't stable, so ties on z are broken by walk order.
 		placed.sort_custom(func(a: Placed, b: Placed) -> bool:
 			return a.z < b.z or (a.z == b.z and a.order < b.order))
-		# Rim light needs to know which TONE each pixel was drawn with
-		# (colors alone can't tell): a parallel image of tones, stacked the
-		# same way as the parts.
 		var rim := mat != null and mat.rim_light
-		var tones: Image = Image.create_empty(frame_size.x, frame_size.y, false, Image.FORMAT_RGBA8) if rim else null
 		for p in placed:
-			if rim:
-				var t := _tone_image(p.part.get_frame_image(p.frame), lookup, p.shade)
-				if p.flip:
-					t.flip_x()
-				tones.blend_rect(t, Rect2i(Vector2i.ZERO, t.get_size()), p.pos + offset)
 			var img := _recolor(p.part.get_frame_image(p.frame), lookup, body, p.shade)
 			for i in patterns.size():
 				var pattern := p.part.get_pattern_frame_image(patterns[i].name, p.frame)
@@ -189,9 +180,18 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette,
 			# (drawn 1:1 in the same orientation) flip together.
 			if p.flip:
 				img.flip_x()
+			# Rim light PER PART: each part gets its own lit edge before it's
+			# stacked, so a part in front shows an edge against whatever is
+			# behind it (more volume than lighting only the silhouette).
+			# Done after the flip so the light stays on the same screen side.
+			# Needs each pixel's TONE (colors alone can't tell), from a
+			# tone image of the same part, flipped the same way.
+			if rim:
+				var tones := _tone_image(p.part.get_frame_image(p.frame), lookup, p.shade)
+				if p.flip:
+					tones.flip_x()
+				_add_rim(img, tones, mat)
 			canvas.blend_rect(img, Rect2i(Vector2i.ZERO, img.get_size()), p.pos + offset)
-		if rim:
-			_add_rim(canvas, tones, mat)
 		_add_outline(canvas, outline_color)
 		sheet.blit_rect(canvas, Rect2i(Vector2i.ZERO, frame_size), Vector2i(f * frame_size.x, 0))
 
@@ -285,27 +285,28 @@ static func _tone_image(src: Image, lookup: Dictionary, shade: int) -> Image:
 	return img
 
 
-## Rim light: every body pixel drawn with tone >= rim_min_tone whose
-## neighbor in rim_direction is outside the creature (transparent, or off
-## the canvas) becomes rim_color. Runs before the outline is added, so
-## "outside" really means outside the body.
-static func _add_rim(canvas: Image, tones: Image, mat: CreatureMaterial) -> void:
-	var w := canvas.get_width()
-	var h := canvas.get_height()
+## Rim light on ONE part's image: every pixel drawn with tone >=
+## rim_min_tone whose neighbor in rim_direction is outside the part
+## (transparent, or off the image) becomes rim_color. Parts carry no
+## outline (it's added to the finished creature), so "outside" really
+## means outside the part.
+static func _add_rim(img: Image, tones: Image, mat: CreatureMaterial) -> void:
+	var w := img.get_width()
+	var h := img.get_height()
 	var rim_pixels: Array[Vector2i] = []
 	for y in h:
 		for x in w:
-			if canvas.get_pixel(x, y).a8 == 0:
+			if img.get_pixel(x, y).a8 == 0:
 				continue
 			if tones.get_pixel(x, y).r8 - 1 < mat.rim_min_tone:
 				continue  # darker tones and organic pixels stay as they are
 			var n := Vector2i(x, y) + mat.rim_direction
-			var outside := n.x < 0 or n.y < 0 or n.x >= w or n.y >= h or canvas.get_pixelv(n).a8 == 0
+			var outside := n.x < 0 or n.y < 0 or n.x >= w or n.y >= h or img.get_pixelv(n).a8 == 0
 			if outside:
 				rim_pixels.append(Vector2i(x, y))
 	# Painted afterwards, so painting doesn't change what counts as outside.
 	for p in rim_pixels:
-		canvas.set_pixelv(p, Color(mat.rim_color, canvas.get_pixelv(p).a))
+		img.set_pixelv(p, Color(mat.rim_color, img.get_pixelv(p).a))
 
 
 ## Paints `color` on every transparent pixel that touches an opaque one.
