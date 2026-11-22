@@ -2,6 +2,7 @@
 tags: [battle-system, plan]
 created: 2026-11-14
 ---
+
 # Rules Engine
 
 Back to [[Battle System Overview]]
@@ -33,23 +34,20 @@ func apply(state: BattleState, action: BattleAction) -> Array[BattleEvent]
 ## Movement
 Own moves and pushes go **cell by cell**; see [[Movement]].
 
-## Turn structure
-- Sides alternate. On its turn, each unit may play **up to 2 cards**, in **any order**:
-  - 1 move + 1 attack, or 2 moves, or 1, or none.
-  - Never 2 attacks.
-- "End turn" passes to the other side.
-- With 3v3 later: each unit of the active side gets its own 2-card budget during the side's turn (order of units chosen by the player).
-
-## Initiative
-- The side with the **lower total build** takes the first turn.
-- Tie: decided by the battle's seeded RNG (so replays are exact).
-- With teams: compare the **sum** of the team's builds (or the average; decide when 3v3 arrives).
+## Turn structure (active time)
+- Every **unit** has its own schedule: after its turn it waits `delay = 50 + build` ticks (`CombatRules.turn_delay`). The unit due earliest acts next; ties go to the lower build, then a seeded tie-breaker. See [[Active Time Turns]].
+- On its turn a unit may play **up to 2 cards**, in **any order**: 1 move + 1 attack, 2 moves, 1, or none. Never 2 attacks.
+- "End turn" ends that unit's turn; lighter creatures act more often and can get two turns in a row.
+- With 3v3, units of both teams interleave in schedule order.
 
 ## Cooldowns
 - Playing a card sets its cooldown to `card.cooldown`.
 - At the start of the **owner's** turn, every cooldown goes down by 1.
 - Cooldown 0 = usable every turn; cooldown 1 = skip one turn; and so on.
 - **Open** for reactions: does the cooldown start when the card is played, or when it triggers? See [[Cards and Effects#Reactions]].
+
+## Luck
+Every attack rolls per victim for a **miss** and a **crit**, tilted towards the lighter creature; **grit** re-rolls misses. See [[Luck and Grit]].
 
 ## Damage (starting point, tune later)
 ```

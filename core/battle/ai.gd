@@ -15,6 +15,8 @@ extends RefCounted
 
 enum Mode { RANDOM, GREEDY }
 
+const GRIT_VALUE := 2.0
+
 var mode: Mode
 var rng := RandomNumberGenerator.new()
 
@@ -48,7 +50,6 @@ func play_unit(rules: BattleRules, unit_index: int) -> Array[BattleAction]:
 		var choice := _choose(rules, unit_index, options)
 		if choice == null:
 			break  # doing nothing scored best
-		choice.use_grit = true  # only spent if the attack misses
 		rules.apply(choice)
 		taken.append(choice)
 	return taken
@@ -60,11 +61,7 @@ func choose_action(rules: BattleRules, unit_index: int) -> BattleAction:
 	var options := rules.legal_actions(unit_index)
 	if options.is_empty():
 		return null
-	var choice := _choose(rules, unit_index, options)
-	# Grit is only spent if the attack misses: always worth allowing.
-	if choice != null:
-		choice.use_grit = true
-	return choice
+	return _choose(rules, unit_index, options)
 
 
 func _choose(rules: BattleRules, unit_index: int, options: Array[BattleAction]) -> BattleAction:
@@ -73,6 +70,17 @@ func _choose(rules: BattleRules, unit_index: int, options: Array[BattleAction]) 
 	var team := rules.state.units[unit_index].team
 	var best: BattleAction = null
 	var best_score := score(rules.state, team)  # baseline: do nothing
+		# Every attack is also tried WITH grit (advantage), if the unit has some.
+	var unit := rules.state.units[unit_index]
+	if unit.grit > 0:
+		var with_grit: Array[BattleAction] = []
+		for option in options:
+			if unit.deck()[option.slot].kind == BattleCard.Kind.ATTACK:
+				var g := BattleAction.new(option.unit_index, option.slot, option.target)
+				g.use_grit = true
+				with_grit.append(g)
+		options = options.duplicate()  # don't modify the caller's array
+		options.append_array(with_grit)
 	for option in options:
 		var sim := rules.clone()
 		# Expected values instead of rolls: the clone has the same RNG
@@ -101,7 +109,7 @@ static func score(state: BattleState, team: int) -> float:
 		if not u.is_alive():
 			continue
 		if u.team == team:
-			s += u.hp + 20.0
+			s += u.hp + 20.0 + u.grit * GRIT_VALUE
 			if u.has_reaction_ready():
 				s += 0.5
 			var nearest := _nearest_enemy(state, u)

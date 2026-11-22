@@ -50,9 +50,11 @@ The **model** never waits for the **view**: it applies an action and returns a l
 - [[Movement]]: walking step by step, move modes, interruptions, paths
 - [[Cards and Effects]]: card data, effects, script cards, **reactions**, passives
 - [[Statuses and Attributes]]: Poisoned-like statuses, permanent attributes, armed reactions as statuses
+- [[Active Time Turns]]: per-unit turns by build
+- [[Luck and Grit]]: misses, crits, grit re-rolls, attribute recipes
 - [[Battle View]]: scenes, sprites on the board, HUD, animations
 - [[AI and Balance Testing]]: enemy AI, headless auto-battles
 - [[Integration with Creature Systems]]: how it plugs into parts, fusion, baker, tools
 - [[Battle Open Questions]]
 - [[Battle System TODO]]
-- Pending (designed, not built): [[Terrain]], [[Battle Maps]]; prototype: [[Active Time Turns]]
+- Pending (designed, not built): [[Terrain]], [[Battle Maps]]; 

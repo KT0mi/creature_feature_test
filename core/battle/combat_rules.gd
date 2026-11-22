@@ -41,10 +41,11 @@ static var max_crit_chance: float = 0.5
 ## Crit damage multiplier before status modifiers.
 static var base_crit_damage: float = 1.5
 
-## GRIT: a creature's re-rolls. When one of its attacks misses, it may
-## spend 1 grit to roll that miss again (if it chose to use grit for the
-## action). It gains 1 grit whenever it misses (an olive branch), and
-## cards can give grit. Never more than MAX_GRIT.
+## GRIT: a resource spent BEFORE an attack for ADVANTAGE: each victim is
+## rolled twice and the better result counts (crit > hit > miss). It's
+## spent whatever the result: a gamble. A creature gains 1 grit whenever
+## one of its attacks misses (an olive branch), and cards can give grit.
+## Never more than MAX_GRIT.
 const MAX_GRIT := 3
 const START_GRIT := 0
 
@@ -67,6 +68,26 @@ static func crit_chance(attacker: BattleUnit, victim: BattleUnit) -> float:
 static func crit_damage(attacker: BattleUnit) -> float:
 	return maxf(1.0, base_crit_damage + attacker.luck_modifier(&"crit_damage"))
 
+
+## Odds of each result of `attacker`'s attack on `victim`, as
+## {miss, hit, crit} (sum 1). With `advantage` (grit), the better of two
+## rolls counts:
+##   miss = miss1^2,  crit = 1 - (1 - crit1)^2,  hit = the rest
+## where crit1 = (1 - miss) x crit chance is one roll's crit chance.
+static func outcome_odds(attacker: BattleUnit, victim: BattleUnit, advantage: bool) -> Dictionary:
+	var miss := miss_chance(attacker, victim)
+	var crit := (1.0 - miss) * crit_chance(attacker, victim)
+	if advantage:
+		miss = miss * miss
+		crit = 1.0 - (1.0 - crit) * (1.0 - crit)
+	return {"miss": miss, "hit": 1.0 - miss - crit, "crit": crit}
+
+
+## Average damage multiplier of an attack (the AI's expected values):
+## hit x 1 + crit x crit damage (a miss deals 0).
+static func expected_factor(attacker: BattleUnit, victim: BattleUnit, advantage: bool) -> float:
+	var odds := outcome_odds(attacker, victim, advantage)
+	return odds.hit + odds.crit * crit_damage(attacker)
 
 ## Ticks a unit waits between two of its turns. At least 1.
 static func turn_delay(unit: BattleUnit) -> int:

@@ -45,6 +45,7 @@ A status can also sit on a **cell** instead of a unit: traps, burning ground, a 
 `max_triggers_per_action` (default 1): how many times it may react during one action. 1 stops "when an enemy steps next to me" from firing on every step of a single walk; raise it for things that should act per step.
 
 ## Attributes
+- Also from **attribute recipes**: conditions on the whole creature (e.g. no eyes → Blind). See [[Luck and Grit#Attribute recipes]].
 - Parts have **Added Attributes** (next to Added Cards): permanent `StatusEffect`s.
 - `CombatProfile.attributes` collects them like cards (pairs once; `merge_duplicate_cards` applies too).
 - The battle applies them to the unit at the start.

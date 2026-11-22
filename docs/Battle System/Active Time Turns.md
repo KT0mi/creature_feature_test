@@ -1,8 +1,8 @@
 
 ---
-tags: [battle-system, pending, prototype]
+tags: [battle-system]
 created: 2026-11-17
-status: headless prototype (branch claude/atb-prototype), not used by the battle scene
+status: implemented
 ---
 # Active Time Turns
 

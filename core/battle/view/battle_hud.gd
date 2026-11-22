@@ -61,8 +61,9 @@ func _ready() -> void:
 	bottom.add_child(_cards_box)
 	# Grit: re-roll this turn's missed attacks (only spent on a miss).
 	_grit_toggle = CheckButton.new()
-	_grit_toggle.text = "Use grit\non a miss"
-	_grit_toggle.button_pressed = true
+	_grit_toggle.text = "Grit on\nnext attack"
+	_grit_toggle.button_pressed = false
+	_grit_toggle.tooltip_text = "Spend 1 grit: every victim of your next attack is rolled twice and the better result counts (crit > hit > miss). Spent even if it misses."
 	_grit_toggle.focus_mode = Control.FOCUS_NONE
 	_grit_toggle.toggled.connect(func(on): grit_toggled.emit(on))
 	bottom.add_child(_grit_toggle)
@@ -156,8 +157,15 @@ func add_log(line: String) -> void:
 
 ## Shows the acting unit's grit on the toggle, e.g. "Use grit (1/2)".
 func set_grit(grit: int, max_grit: int) -> void:
-	_grit_toggle.text = "Use grit\non a miss (%d/%d)" % [grit, max_grit]
+	_grit_toggle.text = "Grit on\nnext attack (%d/%d)" % [grit, max_grit]
 	_grit_toggle.disabled = grit == 0
+	if grit == 0:
+		set_grit_on(false)
+
+
+## Turns the toggle on/off from code (emits grit_toggled if it changes).
+func set_grit_on(on: bool) -> void:
+	_grit_toggle.button_pressed = on
 
 
 func set_end_turn_enabled(on: bool) -> void:
