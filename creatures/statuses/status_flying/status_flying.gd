@@ -2,10 +2,15 @@
 class_name StatusEffectFlying
 extends StatusEffect
 
-func reacts_to(_ctx: BattleContext, _owner: BattleUnit, _instance: StatusInstance,
-		_event: BattleEvent) -> bool:
-	return (_event.type == BattleEvent.Type.DAMAGED and _event.unit == _owner) or \
-			(_event.type)
+func reacts_to(_ctx: BattleContext, owner: BattleUnit, _instance: StatusInstance,
+		event: BattleEvent) -> bool:
+	return (event.type == BattleEvent.Type.DAMAGED and event.unit == owner) \
+		or (event.type == BattleEvent.Type.ATTACKED and event.unit == owner)
 
-func react(_ctx: BattleContext, _owner: BattleUnit, _instance: StatusInstance,
-		_event: BattleEvent) -> void: pass
+func react(ctx: BattleContext, owner: BattleUnit, instance: StatusInstance,
+		event: BattleEvent) -> void:
+	if event.type == BattleEvent.Type.DAMAGED:
+		ctx.lose_hp(owner, CombatRules.collision_damage(owner))
+		ctx.remove_status(owner, instance)
+	else:
+		ctx.remove_status(owner, instance)

@@ -71,6 +71,10 @@ enum Reveal {
 @export_range(-1.0, 1.0, 0.01) var miss_chance: float = 0.0
 ## Added to the owner's chance to CRIT (0.1 = +10%).
 @export_range(-1.0, 1.0, 0.01) var crit_chance: float = 0.0
+## Added to the chance that attacks ON the owner miss (Flying: +0.3).
+@export_range(-1.0, 1.0, 0.01) var incoming_miss_chance: float = 0.0
+## Added to the chance that hits ON the owner are critical (e.g. Exposed).
+@export_range(-1.0, 1.0, 0.01) var incoming_crit_chance: float = 0.0
 ## Added to the owner's crit damage multiplier (0.5: 1.5x -> 2x).
 @export_range(-2.0, 4.0, 0.05) var crit_damage: float = 0.0
 @export_group("")
@@ -90,6 +94,10 @@ enum Reveal {
 func is_reaction() -> bool:
 	return false
 
+##Called when this status is applied for the first time (not counting stacking)
+func on_applied(_ctx: BattleContext, _owner: BattleUnit, _instance: StatusInstance,
+		_event: BattleEvent) -> void:
+	return 
 
 ## Does this status act on `event`? `owner` has the status, `instance`
 ## holds its count and who applied it. Default: never (data-only status).

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffectFlying" format=3 uid="uid://cqbadjslnh8jh"]
+
+[ext_resource type="Script" uid="uid://cx7lfynjotg4v" path="res://creatures/statuses/status_flying/status_flying.gd" id="1_pveia"]
+
+[resource]
+script = ExtResource("1_pveia")
+id = &"flying"
+name = "Flying"
+stack_rule = 2
+max_triggers_per_action = 0
+incoming_miss_chance = 0.30000000000000004
+incoming_crit_chance = null
+stat_overrides = 0.0
+metadata/_custom_type_script = "uid://cx7lfynjotg4v"

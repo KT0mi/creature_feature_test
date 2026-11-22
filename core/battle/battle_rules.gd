@@ -653,15 +653,19 @@ func apply_status(source: BattleUnit, target: BattleUnit, status: StatusEffect, 
 	if target == null or not target.is_alive() or status == null:
 		return
 	var inst := target.get_status(status.id)
+	var first_apply := false
 	if inst != null:
 		inst.count = status.stacked_count(inst.count, amount)
 	else:
-		target.statuses.append(StatusInstance.new(status, amount, source))
+		inst = StatusInstance.new(status, amount, source)
+		target.statuses.append(inst)
+		first_apply = true
 	var ev := _event(BattleEvent.Type.STATUS_APPLIED, target)
 	ev.source = source
 	ev.status = status
 	ev.amount = amount
 	_emit(ev)
+	if first_apply: inst.status.on_applied(self, target, inst, ev)
 
 
 func apply_cell_status(source: BattleUnit, cell: Vector2i, status: StatusEffect, amount: int) -> void:

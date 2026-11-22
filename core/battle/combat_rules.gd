@@ -53,14 +53,18 @@ const START_GRIT := 0
 ## Chance (0..1) that `attacker`'s attack misses `victim`.
 static func miss_chance(attacker: BattleUnit, victim: BattleUnit) -> float:
 	var gap := maxi(0, attacker.profile.build - victim.profile.build)
-	return clampf(base_miss_chance + miss_per_build * gap + attacker.luck_modifier(&"miss_chance"),
+	return clampf(base_miss_chance + miss_per_build * gap 
+		+ attacker.luck_modifier(&"miss_chance")
+		+ victim.luck_modifier(&"incoming_miss_chance"),
 		0.0, max_miss_chance)
 
 
 ## Chance (0..1) that a HIT from `attacker` on `victim` is critical.
 static func crit_chance(attacker: BattleUnit, victim: BattleUnit) -> float:
 	var gap := maxi(0, victim.profile.build - attacker.profile.build)
-	return clampf(base_crit_chance + crit_per_build * gap + attacker.luck_modifier(&"crit_chance"),
+	return clampf(base_crit_chance + crit_per_build * gap 
+		+ attacker.luck_modifier(&"crit_chance")
+		+ victim.luck_modifier(&"incoming_crit_chance"),
 		0.0, max_crit_chance)
 
 
