@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CreatureMaterial" format=3]
+
+[ext_resource type="Resource" path="res://creatures/statuses/attributes/attribute_slime.tres" id="1_frgk3"]
+[ext_resource type="Resource" path="res://creatures/palettes/palette_slime.tres" id="2_tq4vy"]
+[ext_resource type="Script" path="res://core/creature_material.gd" id="3_gr4vb"]
+
+[resource]
+script = ExtResource("3_gr4vb")
+id = &"slime"
+display_name = "Slimy"
+palette = ExtResource("2_tq4vy")
+attribute = ExtResource("1_frgk3")

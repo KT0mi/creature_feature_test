@@ -1,8 +1,21 @@
 [gd_scene format=3 uid="uid://bv6ii7fi7yg6x"]
 
 [ext_resource type="Script" uid="uid://1s5gblblymkw" path="res://core/battle/view/battle_scene.gd" id="1_idkgt"]
+[ext_resource type="Script" path="res://core/view/scrolling_background.gd" id="2_bg"]
 
 [node name="BattleScene" type="Node2D" unique_id=90263359]
 script = ExtResource("1_idkgt")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2111429131]
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -10
+
+[node name="ScrollingBackground" type="ColorRect" parent="Background"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_bg")

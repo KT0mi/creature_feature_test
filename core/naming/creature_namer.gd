@@ -82,10 +82,15 @@ static func collect_candidates(genome: Genome, registry: Node) -> Array[Candidat
 	elif naming.large_word != "" and height >= naming.large_height:
 		out.append(Candidate.new(naming.large_word, Category.SIZE, naming.size_weight))
 
-	# Color, from the body palette.
-	var palette: CreaturePalette = registry.palettes.get(genome.palette)
-	if palette and palette.display_name != "":
-		out.append(Candidate.new(palette.display_name, Category.COLOR, naming.color_weight))
+	# Color, from the material if it has one ("Golden"), else the palette.
+	var mat: CreatureMaterial = registry.materials.get(genome.material) \
+		if genome.material != &"" and "materials" in registry else null
+	if mat != null and mat.display_name != "":
+		out.append(Candidate.new(mat.display_name, Category.COLOR, naming.color_weight))
+	else:
+		var palette: CreaturePalette = registry.palettes.get(genome.palette)
+		if palette and palette.display_name != "":
+			out.append(Candidate.new(palette.display_name, Category.COLOR, naming.color_weight))
 
 	## Patterns.
 	#for gene in genome.patterns:

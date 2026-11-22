@@ -17,6 +17,8 @@ const CARDS_DIR := "res://creatures/cards"
 ## Status library: StatusEffect .tres files (statuses and attributes),
 ## scripted ones keep their .gd next to their .tres.
 const STATUSES_DIR := "res://creatures/statuses/"
+## CreatureMaterial .tres files (Gold, Slime, Void...).
+const MATERIALS_DIR := "res://creatures/materials/"
 ## AttributeRecipe .tres files (attributes from conditions, e.g. Blind).
 const ATTRIBUTE_RECIPES_DIR := "res://creatures/recipes/attribute_recipes/"
 ## Name of the sub-folder (next to a part's .tres) that holds its patterns.
@@ -49,6 +51,8 @@ var naming: CreatureNaming
 var cards: Dictionary = {}
 ## id (StringName) -> StatusEffect
 var statuses: Dictionary = {}
+## id (StringName) -> CreatureMaterial.
+var materials: Dictionary = {}
 ## Every AttributeRecipe, in file path order (deterministic).
 var attribute_recipes: Array[AttributeRecipe] = []
 
@@ -65,6 +69,7 @@ func reload() -> void:
 	recipes.clear()
 	cards.clear()
 	statuses.clear()
+	materials.clear()
 	attribute_recipes.clear()
 
 	for path in _find_tres(PARTS_DIR):
@@ -112,6 +117,18 @@ func reload() -> void:
 		if res is BattleCard:
 			_add_card(res, path)
 	
+	var material_files := _find_tres(MATERIALS_DIR)
+	material_files.sort()
+	for path in material_files:
+		var res := load(path)
+		if not res is CreatureMaterial:
+			continue
+		if res.id == &"" or materials.has(res.id):
+			push_error("Material without id, or duplicate id '%s': %s" % [res.id, path])
+		elif res.palette == null or not res.palette.is_valid():
+			push_error("Material '%s' needs a palette of %d colors: %s" % [res.id, CreaturePalette.TONES, path])
+		else:
+			materials[res.id] = res
 	var recipe_files := _find_tres(ATTRIBUTE_RECIPES_DIR)
 	recipe_files.sort()
 	for path in recipe_files:
@@ -146,10 +163,14 @@ func reload() -> void:
 				recipes[k] = []
 			recipes[k].append(res)
 	
-	print("PartRegistry: %d parts, %d palettes, %d cards, %d statuses, %d recipe pairs, patterns: %s."
-		% [parts.size(), palettes.size(), cards.size(), statuses.size(), recipes.size(), pattern_names])
+	print("PartRegistry: %d parts, %d palettes, %d materials, %d cards, %d statuses, %d recipe pairs, patterns: %s."
+		% [parts.size(), palettes.size(), materials.size(), cards.size(), statuses.size(), recipes.size(), pattern_names])
 
 ## StatusEffect by id, or null.
+func get_material(id: StringName) -> CreatureMaterial:
+	return materials.get(id)
+
+
 func get_status(id: StringName) -> StatusEffect:
 	return statuses.get(id)
 

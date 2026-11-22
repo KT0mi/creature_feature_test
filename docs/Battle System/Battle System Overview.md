@@ -58,3 +58,4 @@ The **model** never waits for the **view**: it applies an action and returns a l
 - [[Battle Open Questions]]
 - [[Battle System TODO]]
 - Pending (designed, not built): [[Terrain]], [[Battle Maps]]; 
+- Visuals: [[Materials]], [[Scrolling Background]]

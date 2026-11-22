@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CreatureMaterial" format=3]
+
+[ext_resource type="Resource" path="res://creatures/palettes/palette_golden.tres" id="1_5gtu0"]
+[ext_resource type="Script" path="res://core/creature_material.gd" id="2_jwrit"]
+[ext_resource type="Shader" path="res://shaders/material_gold.gdshader" id="3_pc8wc"]
+
+[resource]
+script = ExtResource("2_jwrit")
+id = &"gold"
+display_name = "Golden"
+palette = ExtResource("1_5gtu0")
+shader = ExtResource("3_pc8wc")

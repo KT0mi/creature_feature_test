@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="StatusEffect" format=3]
+
+[ext_resource type="Script" path="res://core/battle/status/status_effect.gd" id="1_43p47"]
+
+[resource]
+script = ExtResource("1_43p47")
+id = &"slime"
+name = "Slime"
+description = "Physical hits barely hurt (def maxed), but no resistance at all to special damage."
+permanent = true
+stat_overrides = Dictionary[StringName, int]({
+&"def": 999,
+&"res": 0
+})

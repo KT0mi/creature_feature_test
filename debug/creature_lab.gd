@@ -8,6 +8,8 @@
 ##   F            fuse the 2 selected: cell 1 = parent A, cell 2 = parent B,
 ##                every other cell = a child with a different fusion seed
 ##   Esc          clear selection / back to the random grid
+##   M            cycle the selected creatures' MATERIAL (none -> each
+##                material in res://creatures/materials/ -> none)
 ##   V            PLAY a battle: first selected creature (you) vs the second
 ##                (AI), in the battle scene
 ##   B            auto-battle the 2 selected creatures (greedy AI vs greedy
@@ -86,6 +88,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				queue_redraw()
 			KEY_V:
 				_play_battle()
+			KEY_M:
+				_cycle_material()
 			KEY_B:
 				_auto_battle()
 			KEY_P:
@@ -154,15 +158,35 @@ func _show(list: Array[Genome]) -> void:
 		sprite.centered = false
 		var g := list[i]
 		if g != null and g.root != null:
-			var baked := CreatureBaker.bake(g, PartRegistry.palettes, PartRegistry.key)
+			var baked := CreatureBaker.bake(g, PartRegistry.palettes, PartRegistry.key,
+				PartRegistry.materials)
 			sprite.texture = baked.texture
 			sprite.hframes = baked.frame_count
+			if baked.material:
+				sprite.material = baked.material.make_sprite_material(baked.frame_size)
 			# Center the frame inside its cell, on whole pixels.
 			sprite.position = Vector2(_cell_origin(i) + (cell_size - baked.frame_size) / 2)
 		add_child(sprite)
 		sprites.append(sprite)
 	queue_redraw()
 	_update_hud()
+
+
+## Gives the selected creatures the next material (none -> each material
+## in id order -> none), to preview materials. Lab only: changes the
+## genomes shown here, nothing is saved.
+func _cycle_material() -> void:
+	if selected.is_empty():
+		_update_hud("Select a creature to change its material.")
+		return
+	var ids: Array = PartRegistry.materials.keys()
+	ids.sort()
+	ids.push_front(&"")  # "no material"
+	for i in selected:
+		var g := genomes[i]
+		g.material = ids[(ids.find(g.material) + 1) % ids.size()]
+	_show(genomes)
+	_update_hud("Material: %s" % (genomes[selected[0]].material if genomes[selected[0]].material != &"" else "none"))
 
 
 ## Opens the battle scene: first selected creature (player) vs second (AI).
