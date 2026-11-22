@@ -10,22 +10,17 @@ uniform vec2 frame_size = vec2(64.0, 64.0);
 uniform vec4 glint_color : source_color = vec4(1.0, 0.97, 0.82, 1.0);
 uniform float glint_strength : hint_range(0.0, 1.0) = 0.85;
 // Width of the glint band, in pixels.
-uniform int glint_width = 3;
+uniform int glint_width = 5;
 // Tilt of the band: 1.0 = 45 degrees, 0.0 = vertical.
 uniform float slope = 1.0;
 // Seconds for the band to cross the creature, then seconds of pause.
-uniform float sweep_time = 0.6;
-uniform float pause_time = 1.8;
-// Color for the edge
-uniform vec4 edge_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
+uniform float sweep_time = 0.8;
+uniform float pause_time = 3.5;
 // Animation steps per second (lower = choppier, more "pixel art").
 uniform float fps = 14.0;
 // Pixels darker than this (the outline, hard shadows) stay untouched.
 uniform float min_luma : hint_range(0.0, 1.0) = 0.15;
 
-float hash(vec2 p) {
-	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
 
 void fragment() {
 	// COLOR already holds the texture x the sprite's modulate (flashes,
@@ -38,15 +33,6 @@ void fragment() {
 		vec2 local = vec2(mod(texel.x, frame_size.x), texel.y);
 		float t = floor(TIME * fps) / fps;
 		
-		// Edge
-		// Get the size of one pixel in UV coordinates
-		vec2 pixel_size = TEXTURE_PIXEL_SIZE;
-		// Sample the pixel immediately to the right
-		vec4 right_pixel = texture(TEXTURE, UV + vec2(pixel_size.x, 0.0));
-		// Check if current pixel is opaque and right pixel is transparent
-		if (c.a > 0.0 && right_pixel.a == 0.0) {
-			COLOR = edge_color;
-		}
 		
 		// Glint: a band along x + slope * y that travels over the frame.
 		float cycle = sweep_time + pause_time;

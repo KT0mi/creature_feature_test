@@ -27,6 +27,24 @@ extends Resource
 @export var override_outline: bool = false
 @export var outline_color: Color = Color.WHITE
 
+
+@export_group("Rim light")
+## A 1-pixel edge of reflected light on one side of EVERY PART (e.g. gold
+## catching the light): pixels whose neighbor in `rim_direction` is outside
+## that part turn `rim_color`. Done per part while baking, before parts are
+## stacked and before the outline, so parts in front get a lit edge against
+## the parts behind them, and the outline doesn't get in the way.
+@export var rim_light: bool = false
+@export var rim_color: Color = Color(1.0, 0.95, 0.7)
+@export var rim_override_alpha : bool = false
+## Which side gets the rim: (1, 0) = right, (1, -1) = top-right...
+@export var rim_direction: Vector2i = Vector2i(1, 0)
+## Only pixels drawn with this key tone or lighter get the rim (0 = darkest
+## ... 3 = lightest). 2 leaves the hard shadows (0) and shadows (1) dark.
+@export_range(0, 3) var rim_min_tone: int = 2
+@export_group("")
+
+
 @export_group("Shader")
 ## Shader for the creature's sprite (canvas_item). Optional.
 @export var shader: Shader

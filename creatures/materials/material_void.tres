@@ -8,7 +8,7 @@
 script = ExtResource("1_bjuc3")
 id = &"void"
 display_name = "Void"
-ramp = PackedColorArray(0, 0, 0, 1, 0.061369084, 0.0613691, 0.06136907, 1, 0.10224319, 0.10224321, 0.10224319, 1, 0.1288298, 0.12882978, 0.12882978, 1)
+ramp = PackedColorArray(0, 0, 0, 1, 0.061369084, 0.0613691, 0.06136907, 1, 0.0627451, 0.0627451, 0.0627451, 1, 0.0627451, 0.0627451, 0.0627451, 1)
 metadata/_custom_type_script = "uid://de7qplmr6rrvn"
 
 [resource]
@@ -18,5 +18,6 @@ display_name = "Void"
 palette = SubResource("Resource_7k0qv")
 override_outline = true
 outline_color = Color(0.9763003, 0.97577435, 0.89370894, 1)
+rim_override_alpha = null
 shader = ExtResource("2_j0k8m")
 metadata/_custom_type_script = "uid://d0bubnr5hmfmy"

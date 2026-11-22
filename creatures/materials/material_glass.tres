@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CreatureMaterial" format=3 uid="uid://dbnuwq1crv5l5"]
+
+[ext_resource type="Resource" uid="uid://ibr1dw0tpysp" path="res://creatures/statuses/attributes/material_attributes/attribute_glass.tres" id="1_e8r4e"]
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_k38lk"]
+[ext_resource type="Script" uid="uid://d0bubnr5hmfmy" path="res://core/creature_material.gd" id="1_wqj28"]
+[ext_resource type="Shader" uid="uid://bgtugyabm6ymo" path="res://assets/shaders/material_gold.gdshader" id="3_cyn02"]
+
+[sub_resource type="Resource" id="Resource_cyn02"]
+script = ExtResource("1_k38lk")
+id = &"glass"
+display_name = "Glass"
+ramp = PackedColorArray(0.9882353, 0.99215686, 0.99215686, 1, 0.17630002, 0.39194503, 0.43, 0.9098039, 0.504, 0.66960007, 0.72, 0.60784316, 0.32088968, 0.99999994, 0.99832124, 0.047058824)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"
+
+[resource]
+script = ExtResource("1_wqj28")
+id = &"glass"
+display_name = "Glass"
+palette = SubResource("Resource_cyn02")
+override_outline = true
+outline_color = Color(0.14369121, 0.268327, 0.27295396, 1)
+rim_light = true
+rim_color = Color(0.9873002, 0.99282044, 0.9914555, 1)
+rim_override_alpha = true
+rim_min_tone = 0
+shader = ExtResource("3_cyn02")
+shader_parameters = {
+"glint_color": Color(0.863434, 0.91685545, 0.9345133, 1),
+"glint_width": 18,
+"sweep_time": 1.5
+}
+attribute = ExtResource("1_e8r4e")
+metadata/_custom_type_script = "uid://d0bubnr5hmfmy"

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="StatusEffect" format=3 uid="uid://c24ctxpppyerx"]
+
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_uvoy5"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="2_7w6nh"]
+
+[sub_resource type="Resource" id="Resource_21noe"]
+script = ExtResource("2_7w6nh")
+phys_dmg = -5
+spc_dmg = 5
+metadata/_custom_type_script = "uid://b8t5ct4nvnrc7"
+
+[resource]
+script = ExtResource("1_uvoy5")
+id = &"slime"
+name = "Slime"
+permanent = true
+stat_overrides = Dictionary[StringName, int]({
+&"def": 99,
+&"res": 0
+})
+stat_modifiers = SubResource("Resource_21noe")
+metadata/_custom_type_script = "uid://dabo250s1jkuj"
