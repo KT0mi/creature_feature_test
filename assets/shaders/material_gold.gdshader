@@ -1,7 +1,8 @@
 // Gold material: a diagonal glint that sweeps across the creature every
-// few seconds, plus a few sparkle pixels. Pixel-perfect: everything is in
-// whole texture pixels and time advances in steps (fps), so the glint
-// moves one pixel at a time.
+// few seconds. Pixel-perfect: everything is in whole texture pixels and
+// time advances in steps (fps), so the glint moves one pixel at a time.
+// (The edge of reflected light is baked into the sprite: see the rim
+// light settings on CreatureMaterial.)
 shader_type canvas_item;
 
 // Size of one animation frame of the sprite sheet (set by the game).
@@ -16,16 +17,10 @@ uniform float slope = 1.0;
 // Seconds for the band to cross the creature, then seconds of pause.
 uniform float sweep_time = 0.6;
 uniform float pause_time = 1.8;
-// Color for the edge
-uniform vec4 edge_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 // Animation steps per second (lower = choppier, more "pixel art").
 uniform float fps = 14.0;
 // Pixels darker than this (the outline, hard shadows) stay untouched.
 uniform float min_luma : hint_range(0.0, 1.0) = 0.15;
-
-float hash(vec2 p) {
-	return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
 
 void fragment() {
 	// COLOR already holds the texture x the sprite's modulate (flashes,
@@ -37,17 +32,7 @@ void fragment() {
 		// Position inside the current frame (sheets hold frames side by side).
 		vec2 local = vec2(mod(texel.x, frame_size.x), texel.y);
 		float t = floor(TIME * fps) / fps;
-		
-		// Edge
-		// Get the size of one pixel in UV coordinates
-		vec2 pixel_size = TEXTURE_PIXEL_SIZE;
-		// Sample the pixel immediately to the right
-		vec4 right_pixel = texture(TEXTURE, UV + vec2(pixel_size.x, 0.0));
-		// Check if current pixel is opaque and right pixel is transparent
-		if (c.a > 0.0 && right_pixel.a == 0.0) {
-			COLOR = edge_color;
-		}
-		
+
 		// Glint: a band along x + slope * y that travels over the frame.
 		float cycle = sweep_time + pause_time;
 		float phase = mod(t, cycle) / sweep_time;      // 0..1 while sweeping

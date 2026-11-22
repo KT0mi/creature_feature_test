@@ -9,5 +9,7 @@ script = ExtResource("1_nimm1")
 id = &"gold"
 display_name = "Gold"
 palette = ExtResource("1_if4to")
+rim_light = true
+rim_color = Color(1, 0.98, 0.86, 1)
 shader = ExtResource("3_5gtu0")
 metadata/_custom_type_script = "uid://d0bubnr5hmfmy"
