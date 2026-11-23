@@ -50,6 +50,12 @@ extends Resource
 @export var shader: Shader
 ## Values for the shader's uniforms: uniform name -> value.
 @export var shader_parameters: Dictionary = {}
+## Extra transparent pixels baked around every frame, so the shader can
+## draw OUTSIDE the creature's outline (e.g. flames rising from Fire).
+## 0 = the frame ends right after the outline, as without a material.
+## The creature still stands in the same place: views use Baked.ground,
+## and Baked.margin when they need the body's own size.
+@export_range(0, 32) var effect_margin: int = 0
 @export_group("")
 
 ## Permanent StatusEffect added to the creature in battle (optional), e.g.

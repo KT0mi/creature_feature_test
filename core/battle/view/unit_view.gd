@@ -126,8 +126,10 @@ func die() -> Tween:
 
 
 ## Top of the sprite, relative to the unit's feet (for floating text).
+## The material's effect margin (empty space for e.g. flames) isn't part of
+## the body, so it's left out: text floats over the head, not over the fire.
 func head_offset() -> Vector2:
-	return Vector2(0, -_baked.ground.y - 6)
+	return Vector2(0, -_baked.ground.y + _baked.margin - 6)
 
 
 

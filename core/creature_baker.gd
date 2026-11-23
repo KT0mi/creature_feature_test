@@ -36,6 +36,10 @@ class Baked:
 	## The creature's material (or null): its shader goes on the sprite
 	## (see CreatureMaterial.make_sprite_material).
 	var material: CreatureMaterial
+	## Empty pixels added on EVERY side of each frame for the material's
+	## shader to draw in (CreatureMaterial.effect_margin; 0 without one).
+	## The body (outline included) is frame_size - 2 x margin.
+	var margin: int = 0
 
 ## Padding around the bounding box so the outline fits.
 const OUTLINE_PAD := 1
@@ -137,14 +141,18 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette,
 	var root := genome.root
 	var frames := frame_count_of(root)
 	var box := measure(root)
-	var frame_size := box.size + Vector2i.ONE * OUTLINE_PAD * 2
-	# Shift that moves creature space into canvas space (box corner -> pad).
-	var offset := -box.position + Vector2i.ONE * OUTLINE_PAD
 
 	var lookup := _build_key_lookup(key)
 	var mat: CreatureMaterial = materials.get(genome.material) if genome.material != &"" else null
 	if genome.material != &"" and mat == null:
 		push_warning("Material '%s' not found; using the genome's colors." % genome.material)
+	# Room around the body: the outline's pixel, plus the material's effect
+	# margin (space for its shader to draw outside the creature, e.g. flames).
+	var margin: int = mat.effect_margin if mat else 0
+	var pad := OUTLINE_PAD + margin
+	var frame_size := box.size + Vector2i.ONE * pad * 2
+	# Shift that moves creature space into canvas space (box corner -> pad).
+	var offset := -box.position + Vector2i.ONE * pad
 	var body: CreaturePalette = mat.palette if mat else palettes.get(genome.palette)
 	if body == null:
 		push_warning("Genome palette '%s' not found; colors left as drawn." % genome.palette)
@@ -202,6 +210,7 @@ static func bake(genome: Genome, palettes: Dictionary, key: CreaturePalette,
 	result.origin = offset
 	result.ground = Vector2i(offset.x, _lowest_opaque_row(sheet))
 	result.material = mat
+	result.margin = margin
 	_cache[cache_key] = result
 	return result
 
