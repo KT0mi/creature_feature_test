@@ -4,9 +4,12 @@ extends EditorPlugin
 const ToolsContext := preload("res://addons/creature_tools/tools_context.gd")
 const PaletteInspectorPlugin := preload("res://addons/creature_tools/palette/palette_inspector_plugin.gd")
 const PartEditorScreen := preload("res://addons/creature_tools/part/part_editor_screen.gd")
+const CardInspectorPlugin := preload("res://addons/creature_tools/card/card_inspector_plugin.gd")
 
 var _context: ToolsContext
 var _palette_inspector: EditorInspectorPlugin
+## Card preview (board + pattern / area editing) on top of BattleCards.
+var _card_inspector: EditorInspectorPlugin
 ## The "Parts" main screen (tab next to 2D / 3D / Script / AssetLib).
 var _part_screen: PartEditorScreen
 
@@ -15,6 +18,8 @@ func _enter_tree() -> void:
 	_context = ToolsContext.new()
 	_palette_inspector = PaletteInspectorPlugin.new(_context)
 	add_inspector_plugin(_palette_inspector)
+	_card_inspector = CardInspectorPlugin.new(get_undo_redo())
+	add_inspector_plugin(_card_inspector)
 	_part_screen = PartEditorScreen.new(_context, get_undo_redo())
 	EditorInterface.get_editor_main_screen().add_child(_part_screen)
 	_make_visible(false)
@@ -29,6 +34,7 @@ func _enter_tree() -> void:
 func _exit_tree() -> void:
 	EditorInterface.get_resource_filesystem().filesystem_changed.disconnect(_context.mark_dirty)
 	remove_inspector_plugin(_palette_inspector)
+	remove_inspector_plugin(_card_inspector)
 	EditorInterface.get_inspector().property_edited.disconnect(_on_inspector_edited)
 	if _part_screen:
 		_part_screen.queue_free()
