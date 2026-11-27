@@ -80,13 +80,26 @@ func statuses_visible_to(viewer_team: int) -> Array[StatusInstance]:
 	return out
 
 
+## Stats whose PartStats field (used by StatusEffect.stat_modifiers) has a
+## different name than in CombatProfile / stat_overrides.
+const MODIFIER_FIELDS := {&"build": &"build_weight"}
+
 ## Stat `stat` ("phys_dmg", "def"...) with status modifiers applied: the
 ## profile value plus each status's stat_modifiers (once per status).
 func effective_stat(stat: StringName) -> int:
-	var value: int = profile.get(stat)
+	var base = profile.get(stat)
+	if base == null:
+		push_error("BattleUnit.effective_stat: unknown stat '%s'." % stat)
+		return 0
+	var value: int = base
+	# stat_modifiers are PartStats, where some stats have another name
+	# (build -> build_weight). A stat PartStats doesn't have adds nothing.
+	var field: StringName = MODIFIER_FIELDS.get(stat, stat)
 	for s in statuses:
 		if s.status.stat_modifiers != null:
-			value += s.status.stat_modifiers.get(stat)
+			var modifier = s.status.stat_modifiers.get(field)
+			if modifier != null:
+				value += modifier
 	# Overrides win over everything (the last status applied wins if two
 	# set the same stat).
 	for s in statuses:
