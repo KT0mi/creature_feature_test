@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusEffectFire" format=3 uid="uid://b6d5ugq7xuyih"]
+
+[ext_resource type="Script" uid="uid://buq2wudsxikt0" path="res://creatures/statuses/attributes/material_attributes/attribute_fire/attribute_fire.gd" id="1_iaejs"]
+
+[resource]
+script = ExtResource("1_iaejs")
+id = &"fire"
+name = "Fire"
+description = "Everytime you attack a creature, apply 'Burning' to it."
+permanent = true
+metadata/_custom_type_script = "uid://buq2wudsxikt0"

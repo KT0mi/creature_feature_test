@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="CreatureMaterial" format=3 uid="uid://c6ujc8x6u8psh"]
+
+[ext_resource type="Script" uid="uid://d0bubnr5hmfmy" path="res://core/creature_material.gd" id="1_45t2o"]
+[ext_resource type="Resource" uid="uid://b6d5ugq7xuyih" path="res://creatures/statuses/attributes/material_attributes/attribute_fire/attribute_fire.tres" id="1_dl71i"]
+[ext_resource type="Script" uid="uid://de7qplmr6rrvn" path="res://core/creature_palette.gd" id="1_qoelg"]
+[ext_resource type="Shader" uid="uid://bjro74qya60bq" path="res://assets/shaders/material_fire.gdshader" id="2_6143c"]
+
+[sub_resource type="Resource" id="Resource_dl71i"]
+script = ExtResource("1_qoelg")
+id = &"fire"
+display_name = "Fire"
+ramp = PackedColorArray(1, 0.9490196, 0.61960787, 1, 1, 0.9490196, 0.61960787, 1, 1, 0.6784314, 0.21960784, 1, 0.9019608, 0.3019608, 0.101960786, 1)
+metadata/_custom_type_script = "uid://de7qplmr6rrvn"
+
+[resource]
+script = ExtResource("1_45t2o")
+id = &"fire"
+display_name = "Fire"
+palette = SubResource("Resource_dl71i")
+shader = ExtResource("2_6143c")
+effect_margin = 10
+attribute = ExtResource("1_dl71i")
+metadata/_custom_type_script = "uid://d0bubnr5hmfmy"

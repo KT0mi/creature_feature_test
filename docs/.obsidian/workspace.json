@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Battle System/Active Time Turns.md",
+                "file": "Pending Features/Luck as Gameplay and Balancing Method.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Active Time Turns"
+              "title": "Luck as Gameplay and Balancing Method"
             }
           }
         ],
@@ -203,8 +203,9 @@
       "bases:Create new base": false
     }
   },
-  "active": "87c88ed74ece000f",
+  "active": "d3f4a7f46c7e1877",
   "lastOpenFiles": [
+    "Battle System/Active Time Turns.md",
     "Pending Features/Luck as Gameplay and Balancing Method.md",
     "Battle System/Battle System Overview.md",
     "Battle System/Luck and Grit.md",
@@ -212,7 +213,6 @@
     "Battle System/Rules Engine.md",
     "Luck and Grit.md",
     "Battle System/Battle System TODO.md",
-    "Battle System/Active Time Turns.md",
     "Battle System/Cards and Effects.md",
     "Pending Features/Terrain.md",
     "Pending Features/Battle Maps.md",

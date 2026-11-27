@@ -164,8 +164,11 @@ func _show(list: Array[Genome]) -> void:
 			sprite.hframes = baked.frame_count
 			if baked.material:
 				sprite.material = baked.material.make_sprite_material(baked.frame_size)
-			# Center the frame inside its cell, on whole pixels.
-			sprite.position = Vector2(_cell_origin(i) + (cell_size - baked.frame_size) / 2)
+			# Center the BODY inside its cell, on whole pixels: the material's
+			# effect margin (room for flames...) may spill out of the cell.
+			var body_size := baked.frame_size - Vector2i.ONE * baked.margin * 2
+			sprite.position = Vector2(_cell_origin(i) + (cell_size - body_size) / 2
+				- Vector2i.ONE * baked.margin)
 		add_child(sprite)
 		sprites.append(sprite)
 	queue_redraw()

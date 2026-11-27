@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="StatusEffectBurning" format=3 uid="uid://dg4pmoe1o05ot"]
+
+[ext_resource type="Script" uid="uid://bddu6i3dl2laf" path="res://creatures/statuses/status_burning/status_burning.gd" id="1_f7jyi"]
+
+[resource]
+script = ExtResource("1_f7jyi")
+id = &"burning"
+name = "Burning"
+description = "Loses 2 health at the start of the turn	"
+power = 2
+metadata/_custom_type_script = "uid://bddu6i3dl2laf"

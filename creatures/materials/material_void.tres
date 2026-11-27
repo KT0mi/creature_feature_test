@@ -18,6 +18,5 @@ display_name = "Void"
 palette = SubResource("Resource_7k0qv")
 override_outline = true
 outline_color = Color(0.9763003, 0.97577435, 0.89370894, 1)
-rim_override_alpha = null
 shader = ExtResource("2_j0k8m")
 metadata/_custom_type_script = "uid://d0bubnr5hmfmy"
