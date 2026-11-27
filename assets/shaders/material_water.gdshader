@@ -7,21 +7,27 @@
 // a little over time, so the net slowly reshapes.
 // Two nets of different sizes are layered: the big one gives bright lines,
 // the small one fainter lines, and where they cross you get a sparkle.
+// The lines LIGHT UP the pixel under them instead of replacing it (a
+// "screen" blend): over a dark pixel the line stays darkish, over a light
+// pixel it gets close to white, so the net follows the body's shading.
 // Pixel-perfect: computed per texture pixel, time advances in steps.
 shader_type canvas_item;
 
 // Size of one animation frame of the sprite sheet (set by the game).
 uniform vec2 frame_size = vec2(64.0, 64.0);
 
+// Color of the light in the lines (it brightens the body towards it).
 uniform vec4 line_color : source_color = vec4(0.54, 1.0, 1.0, 1.0);
-uniform vec4 sparkle_color : source_color = vec4(0.73, 1.0, 1.0, 1.0);
+// How much light each kind of line adds (0 = none, 1 = full light_color:
+// even the darkest pixels turn line_color). Lower = softer lines.
+uniform float line_strength : hint_range(0.0, 1.0) = 0.55;
+uniform float sparkle_strength : hint_range(0.0, 1.0) = 0.85;
 // Size of the ripple cells, in pixels (bright net, faint net).
 uniform float cell_size = 11.0;
 uniform float small_cell_size = 6.0;
 // How thick the lines are (in cell units, ~0.05 thin .. 0.25 thick).
 uniform float line_width : hint_range(0.0, 0.5) = 0.08;
-// How strongly the faint net shows (0 = not at all, 1 = as bright).
-uniform float faint_strength : hint_range(0.0, 1.0) = 0.3;
+uniform float faint_strength : hint_range(0.0, 1.0) = 0.25;
 // How far (in cells) each point wanders, and how fast.
 uniform float wander : hint_range(0.0, 0.5) = 0.35;
 uniform float speed = 0.6;
@@ -31,6 +37,12 @@ uniform vec2 drift = vec2(1.0, 0.5);
 uniform float min_luma : hint_range(0.0, 1.0) = 0.15;
 // Animation steps per second (lower = choppier, more "pixel art").
 uniform float fps = 8.0;
+
+// Lights `base` with `light` x `strength` ("screen" blend): never darker
+// than base, never brighter than white, and a lighter base stays lighter.
+vec3 lighten(vec3 base, vec3 light, float strength) {
+	return 1.0 - (1.0 - base) * (1.0 - light * strength);
+}
 
 vec2 hash2(vec2 p) {
 	return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
@@ -73,11 +85,11 @@ void fragment() {
 		bool bright = edge_distance(p / cell_size, t) < line_width;
 		bool faint = edge_distance(p / small_cell_size + 17.0, t * 1.3) < line_width;
 		if (bright && faint) {
-			c.rgb = sparkle_color.rgb;
+			c.rgb = lighten(c.rgb, line_color.rgb, sparkle_strength);
 		} else if (bright) {
-			c.rgb = line_color.rgb;
+			c.rgb = lighten(c.rgb, line_color.rgb, line_strength);
 		} else if (faint) {
-			c.rgb = mix(c.rgb, line_color.rgb, faint_strength);
+			c.rgb = lighten(c.rgb, line_color.rgb, faint_strength);
 		}
 	}
 	COLOR = c;
