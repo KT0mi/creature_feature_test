@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://db4hty6m1pylb"]
+
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_oqxy0"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_mwwon"]
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="3_x8oii"]
+[ext_resource type="Texture2D" uid="uid://bu333vwof64oc" path="res://creatures/parts/eye/eye_lepusiad_1/eye_lepusiad_1.png" id="4_mwwon"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="4_podrk"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_2cdwm"]
+
+[sub_resource type="Resource" id="Resource_gighk"]
+script = ExtResource("5_2cdwm")
+
+[resource]
+script = ExtResource("3_x8oii")
+id = &"eye_lepusiad_1"
+type = &"eye"
+tags = PackedStringArray("side")
+sheet = ExtResource("4_mwwon")
+attach = Vector2i(3, 2)
+stats = SubResource("Resource_gighk")
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

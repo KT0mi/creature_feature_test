@@ -1,0 +1,106 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://6xn0xo8a17bx"]
+
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_4r2nl"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_pyen1"]
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="3_okhnb"]
+[ext_resource type="Texture2D" uid="uid://dacn3w3ybkfjb" path="res://creatures/parts/torso/torso_lepusiad/torso_lepusiad.png" id="4_pyen1"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="4_tidnf"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_i68ju"]
+
+[sub_resource type="Resource" id="Resource_pyen1"]
+script = ExtResource("4_tidnf")
+name = &"head"
+accepts_type = PackedStringArray("head")
+positions = Array[Vector2i]([Vector2i(11, 2)])
+
+[sub_resource type="Resource" id="Resource_okhnb"]
+script = ExtResource("4_tidnf")
+name = &"arm_near"
+accepts_type = PackedStringArray("arm", "wing")
+type_weights = Dictionary[StringName, float]({
+&"wing": 0.1
+})
+forbidden_tags = PackedStringArray("far", "back")
+positions = Array[Vector2i]([Vector2i(3, 10)])
+z_offset = 2
+
+[sub_resource type="Resource" id="Resource_tidnf"]
+script = ExtResource("4_tidnf")
+name = &"arm_far"
+accepts_type = PackedStringArray("arm", "wing")
+type_weights = Dictionary[StringName, float]({
+&"wing": 0.1
+})
+forbidden_tags = PackedStringArray("near", "back")
+positions = Array[Vector2i]([Vector2i(22, 10)])
+z_offset = -1
+copy_from = &"arm_near"
+use_counterpart = true
+
+[sub_resource type="Resource" id="Resource_i68ju"]
+script = ExtResource("4_tidnf")
+name = &"leg_near"
+accepts_type = PackedStringArray("leg")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(10, 38)])
+
+[sub_resource type="Resource" id="Resource_3cgaj"]
+script = ExtResource("4_tidnf")
+name = &"leg_far"
+accepts_type = PackedStringArray("leg")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(19, 38)])
+z_offset = -1
+copy_from = &"leg_near"
+use_counterpart = true
+
+[sub_resource type="Resource" id="Resource_mdhvs"]
+script = ExtResource("4_tidnf")
+name = &"wing_near"
+accepts_type = PackedStringArray("wing")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(4, 8)])
+chance = 0.05
+z_offset = -2
+
+[sub_resource type="Resource" id="Resource_lcv0u"]
+script = ExtResource("4_tidnf")
+name = &"wing_far"
+accepts_type = PackedStringArray("wing")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(19, 8)])
+chance = 0.05
+z_offset = -2
+copy_from = &"wing_near"
+use_counterpart = true
+
+[sub_resource type="Resource" id="Resource_j4kl8"]
+script = ExtResource("4_tidnf")
+name = &"tail"
+accepts_type = PackedStringArray("tail")
+positions = Array[Vector2i]([Vector2i(10, 32)])
+chance = 0.3
+z_offset = -4
+
+[sub_resource type="Resource" id="Resource_na7oi"]
+script = ExtResource("5_i68ju")
+phys_dmg = 10
+spc_dmg = 3
+hp = 15
+def = 8
+res = 8
+build_weight = 8
+
+[resource]
+script = ExtResource("3_okhnb")
+id = &"torso_lepusiad"
+type = &"torso"
+tags = PackedStringArray("biped")
+sheet = ExtResource("4_pyen1")
+attach = Vector2i(13, 40)
+sockets = Array[ExtResource("4_tidnf")]([SubResource("Resource_pyen1"), SubResource("Resource_okhnb"), SubResource("Resource_tidnf"), SubResource("Resource_i68ju"), SubResource("Resource_3cgaj"), SubResource("Resource_mdhvs"), SubResource("Resource_lcv0u"), SubResource("Resource_j4kl8")])
+stats = SubResource("Resource_na7oi")
+name_front = "Lepus"
+name_back = "siad"
+name_full = "Lepusiad"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

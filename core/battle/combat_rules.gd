@@ -30,14 +30,24 @@ static var atb_build_factor: float = 1.0
 ## attacker's crit multiplier). Build tilts the odds towards the underdog:
 ##   miss% = base_miss + miss_per_build x (attacker build - victim build, if > 0)
 ##   crit% = base_crit + crit_per_build x (victim build - attacker build, if > 0)
-## plus the attacker's status modifiers (StatusEffect luck fields), clamped
-## to 0..max. Static vars so the balance script can tune them.
+## That BUILD part is capped at max_build_*_chance (50%), so build alone can
+## never make attacks a coin flip worse. Status modifiers (StatusEffect luck
+## fields: the attacker's miss/crit_chance, the victim's incoming_*) are
+## added on top, and the total is capped at max_*_chance (80%): statuses
+## like Flying or Blind can push past the build cap, but never to certainty.
+## Static vars so the balance script can tune them.
 static var base_miss_chance: float = 0.05
 static var miss_per_build: float = 0.01
-static var max_miss_chance: float = 0.5
+## Cap of the build part (base + build gap) of the miss chance.
+static var max_build_miss_chance: float = 0.5
+## Cap of the whole miss chance (build part + status modifiers).
+static var max_miss_chance: float = 0.9
 static var base_crit_chance: float = 0.05
 static var crit_per_build: float = 0.01
-static var max_crit_chance: float = 0.5
+## Cap of the build part (base + build gap) of the crit chance.
+static var max_build_crit_chance: float = 0.5
+## Cap of the whole crit chance (build part + status modifiers).
+static var max_crit_chance: float = 0.8
 ## Crit damage multiplier before status modifiers.
 static var base_crit_damage: float = 1.5
 
@@ -53,16 +63,18 @@ const START_GRIT := 0
 ## Chance (0..1) that `attacker`'s attack misses `victim`.
 static func miss_chance(attacker: BattleUnit, victim: BattleUnit) -> float:
 	var gap := maxi(0, attacker.profile.build - victim.profile.build)
-	return clampf(base_miss_chance + miss_per_build * gap 
-		+ attacker.luck_modifier(&"miss_chance")
-		+ victim.luck_modifier(&"incoming_miss_chance"),
+	var from_build := clampf(base_miss_chance + miss_per_build * gap, 0.0, max_build_miss_chance)
+	return clampf(from_build
+		+ attacker.luck_modifier(&"miss_chance")            # e.g. Blind
+		+ victim.luck_modifier(&"incoming_miss_chance"),    # e.g. Flying
 		0.0, max_miss_chance)
 
 
 ## Chance (0..1) that a HIT from `attacker` on `victim` is critical.
 static func crit_chance(attacker: BattleUnit, victim: BattleUnit) -> float:
 	var gap := maxi(0, victim.profile.build - attacker.profile.build)
-	return clampf(base_crit_chance + crit_per_build * gap 
+	var from_build := clampf(base_crit_chance + crit_per_build * gap, 0.0, max_build_crit_chance)
+	return clampf(from_build
 		+ attacker.luck_modifier(&"crit_chance")
 		+ victim.luck_modifier(&"incoming_crit_chance"),
 		0.0, max_crit_chance)
@@ -97,11 +109,12 @@ static func expected_factor(attacker: BattleUnit, victim: BattleUnit, advantage:
 static func turn_delay(unit: BattleUnit) -> int:
 	return maxi(1, roundi(atb_base_delay + unit.profile.build * atb_build_factor))
 
-## Damage taken by a pushed unit that hits the board edge or another unit
-## (the other unit takes it too). Not an attack: ignores def/res.
-## A quarter of the victims build, rounded up.
-static func collision_damage(source: BattleUnit) -> int:
-	return ceili(source.effective_stat(&"build") * 0.25)
+## Collision damage taken by `unit`: a pushed unit hitting the board edge
+## or another unit (each of the two takes its own), or a flyer knocked down.
+## Based on the DAMAGED unit's own build, so bulkier creatures hit harder:
+## a quarter of its build, rounded up. Not an attack: ignores def/res.
+static func collision_damage(unit: BattleUnit) -> int:
+	return ceili(unit.effective_stat(&"build") * 0.25)
 
 
 #Damage calculation

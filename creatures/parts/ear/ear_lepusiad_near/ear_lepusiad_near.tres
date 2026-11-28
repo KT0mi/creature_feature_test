@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://b3bqdlgcoj5y0"]
+
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_hi16h"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_o80fd"]
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="3_7y0tw"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="4_l3c4i"]
+[ext_resource type="Texture2D" uid="uid://b0kly17gycejt" path="res://creatures/parts/ear/ear_lepusiad_near/ear_lepusiad_near.png" id="4_o80fd"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_ta1lg"]
+
+[sub_resource type="Resource" id="Resource_2xwlg"]
+script = ExtResource("5_ta1lg")
+
+[resource]
+script = ExtResource("3_7y0tw")
+id = &"ear_lepusiad_near"
+type = &"ear"
+tags = PackedStringArray("near")
+sheet = ExtResource("4_o80fd")
+attach = Vector2i(12, 36)
+counterpart = &"ear_lepusiad_far"
+stats = SubResource("Resource_2xwlg")
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

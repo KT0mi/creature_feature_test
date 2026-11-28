@@ -6,8 +6,7 @@
 script = ExtResource("1_pveia")
 id = &"flying"
 name = "Flying"
-description = "While flying: +30% miss chance for incoming attacks. If hit while flying, recieve collision damage."
+description = "While flying: +50% miss chance for incoming attacks. If hit while flying, recieve collision damage and lose flying."
 stack_rule = 2
-max_triggers_per_action = 0
-incoming_miss_chance = 0.30000000000000004
+incoming_miss_chance = 0.5
 metadata/_custom_type_script = "uid://cx7lfynjotg4v"

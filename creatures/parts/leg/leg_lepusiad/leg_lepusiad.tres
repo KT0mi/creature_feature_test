@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://56is24nvycmm"]
+
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_ek6nw"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_6c5l7"]
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="3_fwq81"]
+[ext_resource type="Resource" uid="uid://b28p27lrqbd32" path="res://creatures/cards/card_rabbits_paw.tres" id="3_jctgo"]
+[ext_resource type="Texture2D" uid="uid://cscgf07utkftj" path="res://creatures/parts/leg/leg_lepusiad/leg_lepusiad.png" id="4_6c5l7"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="4_mqgp5"]
+[ext_resource type="Resource" uid="uid://7738py3ebt8m" path="res://creatures/cards/card_leap.tres" id="4_y3n3f"]
+[ext_resource type="Resource" uid="uid://d4a1wg03rl87d" path="res://creatures/cards/card_step.tres" id="5_4crmg"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_jctgo"]
+
+[sub_resource type="Resource" id="Resource_y3n3f"]
+script = ExtResource("5_jctgo")
+phys_dmg = 2
+hp = 5
+def = -1
+res = -1
+build_weight = 3
+
+[resource]
+script = ExtResource("3_fwq81")
+id = &"leg_lepusiad"
+type = &"leg"
+tags = PackedStringArray("biped")
+sheet = ExtResource("4_6c5l7")
+attach = Vector2i(6, 4)
+stats = SubResource("Resource_y3n3f")
+added_cards = Array[ExtResource("2_6c5l7")]([ExtResource("3_jctgo"), ExtResource("4_y3n3f"), ExtResource("5_4crmg")])
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

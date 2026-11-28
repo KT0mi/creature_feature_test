@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BattleCard" format=3 uid="uid://b28p27lrqbd32"]
+
+[ext_resource type="Script" uid="uid://0pr8s3jbyoo2" path="res://core/battle/data_driven_cards/card_effect.gd" id="1_w67mu"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_el1ry"]
+[ext_resource type="Script" uid="uid://cqdk72ia2cj1o" path="res://core/battle/data_driven_cards/gain_grit_effect.gd" id="2_x7p8h"]
+
+[sub_resource type="Resource" id="Resource_kmxa1"]
+script = ExtResource("2_x7p8h")
+metadata/_custom_type_script = "uid://cqdk72ia2cj1o"
+
+[resource]
+script = ExtResource("2_el1ry")
+id = &"card_rabbits_paw"
+name = "Rabbit's Paw"
+description = "Gain 1 Grit."
+kind = 0
+cooldown = 1
+aim = 1
+effects = Array[ExtResource("1_w67mu")]([SubResource("Resource_kmxa1")])
+metadata/_custom_type_script = "uid://cok13ywyqlu1s"

@@ -1,0 +1,71 @@
+[gd_resource type="Resource" script_class="PartDef" format=3 uid="uid://rx6s2n0kdaeu"]
+
+[ext_resource type="Script" uid="uid://dabo250s1jkuj" path="res://core/battle/status/status_effect.gd" id="1_ftbkt"]
+[ext_resource type="Script" uid="uid://cok13ywyqlu1s" path="res://core/battle/battle_card.gd" id="2_65gtq"]
+[ext_resource type="Script" uid="uid://7dgkkkdx3j2n" path="res://core/part_def.gd" id="3_w1diy"]
+[ext_resource type="Script" uid="uid://bfh2awx2qd881" path="res://core/part_socket.gd" id="4_8c2j0"]
+[ext_resource type="Texture2D" uid="uid://k3je1ovqofpj" path="res://creatures/parts/head/head_lepusiad/head_lepusiad.png" id="4_65gtq"]
+[ext_resource type="Script" uid="uid://b8t5ct4nvnrc7" path="res://core/battle/part_stats.gd" id="5_bsk4t"]
+
+[sub_resource type="Resource" id="Resource_w1diy"]
+script = ExtResource("4_8c2j0")
+name = &"eye_1"
+accepts_type = PackedStringArray("eye")
+positions = Array[Vector2i]([Vector2i(16, 8)])
+
+[sub_resource type="Resource" id="Resource_8c2j0"]
+script = ExtResource("4_8c2j0")
+name = &"eye_2"
+accepts_type = PackedStringArray("eye", "horn")
+type_weights = Dictionary[StringName, float]({
+&"horn": 0.2
+})
+positions = Array[Vector2i]([Vector2i(12, 3)])
+chance = 0.1
+z_offset = 2
+
+[sub_resource type="Resource" id="Resource_bsk4t"]
+script = ExtResource("4_8c2j0")
+name = &"horn"
+accepts_type = PackedStringArray("horn")
+positions = Array[Vector2i]([Vector2i(18, 2)])
+chance = 0.2
+z_offset = 2
+
+[sub_resource type="Resource" id="Resource_65gtq"]
+script = ExtResource("4_8c2j0")
+name = &"ear_near"
+accepts_type = PackedStringArray("ear")
+forbidden_tags = PackedStringArray("far")
+positions = Array[Vector2i]([Vector2i(6, 1)])
+chance = 0.9
+
+[sub_resource type="Resource" id="Resource_kk0cb"]
+script = ExtResource("4_8c2j0")
+name = &"ear_far"
+accepts_type = PackedStringArray("ear")
+forbidden_tags = PackedStringArray("near")
+positions = Array[Vector2i]([Vector2i(12, 1)])
+chance = 0.9
+z_offset = -1
+copy_from = &"ear_near"
+use_counterpart = true
+
+[sub_resource type="Resource" id="Resource_svcte"]
+script = ExtResource("5_bsk4t")
+hp = 3
+def = 1
+build_weight = 2
+
+[resource]
+script = ExtResource("3_w1diy")
+id = &"head_lepusiad"
+type = &"head"
+sheet = ExtResource("4_65gtq")
+attach = Vector2i(9, 16)
+sockets = Array[ExtResource("4_8c2j0")]([SubResource("Resource_w1diy"), SubResource("Resource_8c2j0"), SubResource("Resource_bsk4t"), SubResource("Resource_65gtq"), SubResource("Resource_kk0cb")])
+stats = SubResource("Resource_svcte")
+name_front = "Lepus"
+name_back = "siad"
+name_full = "Lepusiad"
+metadata/_custom_type_script = "uid://7dgkkkdx3j2n"

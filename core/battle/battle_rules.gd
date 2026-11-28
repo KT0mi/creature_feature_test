@@ -499,7 +499,8 @@ func turn(unit: BattleUnit, facing: Grid.Facing) -> void:
 
 ## Moves `unit` cell by cell, each cell a forced STEPPED (so pushes trigger
 ## traps too). Hitting the board edge or a unit stops it: COLLIDED, and
-## both it and the unit hit take CombatRules.collision_damage(). Reactions
+## both it and the unit hit take CombatRules.collision_damage() (each from
+## its own build). Reactions
 ## to a step can stop the push there (no collision then). Ends with PUSHED
 ## (where it really ended) if it moved at all.
 func push(source: BattleUnit, unit: BattleUnit, direction: Vector2i, distance: int) -> void:
@@ -556,11 +557,14 @@ func push(source: BattleUnit, unit: BattleUnit, direction: Vector2i, distance: i
 		hit.from = unit.position
 		hit.to = hit_cell
 		_emit(hit)
-		var dmg := CombatRules.collision_damage(source)
+		# Each one takes damage from its OWN build (bulkier = hit harder).
+		var dmg := CombatRules.collision_damage(unit)
 		if dmg > 0:
 			_hurt(unit, dmg, source)
-			if blocker != null:
-				_hurt(blocker, dmg, source)
+		if blocker != null:
+			var blocker_dmg := CombatRules.collision_damage(blocker)
+			if blocker_dmg > 0:
+				_hurt(blocker, blocker_dmg, source)
 
 ## Damage from the attack being played gets its luck: x crit damage if the
 ## roll crit (ROLL), or x its expected value (EXPECTED). Damage from
